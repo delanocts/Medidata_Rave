@@ -1,0 +1,77 @@
+# Values shared by every study. Study files override these.
+# Nothing study-, site-, form- or field-specific may appear here (CFG-2).
+
+rave:
+  rws_path: "/RaveWebServices"
+  allowed_environments: ["DEV", "Dev", "Sandbox", "UAT", "Training"]
+  auth_mode: "basic"
+  timeout_seconds: 60
+  max_retries: 3
+  retry_backoff_seconds: 2
+  requests_per_minute: 30
+  verify_tls: true          # SEC-2: there is no supported way to turn this off
+
+metadata:
+  # How many existing subjects to sample to learn folder/form assignments that
+  # the version metadata does not declare. Read-only. 0 disables sampling.
+  sample_subjects: 12
+
+study:
+  oid: null
+  crf_version: null          # null = latest active version for the site (OQ-5)
+  draft_name: null
+
+site:
+  create_if_missing: false
+
+subjects:
+  count: 1
+  id_prefix: "TST-"
+  id_start_number: 1
+  id_pad_width: 3
+  on_existing_id: "skip"     # skip | continue_numbering | fail
+
+generation:
+  provider: "anthropic"
+  model: "claude-sonnet-5"
+  # Ignored on current Claude models - they removed the sampling parameters and
+  # return 400 if `temperature` is sent. Kept only for older model ids.
+  temperature: 0.7
+  max_validation_retries: 3
+  batch_scope: "form"        # form | visit | subject
+  cache: true
+  therapeutic_realism: true  # OQ-9
+  # Populate every field on a form, not just the mandatory ones. Rave-derived
+  # and not-visible fields are always excluded - they cannot be written.
+  require_all_fields: true
+  # Wide CRF forms with every field populated produce long replies. Too low and
+  # the answer is truncated mid-JSON.
+  max_tokens: 32000
+  # Cap fields x log records per form. A wide log form otherwise asks the model
+  # for hundreds of values in one reply and the answer is truncated.
+  max_values_per_form: 150
+  therapeutic_area: null
+  visits:
+    mode: "all"              # all | subset  (OQ-6)
+    include: []              # folder OIDs when mode=subset
+    exclude: []
+  log_records:
+    min: 5                   # OQ-7
+    max: 10
+
+dynamics:
+  enabled: true
+  trigger_strategy: "maximize"   # maximize | random | as_configured
+  max_iterations: 5
+  max_graph_depth: 25
+  overrides: []
+  # Custom-function checks cannot be resolved from metadata - their source is not
+  # exposed by any API. Declare their effect here once known; until then they are
+  # reported as unresolvable (FR-3.5).
+  custom_function_overrides: []
+
+execution:
+  output_root: "./output"
+  max_parallel_subjects: 1
+  dry_run: false
+  log_level: "INFO"

@@ -1,0 +1,33 @@
+# Study: AES-002 (DEV) - Aesthetics
+# The only file that changes when targeting a different study (NFR-1).
+
+rave:
+  base_url: "https://cognizant.mdsol.com"
+  environment: "DEV"
+
+study:
+  name: "AES-002"
+
+site:
+  # Rave's site *number* is the ODM Location OID; the name is the label.
+  # Confirmed from Sites.odm: OID=11002, Name=DEV-AES-002.
+  number: "11002"
+  name: "DEV-AES-002"
+  country: "US"              # ISO 3166 alpha-2
+  create_if_missing: false   # created manually; the account cannot write AdminData
+
+subjects:
+  count: 3
+  id_prefix: "TST-"
+  id_start_number: 1
+  id_pad_width: 3            # -> TST-001, TST-002
+
+generation:
+  # Rave's own derivation on ADMIN/EX_MNMX_F reports the indication as
+  # "Acne Scars, Scar Mitigation" - more specific than the "Aesthetics" label.
+  therapeutic_area: "Aesthetic dermatology - acne scars, scar mitigation"
+  therapeutic_realism: true
+
+dynamics:
+  enabled: true
+  trigger_strategy: "maximize"

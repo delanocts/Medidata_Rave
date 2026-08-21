@@ -1,0 +1,76 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Pipeline: full run (LIVE - writes to Rave)",
+      "type": "debugpy", "request": "launch",
+      "program": "${workspaceFolder}/scripts/run_all.py",
+      "args": ["--study", "aes-002"],
+      "console": "integratedTerminal", "cwd": "${workspaceFolder}", "justMyCode": false
+    },
+    {
+      "name": "Pipeline: dry run (posts nothing)",
+      "type": "debugpy", "request": "launch",
+      "program": "${workspaceFolder}/scripts/run_all.py",
+      "args": ["--study", "aes-002", "--dry-run"],
+      "console": "integratedTerminal", "cwd": "${workspaceFolder}", "justMyCode": false
+    },
+    {
+      "name": "Pipeline: resume after a failure",
+      "type": "debugpy", "request": "launch",
+      "program": "${workspaceFolder}/scripts/run_all.py",
+      "args": ["--study", "aes-002", "--resume"],
+      "console": "integratedTerminal", "cwd": "${workspaceFolder}", "justMyCode": false
+    },
+    {
+      "name": "A1 connection test",
+      "type": "debugpy", "request": "launch",
+      "program": "${workspaceFolder}/scripts/test_connection.py",
+      "args": ["--study", "aes-002"],
+      "console": "integratedTerminal", "cwd": "${workspaceFolder}", "justMyCode": false
+    },
+    {
+      "name": "A2 metadata",
+      "type": "debugpy", "request": "launch",
+      "program": "${workspaceFolder}/scripts/run_metadata.py",
+      "args": ["--study", "aes-002"],
+      "console": "integratedTerminal", "cwd": "${workspaceFolder}", "justMyCode": false
+    },
+    {
+      "name": "A3 study model (offline)",
+      "type": "debugpy", "request": "launch",
+      "program": "${workspaceFolder}/scripts/run_model.py",
+      "args": ["--study", "aes-002"],
+      "console": "integratedTerminal", "cwd": "${workspaceFolder}", "justMyCode": false
+    },
+    {
+      "name": "A4 provision (LIVE)",
+      "type": "debugpy", "request": "launch",
+      "program": "${workspaceFolder}/scripts/run_provision.py",
+      "args": ["--study", "aes-002"],
+      "console": "integratedTerminal", "cwd": "${workspaceFolder}", "justMyCode": false
+    },
+    {
+      "name": "A8 dynamics for one subject (LIVE)",
+      "type": "debugpy", "request": "launch",
+      "program": "${workspaceFolder}/scripts/run_dynamics.py",
+      "args": ["--study", "aes-002", "--subject", "${input:subject}"],
+      "console": "integratedTerminal", "cwd": "${workspaceFolder}", "justMyCode": false
+    },
+    {
+      "name": "A7 verify and report",
+      "type": "debugpy", "request": "launch",
+      "program": "${workspaceFolder}/scripts/run_verify.py",
+      "args": ["--study", "aes-002"],
+      "console": "integratedTerminal", "cwd": "${workspaceFolder}", "justMyCode": false
+    }
+  ],
+  "inputs": [
+    {
+      "id": "subject",
+      "type": "promptString",
+      "description": "Subject ID",
+      "default": "TST-001"
+    }
+  ]
+}

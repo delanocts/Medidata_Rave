@@ -1,0 +1,403 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Rave test data generator study configuration",
+  "type": "object",
+  "required": [
+    "rave",
+    "study",
+    "site",
+    "subjects",
+    "generation",
+    "dynamics",
+    "execution",
+    "metadata"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "rave": {
+      "type": "object",
+      "required": [
+        "base_url",
+        "environment",
+        "allowed_environments",
+        "rws_path",
+        "auth_mode"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "base_url": {
+          "type": "string",
+          "pattern": "^https://[^/]+$",
+          "description": "https only, no trailing slash"
+        },
+        "rws_path": {
+          "type": "string",
+          "pattern": "^/"
+        },
+        "environment": {
+          "type": "string",
+          "minLength": 1
+        },
+        "allowed_environments": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "auth_mode": {
+          "enum": [
+            "basic",
+            "oauth"
+          ]
+        },
+        "timeout_seconds": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 600
+        },
+        "max_retries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "retry_backoff_seconds": {
+          "type": "number",
+          "minimum": 0
+        },
+        "requests_per_minute": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 600
+        },
+        "verify_tls": {
+          "const": true,
+          "description": "SEC-2: TLS verification cannot be disabled"
+        }
+      }
+    },
+    "study": {
+      "type": "object",
+      "required": [
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "oid": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "crf_version": {
+          "type": [
+            "string",
+            "integer",
+            "null"
+          ]
+        },
+        "draft_name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "site": {
+      "type": "object",
+      "required": [
+        "number",
+        "name"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "number": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "country": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "pattern": "^[A-Z]{2}$"
+        },
+        "create_if_missing": {
+          "type": "boolean"
+        }
+      }
+    },
+    "subjects": {
+      "type": "object",
+      "required": [
+        "count",
+        "id_prefix"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        },
+        "id_prefix": {
+          "type": "string"
+        },
+        "id_start_number": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "id_pad_width": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 12
+        },
+        "on_existing_id": {
+          "enum": [
+            "skip",
+            "continue_numbering",
+            "fail"
+          ]
+        }
+      }
+    },
+    "generation": {
+      "type": "object",
+      "required": [
+        "provider",
+        "model"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "enum": [
+            "anthropic"
+          ]
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        },
+        "temperature": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "max_validation_retries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 10
+        },
+        "batch_scope": {
+          "enum": [
+            "form",
+            "visit",
+            "subject"
+          ]
+        },
+        "cache": {
+          "type": "boolean"
+        },
+        "therapeutic_realism": {
+          "type": "boolean"
+        },
+        "therapeutic_area": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "visits": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "enum": [
+                "all",
+                "subset"
+              ]
+            },
+            "include": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "exclude": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "log_records": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "min": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 100
+            },
+            "max": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            }
+          }
+        },
+        "require_all_fields": {
+          "type": "boolean"
+        },
+        "max_tokens": {
+          "type": "integer",
+          "minimum": 1024,
+          "maximum": 128000
+        },
+        "max_values_per_form": {
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 2000
+        }
+      }
+    },
+    "dynamics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "trigger_strategy": {
+          "enum": [
+            "maximize",
+            "random",
+            "as_configured"
+          ]
+        },
+        "max_iterations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20
+        },
+        "max_graph_depth": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "overrides": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "field_oid",
+              "value"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "field_oid": {
+                "type": "string"
+              },
+              "value": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              },
+              "form_oid": {
+                "type": "string"
+              },
+              "folder_oid": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "custom_function_overrides": {
+          "type": "array",
+          "description": "Custom function logic is not retrievable via any API; declare its effect here.",
+          "items": {
+            "type": "object",
+            "required": [
+              "function_name",
+              "trigger_field_oid",
+              "trigger_value"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "function_name": {
+                "type": "string"
+              },
+              "trigger_field_oid": {
+                "type": "string"
+              },
+              "trigger_value": {
+                "type": [
+                  "string",
+                  "number",
+                  "boolean"
+                ]
+              },
+              "activates_form_oid": {
+                "type": "string"
+              },
+              "activates_folder_oid": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "execution": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "output_root": {
+          "type": "string"
+        },
+        "max_parallel_subjects": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 16
+        },
+        "dry_run": {
+          "type": "boolean"
+        },
+        "log_level": {
+          "enum": [
+            "DEBUG",
+            "INFO",
+            "WARNING",
+            "ERROR"
+          ]
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "sample_subjects": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 50
+        }
+      }
+    }
+  }
+}

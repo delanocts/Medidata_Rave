@@ -1,0 +1,121 @@
+########## TST-001 ##########
+23:42:25 INFO    httpx: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 400 Bad Request"
+23:42:25 INFO    rave_agent.dynamics.resolver: pass complete
+23:42:25 INFO    rave_agent.dynamics.resolver: no further folders to attempt
+
+Study      : AES-002(DEV)
+Subject    : TST-001 at site 11002
+Seed set   : 9 folder(s)
+Max passes : 5
+Mode       : LIVE
+
+PASS  ATTEMPTED  SUBMITTED  REJECTED  NEW FOLDERS
+----- ---------- ---------- --------- ------------------------------
+0     9          30         4         OMAESAE, SCREEN, SCREEN_27, SCREEN_15, E
+1     21         23         34        ABCD, D420, PD, RAND, TX1_D4, TX2_D31, T
+2     17         0          34        -
+0     9          8          8         -
+1     16         254        16        COMP, FU_D151, FU_D181, FU_D241, FU_D331
+2     16         0          16        -
+0     9          10         0         PREG, IC
+1     15         28         0         RE_SCREEN
+0     9          0          0         -
+
+Active folders   : 27 / 38
+  ABCD, ADMIN, COMP, D420, ECOA_HH, FU_D151, FU_D181, FU_D241, FU_D331, FU_D91, IC, OMAESAE, PD, PREG, RAND, RE_SCREEN, SCREEN, SCREEN_15, SCREEN_27, TX1_D15, TX1_D4, TX2_D31, TX2_D34, TX2_D45, TX3_D61, TX3_D64, TX3_D75
+Predicted by ALS : 21
+
+Forms populated  : 353
+Tokens           : {'calls': 0, 'input_tokens': 0, 'output_tokens': 0}
+State            : D:\OneDrive\My Documents\Learning\Claude\Medidata_Rave\rave-testdata-agent\output\AES-002\state\TST-001\activation_state.json
+########## TST-002 ##########
+23:42:28 WARNING rave_agent.rave.client: rws call failed
+23:42:28 ERROR   rave_agent.submission.submitter: submission failed
+23:42:28 WARNING rave_agent.rave.client: rws call failed
+23:42:28 ERROR   rave_agent.submission.submitter: submission failed
+23:42:29 WARNING rave_agent.rave.client: rws call failed
+23:42:29 ERROR   rave_agent.submission.submitter: submission failed
+23:42:29 WARNING rave_agent.rave.client: rws call failed
+23:42:29 ERROR   rave_agent.submission.submitter: submission failed
+23:42:30 WARNING rave_agent.rave.client: rws call failed
+23:42:30 ERROR   rave_agent.submission.submitter: submission failed
+23:42:30 WARNING rave_agent.rave.client: rws call failed
+23:42:30 ERROR   rave_agent.submission.submitter: submission failed
+23:42:31 WARNING rave_agent.rave.client: rws call failed
+23:42:31 ERROR   rave_agent.submission.submitter: submission failed
+23:42:33 INFO    httpx: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+23:43:46 INFO    rave_agent.generation.llm_client: llm call
+23:43:47 WARNING rave_agent.rave.client: rws call failed
+23:43:47 ERROR   rave_agent.submission.submitter: submission failed
+23:43:49 INFO    httpx: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+23:44:18 INFO    rave_agent.generation.llm_client: llm call
+23:44:20 INFO    rave_agent.rave.client: rws call ok
+23:44:20 INFO    rave_agent.submission.submitter: submission accepted
+23:44:21 WARNING rave_agent.rave.client: rws call failed
+23:44:21 ERROR   rave_agent.submission.submitter: submission failed
+23:44:21 INFO    httpx: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 400 Bad Request"
+23:44:21 INFO    rave_agent.dynamics.resolver: pass complete
+23:44:21 WARNING rave_agent.rave.client: rws call failed
+23:44:21 ERROR   rave_agent.submission.submitter: submission failed
+23:44:22 WARNING rave_agent.rave.client: rws call failed
+23:44:22 ERROR   rave_agent.submission.submitter: submission failed
+23:44:22 WARNING rave_agent.rave.client: rws call failed
+23:44:22 ERROR   rave_agent.submission.submitter: submission failed
+23:44:23 WARNING rave_agent.rave.client: rws call failed
+23:44:23 ERROR   rave_agent.submission.submitter: submission failed
+23:44:23 WARNING rave_agent.rave.client: rws call failed
+23:44:23 ERROR   rave_agent.submission.submitter: submission failed
+23:44:24 WARNING rave_agent.rave.client: rws call failed
+23:44:24 ERROR   rave_agent.submission.submitter: submission failed
+23:44:24 WARNING rave_agent.rave.client: rws call failed
+23:44:24 ERROR   rave_agent.submission.submitter: submission failed
+23:44:24 WARNING rave_agent.rave.client: rws call failed
+23:44:24 ERROR   rave_agent.submission.submitter: submission failed
+23:44:25 WARNING rave_agent.rave.client: rws call failed
+23:44:25 ERROR   rave_agent.submission.submitter: submission failed
+23:44:25 WARNING rave_agent.rave.client: rws call failed
+23:44:25 ERROR   rave_agent.submission.submitter: submission failed
+23:44:26 WARNING rave_agent.rave.client: rws call failed
+23:44:26 ERROR   rave_agent.submission.submitter: submission failed
+23:44:26 WARNING rave_agent.rave.client: rws call failed
+23:44:26 ERROR   rave_agent.submission.submitter: submission failed
+23:44:27 WARNING rave_agent.rave.client: rws call failed
+23:44:27 ERROR   rave_agent.submission.submitter: submission failed
+23:44:27 WARNING rave_agent.rave.client: rws call failed
+23:44:27 ERROR   rave_agent.submission.submitter: submission failed
+23:44:27 WARNING rave_agent.rave.client: rws call failed
+23:44:27 ERROR   rave_agent.submission.submitter: submission failed
+23:44:28 WARNING rave_agent.rave.client: rws call failed
+23:44:28 ERROR   rave_agent.submission.submitter: submission failed
+23:44:28 INFO    rave_agent.dynamics.resolver: pass complete
+
+Study      : AES-002(DEV)
+Subject    : TST-002 at site 11002
+Seed set   : 9 folder(s)
+Max passes : 5
+Mode       : LIVE
+
+PASS  ATTEMPTED  SUBMITTED  REJECTED  NEW FOLDERS
+----- ---------- ---------- --------- ------------------------------
+0     9          29         5         OMAESAE, SCREEN, SCREEN_27, SCREEN_15, E
+1     21         24         34        ABCD, D420, PD, RAND, TX1_D4, TX2_D31, T
+2     17         0          34        -
+0     9          9          8         -
+1     16         253        16        COMP, FU_D151, FU_D181, FU_D241, FU_D331
+2     16         0          16        -
+0     9          1          9         IC
+1     16         0          16        -
+
+Active folders   : 25 / 38
+  ABCD, ADMIN, COMP, D420, ECOA_HH, FU_D151, FU_D181, FU_D241, FU_D331, FU_D91, IC, OMAESAE, PD, RAND, SCREEN, SCREEN_15, SCREEN_27, TX1_D15, TX1_D4, TX2_D31, TX2_D34, TX2_D45, TX3_D61, TX3_D64, TX3_D75
+Predicted by ALS : 21
+Predicted but never activated (1): RE_SCREEN
+  (FR-8.7 - likely a custom function, an unmet Or-branch, or permissions)
+
+Forms populated  : 316
+
+Triggers the CRF version cannot satisfy:
+  DS_IC_F.DSSCAT - the ALS wants ['120'], not in its codelist
+  (the edit check predates this CRF version; those targets stay unreachable)
+Tokens           : {'calls': 2, 'input_tokens': 15854, 'output_tokens': 14231}
+State            : D:\OneDrive\My Documents\Learning\Claude\Medidata_Rave\rave-testdata-agent\output\AES-002\state\TST-002\activation_state.json

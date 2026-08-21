@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata" ODMVersion="1.3">
+  <Study OID="beta-2(UAT)">
+    <GlobalVariables><StudyName>beta-2</StudyName><ProtocolName>beta-2</ProtocolName></GlobalVariables>
+    <MetaDataVersion OID="4411" Name="v3" mdsol:PrimaryFormOID="scr_entry" mdsol:DefaultMatrixOID="SEED">
+
+      <StudyEventDef OID="scr" Name="Screening" Type="Common" Repeating="Yes"
+                     mdsol:OrderNumber="1" mdsol:TargetDays="0">
+        <FormRef FormOID="scr_entry" Mandatory="Yes" OrderNumber="1"/>
+        <FormRef FormOID="ae_log" Mandatory="No" OrderNumber="2"/>
+      </StudyEventDef>
+
+      <FormDef OID="scr_entry" Name="Screening entry" Repeating="Yes"
+               mdsol:OrderNumber="1" mdsol:LogDirection="Portrait">
+        <ItemGroupRef ItemGroupOID="scr_entry" Mandatory="Yes"/>
+      </FormDef>
+      <FormDef OID="ae_log" Name="Adverse events" Repeating="Yes" mdsol:OrderNumber="2">
+        <ItemGroupRef ItemGroupOID="ae_log" Mandatory="No"/>
+        <ItemGroupRef ItemGroupOID="ae_log_LOG_LINE" Mandatory="No"/>
+      </FormDef>
+      <FormDef OID="tx_admin" Name="Treatment" Repeating="Yes" mdsol:OrderNumber="3">
+        <ItemGroupRef ItemGroupOID="tx_admin" Mandatory="No"/>
+      </FormDef>
+
+      <ItemGroupDef OID="scr_entry" Name="Entry" Repeating="No">
+        <ItemRef ItemOID="scr_entry.eligible" OrderNumber="1" Mandatory="Yes"/>
+        <ItemRef ItemOID="scr_entry.scr_dt" OrderNumber="2" Mandatory="Yes"/>
+        <ItemRef ItemOID="scr_entry.hidden_flag" OrderNumber="3" Mandatory="No"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="ae_log" Name="AE header" Repeating="No">
+        <ItemRef ItemOID="ae_log.any_ae" OrderNumber="1" Mandatory="Yes"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="ae_log_LOG_LINE" Name="AE lines" Repeating="Yes">
+        <ItemRef ItemOID="ae_log.term" OrderNumber="1" Mandatory="Yes"/>
+        <ItemRef ItemOID="ae_log.sev" OrderNumber="2" Mandatory="No"/>
+        <ItemRef ItemOID="ae_log.onset" OrderNumber="3" Mandatory="No"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="tx_admin" Name="Treatment" Repeating="No">
+        <ItemRef ItemOID="tx_admin.dose" OrderNumber="1" Mandatory="Yes"/>
+        <ItemRef ItemOID="tx_admin.tx_time" OrderNumber="2" Mandatory="No"/>
+        <ItemRef ItemOID="tx_admin.calc_bmi" OrderNumber="3" Mandatory="No"/>
+      </ItemGroupDef>
+
+      <ItemDef OID="scr_entry.eligible" Name="eligible" DataType="text" Length="1"
+               mdsol:Active="Yes" mdsol:Visible="Yes">
+        <Question><TranslatedText xml:lang="de">Geeignet</TranslatedText>
+                  <TranslatedText xml:lang="en">Eligible for study</TranslatedText></Question>
+        <CodeListRef CodeListOID="cl_01"/>
+      </ItemDef>
+      <ItemDef OID="scr_entry.scr_dt" Name="scr_dt" DataType="date"
+               mdsol:DateTimeFormat="yyyy-MM-dd" mdsol:Active="Yes" mdsol:Visible="Yes">
+        <Question><TranslatedText xml:lang="en">Screening date</TranslatedText></Question>
+      </ItemDef>
+      <ItemDef OID="scr_entry.hidden_flag" Name="hidden_flag" DataType="text" Length="1"
+               mdsol:Active="Yes" mdsol:Visible="No">
+        <Question><TranslatedText xml:lang="en">Hidden until triggered</TranslatedText></Question>
+      </ItemDef>
+      <ItemDef OID="ae_log.any_ae" Name="any_ae" DataType="text" Length="1"
+               mdsol:Active="Yes" mdsol:Visible="Yes">
+        <Question><TranslatedText xml:lang="en">Any adverse event</TranslatedText></Question>
+        <CodeListRef CodeListOID="cl_01"/>
+      </ItemDef>
+      <ItemDef OID="ae_log.term" Name="term" DataType="text" Length="60"
+               mdsol:Active="Yes" mdsol:Visible="Yes">
+        <Question><TranslatedText xml:lang="en">Event term</TranslatedText></Question>
+      </ItemDef>
+      <ItemDef OID="ae_log.sev" Name="sev" DataType="integer" Length="1"
+               mdsol:Active="Yes" mdsol:Visible="Yes">
+        <Question><TranslatedText xml:lang="en">Severity</TranslatedText></Question>
+        <CodeListRef CodeListOID="cl_sev"/>
+      </ItemDef>
+      <ItemDef OID="ae_log.onset" Name="onset" DataType="date"
+               mdsol:DateTimeFormat="dd MMM yyyy" mdsol:Active="Yes" mdsol:Visible="Yes">
+        <Question><TranslatedText xml:lang="en">Onset date</TranslatedText></Question>
+      </ItemDef>
+      <ItemDef OID="tx_admin.dose" Name="dose" DataType="integer" Length="3"
+               mdsol:Active="Yes" mdsol:Visible="Yes">
+        <Question><TranslatedText xml:lang="en">Dose in mg</TranslatedText></Question>
+        <RangeCheck Comparator="LE" SoftHard="Hard"><CheckValue>200</CheckValue></RangeCheck>
+      </ItemDef>
+      <ItemDef OID="tx_admin.tx_time" Name="tx_time" DataType="time"
+               mdsol:DateTimeFormat="HH:nn" mdsol:Active="Yes" mdsol:Visible="Yes">
+        <Question><TranslatedText xml:lang="en">Time of administration</TranslatedText></Question>
+      </ItemDef>
+      <ItemDef OID="tx_admin.calc_bmi" Name="calc_bmi" DataType="float" Length="4"
+               mdsol:Active="Yes" mdsol:Visible="Yes">
+        <Question><TranslatedText xml:lang="en">Derived BMI</TranslatedText></Question>
+      </ItemDef>
+
+      <CodeList OID="cl_01" Name="Affirm" DataType="text">
+        <CodeListItem CodedValue="1" mdsol:OrderNumber="2">
+          <Decode><TranslatedText xml:lang="en">Yes</TranslatedText></Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="0" mdsol:OrderNumber="1">
+          <Decode><TranslatedText xml:lang="en">No</TranslatedText></Decode>
+        </CodeListItem>
+      </CodeList>
+      <CodeList OID="cl_sev" Name="Severity" DataType="integer">
+        <CodeListItem CodedValue="1" mdsol:OrderNumber="1">
+          <Decode><TranslatedText xml:lang="en">Mild</TranslatedText></Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="2" mdsol:OrderNumber="2">
+          <Decode><TranslatedText xml:lang="en">Moderate</TranslatedText></Decode>
+        </CodeListItem>
+        <CodeListItem CodedValue="3" mdsol:OrderNumber="3">
+          <Decode><TranslatedText xml:lang="en">Severe</TranslatedText></Decode>
+        </CodeListItem>
+      </CodeList>
+    </MetaDataVersion>
+  </Study>
+</ODM>

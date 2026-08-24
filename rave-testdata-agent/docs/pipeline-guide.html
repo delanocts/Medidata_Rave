@@ -1,0 +1,1100 @@
+<title>Rave Test Data Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+
+<style>
+  :root {
+    --paper:      #f6f7f8;
+    --surface:    #ffffff;
+    --surface-2:  #eef1f2;
+    --ink:        #141d24;
+    --ink-soft:   #4a5a66;
+    --ink-faint:  #7a8994;
+    --rule:       #dce1e4;
+    --rule-soft:  #e8ecee;
+    --petrol:     #0d6d70;
+    --petrol-bg:  #e2eff0;
+    --amber:      #9a5b12;
+    --amber-bg:   #f6ecdd;
+    --moss:       #2f6a4c;
+    --moss-bg:    #e4efe9;
+    --shadow:     0 1px 2px rgba(20,29,36,.06), 0 8px 24px -18px rgba(20,29,36,.5);
+
+    --measure: 68ch;
+    --step--1: .8125rem;
+    --step-0:  1rem;
+    --step-1:  1.1875rem;
+    --step-2:  1.5rem;
+    --step-3:  2rem;
+    --step-4:  2.625rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #101619;
+      --surface:    #161e22;
+      --surface-2:  #1c262b;
+      --ink:        #e4eaed;
+      --ink-soft:   #a3b1b9;
+      --ink-faint:  #71818b;
+      --rule:       #26333a;
+      --rule-soft:  #1e292f;
+      --petrol:     #4cbabd;
+      --petrol-bg:  #10353a;
+      --amber:      #d99a45;
+      --amber-bg:   #362713;
+      --moss:       #62ad83;
+      --moss-bg:    #14301f;
+      --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -18px rgba(0,0,0,.9);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:      #101619;
+    --surface:    #161e22;
+    --surface-2:  #1c262b;
+    --ink:        #e4eaed;
+    --ink-soft:   #a3b1b9;
+    --ink-faint:  #71818b;
+    --rule:       #26333a;
+    --rule-soft:  #1e292f;
+    --petrol:     #4cbabd;
+    --petrol-bg:  #10353a;
+    --amber:      #d99a45;
+    --amber-bg:   #362713;
+    --moss:       #62ad83;
+    --moss-bg:    #14301f;
+    --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -18px rgba(0,0,0,.9);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-size: var(--step-0);
+    line-height: 1.62;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 78rem; margin: 0 auto; padding: 3.5rem 1.5rem 6rem; }
+  .prose { max-width: var(--measure); }
+
+  /* ---- masthead ---- */
+  .masthead { border-bottom: 2px solid var(--ink); padding-bottom: 1.5rem; margin-bottom: 2.5rem; }
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: var(--step--1); letter-spacing: .12em; text-transform: uppercase;
+    color: var(--petrol); margin: 0 0 .6rem;
+  }
+  h1 {
+    font-family: "IBM Plex Serif", ui-serif, Georgia, serif;
+    font-weight: 600; font-size: var(--step-4); line-height: 1.1;
+    letter-spacing: -.015em; margin: 0 0 .7rem; text-wrap: balance;
+  }
+  .standfirst { font-size: var(--step-1); color: var(--ink-soft); margin: 0; max-width: var(--measure); text-wrap: pretty; }
+
+  h2 {
+    font-family: "IBM Plex Serif", ui-serif, Georgia, serif;
+    font-weight: 600; font-size: var(--step-3); line-height: 1.15;
+    letter-spacing: -.012em; margin: 4rem 0 .35rem; text-wrap: balance;
+    padding-top: 1.6rem; border-top: 1px solid var(--rule);
+  }
+  h2:first-of-type { margin-top: 3rem; }
+  h3 {
+    font-family: "IBM Plex Serif", ui-serif, Georgia, serif;
+    font-weight: 600; font-size: var(--step-2); line-height: 1.25;
+    margin: 2.6rem 0 .3rem; text-wrap: balance;
+  }
+  h4 {
+    font-size: var(--step-0); font-weight: 600; margin: 1.8rem 0 .3rem;
+    letter-spacing: .005em;
+  }
+  .deck { color: var(--ink-soft); margin: 0 0 1.6rem; max-width: var(--measure); }
+
+  p, ul, ol { margin: 0 0 1.1rem; }
+  .prose li { margin-bottom: .4rem; }
+  a { color: var(--petrol); text-underline-offset: .18em; }
+  strong { font-weight: 600; }
+
+  code, .mono {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: .885em;
+  }
+  :not(pre) > code {
+    background: var(--surface-2); padding: .12em .38em;
+    border-radius: 3px; color: var(--ink);
+  }
+
+  pre {
+    background: var(--surface); color: var(--ink);
+    border: 1px solid var(--rule); border-left: 3px solid var(--petrol);
+    border-radius: 4px; padding: 1rem 1.15rem; margin: 0 0 1.2rem;
+    overflow-x: auto; font-size: var(--step--1); line-height: 1.7;
+  }
+  pre code { background: none; padding: 0; }
+  .cmt { color: var(--ink-faint); }
+  .flag { color: var(--petrol); }
+
+  /* ---- figures ---- */
+  figure { margin: 2rem 0 2.4rem; }
+  .figframe {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 5px; padding: 1.5rem 1.25rem 1.15rem;
+    overflow-x: auto; box-shadow: var(--shadow);
+  }
+  .figframe svg { display: block; max-width: 100%; height: auto; min-width: 640px; margin: 0 auto; }
+  figcaption {
+    font-size: var(--step--1); color: var(--ink-soft);
+    margin-top: .85rem; max-width: var(--measure); text-wrap: pretty;
+  }
+  figcaption b { color: var(--ink); font-weight: 600; }
+
+  /* ---- tables ---- */
+  .tablewrap { overflow-x: auto; margin: 0 0 1.4rem; }
+  table { border-collapse: collapse; width: 100%; font-size: var(--step--1); min-width: 34rem; }
+  th, td {
+    text-align: left; padding: .58rem .75rem;
+    border-bottom: 1px solid var(--rule-soft); vertical-align: top;
+  }
+  thead th {
+    border-bottom: 1px solid var(--rule); color: var(--ink-faint);
+    font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+    font-size: .7rem; white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; }
+  td .mono { color: var(--ink); }
+
+  /* ---- pills ---- */
+  .pill {
+    display: inline-block; font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .68rem; letter-spacing: .05em; text-transform: uppercase;
+    padding: .16em .5em; border-radius: 3px; white-space: nowrap; font-weight: 500;
+  }
+  .pill-read  { background: var(--petrol-bg); color: var(--petrol); }
+  .pill-write { background: var(--amber-bg);  color: var(--amber); }
+  .pill-local { background: var(--surface-2); color: var(--ink-soft); }
+
+  /* ---- callouts ---- */
+  .note {
+    border: 1px solid var(--rule); border-left: 3px solid var(--petrol);
+    background: var(--surface); border-radius: 4px;
+    padding: 1rem 1.15rem; margin: 0 0 1.4rem; max-width: var(--measure);
+  }
+  .note.warn { border-left-color: var(--amber); }
+  .note > :last-child { margin-bottom: 0; }
+  .note-label {
+    display: block; font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .68rem; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--petrol); margin-bottom: .35rem; font-weight: 500;
+  }
+  .note.warn .note-label { color: var(--amber); }
+
+  /* ---- step list ---- */
+  ol.steps { list-style: none; padding: 0; counter-reset: step; max-width: var(--measure); }
+  ol.steps > li {
+    counter-increment: step; position: relative;
+    padding-left: 2.6rem; margin-bottom: 1.3rem;
+  }
+  ol.steps > li::before {
+    content: counter(step); position: absolute; left: 0; top: .05rem;
+    width: 1.75rem; height: 1.75rem; border-radius: 50%;
+    background: var(--petrol-bg); color: var(--petrol);
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: .8rem; font-weight: 500;
+    display: flex; align-items: center; justify-content: center;
+  }
+  ol.steps h4 { margin-top: 0; }
+
+  .lede-in { color: var(--ink-soft); }
+  hr.soft { border: none; border-top: 1px solid var(--rule); margin: 3rem 0; }
+
+  :focus-visible { outline: 2px solid var(--petrol); outline-offset: 3px; border-radius: 2px; }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+  @media (max-width: 40rem) { :root { --step-4: 2.1rem; --step-3: 1.65rem; } .wrap { padding-top: 2.25rem; } }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Operator guide</p>
+    <h1>Rave Test Data Pipeline</h1>
+    <p class="standfirst">
+      A configuration-driven pipeline that reads a Medidata Rave study's design,
+      generates clinically plausible data for it with an LLM, loads that data through
+      RWS, and reports what actually landed. Pointing it at a different study means
+      writing one config file.
+    </p>
+  </header>
+
+  <div class="prose">
+    <p>
+      The tool exists because populating a Rave study by hand is slow and populating it
+      with junk is useless. It reads the study's own metadata to learn every folder, form,
+      field, codelist and range, generates values that conform to all of them, and then
+      proves what it wrote by reading the subject back out of Rave.
+    </p>
+    <p>
+      Nothing about a specific study lives in the code. The engine, the skills and the
+      defaults are fixed; a study file supplies the host, the study name, the site and a
+      few generation preferences.
+    </p>
+    <p>
+      If you have just cloned the repository, start with <strong>Getting started from a
+      fresh clone</strong> below and come back to the pipeline diagram once it runs.
+    </p>
+  </div>
+
+  <h2>Getting started from a fresh clone</h2>
+  <p class="deck">
+    Five steps from an empty folder to a populated subject. The fourth one — the ALS
+    workbook — is the only part the tool cannot fetch for you.
+  </p>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>You need</th><th>Why</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Python 3.11 or newer</td>
+          <td>Built and tested on 3.14.</td>
+        </tr>
+        <tr>
+          <td>A Rave account with RWS access</td>
+          <td>Basic auth. MFA must be off, so this is normally a service account. It needs the Architect role to read study design.</td>
+        </tr>
+        <tr>
+          <td>An Anthropic API key with billing</td>
+          <td>Generation calls the Claude API. A key on a zero-balance account authenticates and then fails at the first form.</td>
+        </tr>
+        <tr>
+          <td>A non-production study</td>
+          <td>Dev, Sandbox, UAT or Training. Production is refused and no flag unblocks it.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ol class="steps">
+    <li>
+      <h4>Clone the repository</h4>
+      <p class="lede-in">
+        The tool lives in the <span class="mono">rave-testdata-agent</span> subfolder — every
+        command below assumes you are inside it.
+      </p>
+<pre><code>git clone https://github.com/TechDlx/Medidata_Rave.git
+cd Medidata_Rave/rave-testdata-agent</code></pre>
+    </li>
+
+    <li>
+      <h4>Create a virtualenv and install the dependencies</h4>
+      <p class="lede-in">
+        Use a virtualenv rather than a global Python. Several installs of the same version can
+        coexist, and installing into one while your editor runs another produces
+        <span class="mono">ModuleNotFoundError</span> from a checkout where everything is in fact
+        present.
+      </p>
+<pre><code><span class="cmt"># Windows</span>
+python -m venv .venv
+.venv\Scripts\activate
+
+<span class="cmt"># macOS / Linux</span>
+python3 -m venv .venv
+source .venv/bin/activate
+
+pip install -r requirements.txt</code></pre>
+      <p class="lede-in">
+        In VS Code, run <strong>Python: Select Interpreter</strong> and choose
+        <span class="mono">.venv</span>. If a script still cannot find its imports, it will tell
+        you which interpreter is running and how to fix it rather than throwing a bare traceback.
+      </p>
+    </li>
+
+    <li>
+      <h4>Create your <span class="mono">.env</span></h4>
+      <p class="lede-in">
+        Copy the committed template and fill in three values. The file is git-ignored and must
+        never be committed; nothing else in the tool reads credentials, and they are registered
+        for redaction the moment they load.
+      </p>
+<pre><code><span class="cmt"># Windows</span>
+copy .env.example .env
+
+<span class="cmt"># macOS / Linux</span>
+cp .env.example .env</code></pre>
+<pre><code><span class="cmt"># .env</span>
+RAVE_USERNAME=your.rave.login
+RAVE_PASSWORD=your-rave-password
+ANTHROPIC_API_KEY=sk-ant-...</code></pre>
+    </li>
+
+    <li>
+      <h4>Create or update the study configuration</h4>
+      <p class="lede-in">
+        One file per study in <span class="mono">config/studies/</span>. Its filename minus the
+        extension is what you pass to <span class="mono">--study</span>, so
+        <span class="mono">onc-114.yaml</span> becomes
+        <span class="mono">--study onc-114</span>. The repository ships
+        <span class="mono">aes-002.yaml</span> as a worked example — copy it rather than starting
+        from blank.
+      </p>
+<pre><code><span class="cmt"># Windows</span>
+copy config\studies\aes-002.yaml config\studies\onc-114.yaml
+
+<span class="cmt"># macOS / Linux</span>
+cp config/studies/aes-002.yaml config/studies/onc-114.yaml</code></pre>
+
+      <p class="lede-in">
+        Only these keys have to be set. Everything else falls back to
+        <span class="mono">config/defaults.yaml</span>, which is shared by every study and should
+        not carry study-specific values.
+      </p>
+
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr><th>Key</th><th>Set it to</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="mono">rave.base_url</span></td>
+              <td>Your Rave host, https, no trailing slash.</td>
+            </tr>
+            <tr>
+              <td><span class="mono">rave.environment</span></td>
+              <td><span class="mono">DEV</span>, <span class="mono">Sandbox</span>, <span class="mono">UAT</span> or <span class="mono">Training</span>. Anything resembling production is refused.</td>
+            </tr>
+            <tr>
+              <td><span class="mono">study.name</span></td>
+              <td>Exactly as Rave lists it. A1 prints the studies your account can see if you are unsure.</td>
+            </tr>
+            <tr>
+              <td><span class="mono">site.number</span></td>
+              <td>The ODM <span class="mono">Location/@OID</span> — <em>not</em> the site label. See the warning below.</td>
+            </tr>
+            <tr>
+              <td><span class="mono">subjects.count</span></td>
+              <td>How many subjects to end up with. With the default <span class="mono">on_existing_id: skip</span> this is a ceiling, not a batch size.</td>
+            </tr>
+            <tr>
+              <td><span class="mono">subjects.id_prefix</span></td>
+              <td>Prefix for generated IDs, padded by <span class="mono">id_pad_width</span>. Match any mask the study enforces.</td>
+            </tr>
+            <tr>
+              <td><span class="mono">generation.therapeutic_area</span></td>
+              <td>The indication, in plain words. This is what makes the data clinically apt rather than merely valid.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+<pre><code><span class="cmt"># config/studies/onc-114.yaml</span>
+rave:
+  base_url: "https://yourhost.mdsol.com"
+  environment: "UAT"                <span class="cmt"># must be non-production</span>
+
+study:
+  name: "ONC-114"                   <span class="cmt"># exactly as Rave lists it</span>
+
+site:
+  number: "20431"                   <span class="cmt"># the ODM Location OID</span>
+  name: "UAT-ONC-114"               <span class="cmt"># the label, for reporting only</span>
+  create_if_missing: false          <span class="cmt"># see note</span>
+
+subjects:
+  count: 2
+  id_prefix: "TST-"
+  id_start_number: 1
+  id_pad_width: 3                   <span class="cmt"># -&gt; TST-001, TST-002</span>
+
+generation:
+  therapeutic_area: "Metastatic colorectal carcinoma, second line"
+  therapeutic_realism: true
+
+dynamics:
+  enabled: true
+  trigger_strategy: "maximize"</code></pre>
+
+      <div class="note warn">
+        <span class="note-label">site.number is the OID, not the label</span>
+        <p>
+          Rave's site <em>number</em> is the ODM <span class="mono">Location/@OID</span>; the
+          <em>name</em> is only a label, and local conventions can make the two look reversed —
+          a site displayed as <span class="mono">UAT-ONC-114</span> may well have OID
+          <span class="mono">20431</span>. Every <span class="mono">SiteRef</span> the tool writes
+          carries the OID, so getting this wrong sends data to the wrong site or nowhere. A1 and
+          A2 both list the sites they can see; follow the pattern of the existing ones.
+        </p>
+      </div>
+
+      <p class="lede-in">
+        Leave <code>create_if_missing: false</code> unless you know the account can write
+        administrative data. Most data-entry service accounts cannot, and Rave reports that
+        missing permission as <span class="mono">Study does not exist</span> — which reads exactly
+        like a typo. Creating the site in the Rave UI is usually the faster route.
+      </p>
+
+      <p class="lede-in">
+        Config is validated at startup against a schema, and every problem is reported at once
+        rather than one per run. To check the file without touching Rave:
+      </p>
+<pre><code>python scripts/run_metadata.py <span class="flag">--study</span> onc-114 <span class="flag">--dry-run</span></code></pre>
+    </li>
+
+    <li>
+      <h4>Confirm access</h4>
+      <p class="lede-in">
+        With credentials and config both in place, this proves the whole chain: DNS, TLS,
+        authentication, that the study is visible to your account, that the site exists, and that
+        the Anthropic key works.
+      </p>
+<pre><code>python scripts/test_connection.py <span class="flag">--study</span> onc-114</code></pre>
+      <p class="lede-in">
+        Every mandatory check must pass. Two results deserve a second look even though they are
+        only warnings: <strong>Architect metadata access</strong> failing means the account cannot
+        read study design, and <strong>Edit checks in metadata</strong> reporting zero means the
+        next step is the only route to this study's dynamics.
+      </p>
+    </li>
+
+    <li>
+      <h4>Download the ALS from Rave and drop it in</h4>
+      <p class="lede-in">
+        RWS returns study structure but not edit checks, and drafts can be listed but not
+        downloaded. The ALS workbook is the only source for the logic that drives dynamic folders
+        and forms, and it has to be exported by hand.
+      </p>
+      <p class="lede-in">
+        In Rave Architect: open the study, select the <strong>draft</strong> matching the CRF
+        version you are targeting, and use <strong>Download Draft</strong>, choosing the Excel /
+        ALS format. <span class="mono">run_metadata.py</span> prints the available draft names and
+        OIDs, so run it once first — it also creates the folder the file goes into:
+      </p>
+<pre><code>python scripts/run_metadata.py <span class="flag">--study</span> onc-114</code></pre>
+      <p class="lede-in">Then put the workbook here, named however Rave exported it:</p>
+<pre><code>output/ONC-114/metadata/ONC-114_3.xls
+       └───┬───┘
+   your study.name from the config</code></pre>
+      <p class="lede-in">
+        Re-run <span class="mono">run_metadata.py</span> and the <span class="mono">als</span> row
+        changes from <span class="mono">missing</span> to <span class="mono">manual</span>. Any
+        <span class="mono">.xls</span>, <span class="mono">.xlsx</span> or
+        <span class="mono">.xlsm</span> in that folder is picked up automatically.
+      </p>
+      <div class="note">
+        <span class="note-label">The .xls is not a spreadsheet</span>
+        <p>
+          Architect exports SpreadsheetML — XML with a <span class="mono">.xls</span> name. Opening
+          and re-saving it in Excel can convert it to a real binary workbook, which the parser
+          cannot read. Move the downloaded file without opening it.
+        </p>
+      </div>
+      <p class="lede-in">
+        Without an ALS the pipeline still runs. It fills the seed folders and discovers dynamics by
+        attempting writes, but it cannot predict them and cannot report predicted against actual.
+      </p>
+    </li>
+
+    <li>
+      <h4>Dry run, then go live</h4>
+      <p class="lede-in">
+        The dry run builds every payload and posts none of them, so you can check the site
+        resolves and the subject IDs are what you expect before anything reaches Rave.
+      </p>
+<pre><code>python scripts/run_all.py <span class="flag">--study</span> onc-114 <span class="flag">--dry-run</span>
+python scripts/run_all.py <span class="flag">--study</span> onc-114</code></pre>
+      <p class="lede-in">
+        Expect roughly half an hour per subject on a mid-size study. The report lands in
+        <span class="mono">output/&lt;STUDY&gt;/reports/</span> as JSON and HTML.
+      </p>
+    </li>
+  </ol>
+
+  <div class="note warn">
+    <span class="note-label">What the clone does not include</span>
+    <p>
+      <span class="mono">.env</span>, <span class="mono">.venv/</span> and
+      <span class="mono">output/</span> are all git-ignored, so a fresh clone has no credentials,
+      no dependencies and no run artifacts. That is deliberate: it means no one can commit a
+      credential or another study's clinical data by accident.
+    </p>
+  </div>
+
+  <h2>How the pipeline works</h2>
+  <p class="deck">
+    Six stages run in order. Three of them cross into Rave; the rest read and write local
+    artifacts. Each stage hands the next one a file on disk, which is what lets any stage
+    run on its own.
+  </p>
+
+  <figure>
+    <div class="figframe">
+      <svg viewBox="0 0 980 430" role="img"
+           aria-label="Pipeline diagram: six stages run left to right. A1 connection, A2 metadata and A7 verify read from Rave; A4 provision and A8 dynamics write to Rave. Stages exchange files through a local artifact store.">
+        <defs>
+          <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+          </marker>
+          <marker id="ah-amber" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#9a5b12"/>
+          </marker>
+        </defs>
+
+        <!-- ARTIFACT LANE -->
+        <text x="16" y="30" font-family="IBM Plex Mono, monospace" font-size="10"
+              letter-spacing="1.4" fill="currentColor" opacity=".55">LOCAL ARTIFACTS</text>
+        <rect x="16" y="40" width="948" height="58" rx="4"
+              fill="none" stroke="currentColor" stroke-opacity=".22" stroke-dasharray="3 3"/>
+
+        <g font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor">
+          <text x="176" y="66" text-anchor="middle">metadata/</text>
+          <text x="176" y="82" text-anchor="middle" opacity=".6">ODM · ALS · matrices</text>
+
+          <text x="352" y="66" text-anchor="middle">model/</text>
+          <text x="352" y="82" text-anchor="middle" opacity=".6">study_model · dynamics_graph</text>
+
+          <text x="606" y="66" text-anchor="middle">generated/ · submissions/ · state/</text>
+          <text x="606" y="82" text-anchor="middle" opacity=".6">values · payloads · activation</text>
+
+          <text x="882" y="66" text-anchor="middle">reports/</text>
+          <text x="882" y="82" text-anchor="middle" opacity=".6">json · html</text>
+        </g>
+
+        <!-- STAGE ROW -->
+        <g>
+          <!-- A1 -->
+          <rect x="16" y="176" width="122" height="66" rx="4" fill="none" stroke="currentColor" stroke-opacity=".45"/>
+          <text x="77" y="200" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0d6d70" letter-spacing=".5">A1</text>
+          <text x="77" y="218" text-anchor="middle" font-size="12.5" fill="currentColor">Connection</text>
+          <text x="77" y="233" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".6">access check</text>
+
+          <!-- A2 -->
+          <rect x="154" y="176" width="122" height="66" rx="4" fill="none" stroke="currentColor" stroke-opacity=".45"/>
+          <text x="215" y="200" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0d6d70" letter-spacing=".5">A2</text>
+          <text x="215" y="218" text-anchor="middle" font-size="12.5" fill="currentColor">Metadata</text>
+          <text x="215" y="233" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".6">download</text>
+
+          <!-- A3 -->
+          <rect x="292" y="176" width="122" height="66" rx="4" fill="none" stroke="currentColor" stroke-opacity=".45"/>
+          <text x="353" y="200" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0d6d70" letter-spacing=".5">A3</text>
+          <text x="353" y="218" text-anchor="middle" font-size="12.5" fill="currentColor">Study model</text>
+          <text x="353" y="233" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".6">offline</text>
+
+          <!-- A4 -->
+          <rect x="430" y="176" width="122" height="66" rx="4" fill="none" stroke="#9a5b12" stroke-width="1.5"/>
+          <text x="491" y="200" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#9a5b12" letter-spacing=".5">A4</text>
+          <text x="491" y="218" text-anchor="middle" font-size="12.5" fill="currentColor">Provision</text>
+          <text x="491" y="233" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".6">site · subjects</text>
+
+          <!-- A8 (contains A5 + A6) -->
+          <rect x="568" y="160" width="228" height="98" rx="4" fill="none" stroke="#9a5b12" stroke-width="1.5"/>
+          <text x="682" y="180" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#9a5b12" letter-spacing=".5">A8</text>
+          <text x="682" y="197" text-anchor="middle" font-size="12.5" fill="currentColor">Dynamics loop</text>
+          <rect x="582" y="208" width="96" height="34" rx="3" fill="currentColor" fill-opacity=".05" stroke="currentColor" stroke-opacity=".3"/>
+          <text x="630" y="223" text-anchor="middle" font-size="10.5" fill="currentColor">A5 generate</text>
+          <text x="630" y="236" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".55">LLM</text>
+          <rect x="688" y="208" width="96" height="34" rx="3" fill="currentColor" fill-opacity=".05" stroke="currentColor" stroke-opacity=".3"/>
+          <text x="736" y="223" text-anchor="middle" font-size="10.5" fill="currentColor">A6 submit</text>
+          <text x="736" y="236" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".55">ODM</text>
+
+          <!-- A7 -->
+          <rect x="842" y="176" width="122" height="66" rx="4" fill="none" stroke="currentColor" stroke-opacity=".45"/>
+          <text x="903" y="200" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0d6d70" letter-spacing=".5">A7</text>
+          <text x="903" y="218" text-anchor="middle" font-size="12.5" fill="currentColor">Verify</text>
+          <text x="903" y="233" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".6">reconcile</text>
+        </g>
+
+        <!-- stage-to-stage flow -->
+        <g stroke="currentColor" stroke-opacity=".5" fill="none" marker-end="url(#ah)">
+          <line x1="138" y1="209" x2="152" y2="209"/>
+          <line x1="276" y1="209" x2="290" y2="209"/>
+          <line x1="414" y1="209" x2="428" y2="209"/>
+          <line x1="552" y1="209" x2="566" y2="209"/>
+          <line x1="796" y1="209" x2="840" y2="209"/>
+        </g>
+
+        <!-- writes up to artifacts -->
+        <g stroke="currentColor" stroke-opacity=".38" fill="none" marker-end="url(#ah)">
+          <path d="M 215 176 L 215 100"/>
+          <path d="M 353 176 L 353 100"/>
+          <path d="M 682 160 L 682 100"/>
+          <path d="M 903 176 L 903 100"/>
+        </g>
+        <!-- reads down from artifacts -->
+        <g stroke="currentColor" stroke-opacity=".22" fill="none" stroke-dasharray="3 3" marker-end="url(#ah)">
+          <path d="M 300 100 L 300 176"/>
+          <path d="M 460 100 L 460 176"/>
+          <path d="M 600 100 L 600 160"/>
+        </g>
+
+        <!-- RAVE LANE -->
+        <rect x="16" y="330" width="948" height="72" rx="4"
+              fill="currentColor" fill-opacity=".035" stroke="currentColor" stroke-opacity=".3"/>
+        <text x="36" y="358" font-family="IBM Plex Serif, serif" font-size="14" fill="currentColor">Medidata Rave</text>
+        <text x="36" y="376" font-family="IBM Plex Mono, monospace" font-size="10" fill="currentColor" opacity=".6">RaveWebServices · non-production only</text>
+
+        <!-- read arrows (thin, petrol) -->
+        <g stroke="#0d6d70" stroke-width="1.2" fill="none" marker-end="url(#ah)" color="#0d6d70">
+          <path d="M 77 242 L 77 328"/>
+          <path d="M 215 242 L 215 328"/>
+          <path d="M 903 242 L 903 328"/>
+        </g>
+        <!-- write arrows (heavier, amber) -->
+        <g stroke="#9a5b12" stroke-width="2.2" fill="none" marker-end="url(#ah-amber)">
+          <path d="M 491 242 L 491 328"/>
+          <path d="M 682 258 L 682 328"/>
+        </g>
+
+        <g font-family="IBM Plex Mono, monospace" font-size="9.5">
+          <text x="86" y="292" fill="#0d6d70">reads</text>
+          <text x="224" y="292" fill="#0d6d70">reads</text>
+          <text x="500" y="292" fill="#9a5b12">writes</text>
+          <text x="691" y="300" fill="#9a5b12">writes</text>
+          <text x="866" y="292" fill="#0d6d70" text-anchor="end">reads back</text>
+        </g>
+      </svg>
+    </div>
+    <figcaption>
+      Stages exchange files, never memory — which is why any stage runs standalone and the
+      run resumes from where it stopped. Only <b>A4</b> and <b>A8</b> write to Rave
+      (amber); <b>A1</b>, <b>A2</b> and <b>A7</b> only read (petrol); <b>A3</b> never touches
+      the network. A5 and A6 are real stages, but a full run drives them from inside A8 so
+      that generation and submission stay in step with what has activated.
+    </figcaption>
+  </figure>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Stage</th><th>Script</th><th>Rave</th><th>What it does</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="mono">A1</span></td>
+          <td><span class="mono">test_connection.py</span></td>
+          <td><span class="pill pill-read">reads</span></td>
+          <td>Proves DNS, TLS, credentials, study visibility, design-metadata access, the site, and the LLM key. Exits non-zero on any mandatory failure.</td>
+        </tr>
+        <tr>
+          <td><span class="mono">A2</span></td>
+          <td><span class="mono">run_metadata.py</span></td>
+          <td><span class="pill pill-read">reads</span></td>
+          <td>Downloads ODM metadata, the matrix map, sites and subjects. Skips anything already cached and unchanged. Picks up a hand-exported ALS if present.</td>
+        </tr>
+        <tr>
+          <td><span class="mono">A3</span></td>
+          <td><span class="mono">run_model.py</span></td>
+          <td><span class="pill pill-local">offline</span></td>
+          <td>Turns metadata plus the ALS into the normalized study model and the dynamics graph. Makes no network calls at all.</td>
+        </tr>
+        <tr>
+          <td><span class="mono">A4</span></td>
+          <td><span class="mono">run_provision.py</span></td>
+          <td><span class="pill pill-write">writes</span></td>
+          <td>Confirms the site, allocates subject IDs from the prefix, and creates the subjects that do not yet exist.</td>
+        </tr>
+        <tr>
+          <td><span class="mono">A5</span></td>
+          <td><span class="mono">run_generate.py</span></td>
+          <td><span class="pill pill-local">offline</span></td>
+          <td>Asks the LLM for values, checks every one against the metadata, and repairs what fails. Caches results so a re-run costs nothing.</td>
+        </tr>
+        <tr>
+          <td><span class="mono">A6</span></td>
+          <td><span class="mono">run_submit.py</span></td>
+          <td><span class="pill pill-write">writes</span></td>
+          <td>Assembles ODM and posts it, one form per request so a rejection names the form that caused it.</td>
+        </tr>
+        <tr>
+          <td><span class="mono">A8</span></td>
+          <td><span class="mono">run_dynamics.py</span></td>
+          <td><span class="pill pill-write">writes</span></td>
+          <td>Drives A5 and A6 in passes, unlocking dynamic folders as trigger values land. This is the stage a full run actually uses.</td>
+        </tr>
+        <tr>
+          <td><span class="mono">A7</span></td>
+          <td><span class="mono">run_verify.py</span></td>
+          <td><span class="pill pill-read">reads</span></td>
+          <td>Reads each subject back and compares field by field, then writes the run report as JSON and HTML.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>The dynamics loop</h2>
+  <p class="deck">
+    Most of a study is not visible to a new subject. Folders arrive only when an edit
+    check fires, and the obvious way to detect that does not work.
+  </p>
+
+  <div class="prose">
+    <p>
+      Rave's clinical dataset returns only folders that already hold data, so a folder that
+      is active but empty is invisible — which is exactly the state you are trying to
+      detect. The loop therefore uses the write itself as the detector: if Rave accepts
+      data for a folder, that folder is live.
+    </p>
+  </div>
+
+  <figure>
+    <div class="figframe">
+      <svg viewBox="0 0 900 300" role="img"
+           aria-label="The dynamics loop: pass zero fills the seed folders, the graph predicts which folders the written values unlocked, the loop attempts those, and acceptance by Rave proves activation. The loop repeats until a pass activates nothing new.">
+        <defs>
+          <marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+          </marker>
+          <marker id="ah2-moss" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#2f6a4c"/>
+          </marker>
+          <marker id="ah2-amber" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#9a5b12"/>
+          </marker>
+        </defs>
+
+        <!-- seed -->
+        <rect x="20" y="112" width="130" height="60" rx="4" fill="none" stroke="currentColor" stroke-opacity=".45"/>
+        <text x="85" y="138" text-anchor="middle" font-size="12.5" fill="currentColor">Seed folders</text>
+        <text x="85" y="155" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".6">default matrix</text>
+
+        <!-- generate -->
+        <rect x="196" y="112" width="130" height="60" rx="4" fill="none" stroke="currentColor" stroke-opacity=".45"/>
+        <text x="261" y="138" text-anchor="middle" font-size="12.5" fill="currentColor">Generate</text>
+        <text x="261" y="155" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".6">trigger values pinned</text>
+
+        <!-- submit -->
+        <rect x="372" y="112" width="130" height="60" rx="4" fill="none" stroke="#9a5b12" stroke-width="1.5"/>
+        <text x="437" y="138" text-anchor="middle" font-size="12.5" fill="currentColor">Submit to Rave</text>
+        <text x="437" y="155" text-anchor="middle" font-size="10.5" fill="currentColor" opacity=".6">one form per post</text>
+
+        <!-- decision -->
+        <path d="M 620 142 L 680 100 L 740 142 L 680 184 Z" fill="none" stroke="currentColor" stroke-opacity=".45"/>
+        <text x="680" y="138" text-anchor="middle" font-size="11.5" fill="currentColor">Accepted?</text>
+        <text x="680" y="153" text-anchor="middle" font-size="9.5" fill="currentColor" opacity=".55">Rave decides</text>
+
+        <!-- flow -->
+        <g stroke="currentColor" stroke-opacity=".5" fill="none" marker-end="url(#ah2)">
+          <line x1="150" y1="142" x2="194" y2="142"/>
+          <line x1="326" y1="142" x2="370" y2="142"/>
+          <line x1="502" y1="142" x2="618" y2="142"/>
+        </g>
+
+        <!-- accepted -> active -->
+        <path d="M 740 142 L 800 142" stroke="#2f6a4c" stroke-width="1.6" fill="none" marker-end="url(#ah2-moss)"/>
+        <rect x="800" y="112" width="86" height="60" rx="4" fill="none" stroke="#2f6a4c" stroke-width="1.4"/>
+        <text x="843" y="138" text-anchor="middle" font-size="12" fill="currentColor">Folder</text>
+        <text x="843" y="154" text-anchor="middle" font-size="12" fill="currentColor">is live</text>
+        <text x="770" y="133" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#2f6a4c">yes</text>
+
+        <!-- refused -> retry -->
+        <path d="M 680 184 L 680 236 L 261 236 L 261 174"
+              stroke="#9a5b12" stroke-width="1.6" fill="none" stroke-dasharray="5 4" marker-end="url(#ah2-amber)"/>
+        <text x="694" y="208" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#9a5b12">no — not yet active</text>
+        <text x="470" y="252" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="9.5" fill="#9a5b12">retry on the next pass</text>
+
+        <!-- graph feed -->
+        <text x="261" y="72" text-anchor="middle" font-family="IBM Plex Mono, monospace" font-size="10" fill="#0d6d70">dynamics_graph.json</text>
+        <path d="M 261 80 L 261 110" stroke="#0d6d70" stroke-width="1.2" fill="none" marker-end="url(#ah2)" color="#0d6d70"/>
+        <text x="290" y="98" font-size="10" fill="currentColor" opacity=".6">predicts what to try</text>
+
+        <text x="20" y="284" font-size="10.5" fill="currentColor" opacity=".6">
+          The loop stops when a pass activates nothing new, or after dynamics.max_iterations.
+        </text>
+      </svg>
+    </div>
+    <figcaption>
+      Acceptance is the proof. A refusal is read carefully: <b>Folder not found</b> means
+      the folder is absent, so its remaining forms are skipped — but <b>Form does not exist
+      in the designated folder</b> means the folder is live and only that form has yet to
+      arrive, so the rest of the folder still gets filled. Conflating those two abandons a
+      live folder after its first missing form.
+    </figcaption>
+  </figure>
+
+  <h2>Running it</h2>
+
+  <p class="deck">
+    With the virtualenv active, one command runs everything. The orchestrator records each
+    stage's outcome in <span class="mono">run_manifest.json</span>, which is what
+    <span class="mono">--resume</span> reads.
+  </p>
+
+<pre><code>python scripts/run_all.py <span class="flag">--study</span> aes-002              <span class="cmt"># everything, in order</span>
+python scripts/run_all.py <span class="flag">--study</span> aes-002 <span class="flag">--dry-run</span>    <span class="cmt"># build payloads, post nothing</span>
+python scripts/run_all.py <span class="flag">--study</span> aes-002 <span class="flag">--resume</span>     <span class="cmt"># continue after a failure</span>
+python scripts/run_all.py <span class="flag">--study</span> aes-002 <span class="flag">--stop-after</span> model</code></pre>
+
+  <div class="note warn">
+    <span class="note-label">Resume is for failures only</span>
+    <p>
+      <code>--resume</code> skips every stage already marked <span class="mono">ok</span> in
+      <span class="mono">run_manifest.json</span> — provisioning included. Use it to carry on
+      after something broke, never to add a subject, or the new subject is never created.
+    </p>
+  </div>
+
+  <h3>Adding a subject to a study already running</h3>
+  <p>
+    Raise <code>subjects.count</code> and run the pipeline. With the default
+    <code>on_existing_id: skip</code>, count is a ceiling: setting it to <span class="mono">3</span>
+    when <span class="mono">TST-001</span> and <span class="mono">TST-002</span> exist creates
+    only <span class="mono">TST-003</span>. Switch to <code>continue_numbering</code> if you
+    would rather count meant "this many new ones".
+  </p>
+  <p>To touch only the new subject rather than revisiting the others:</p>
+<pre><code>python scripts/run_provision.py <span class="flag">--study</span> aes-002
+python scripts/run_dynamics.py  <span class="flag">--study</span> aes-002 <span class="flag">--subject</span> TST-003
+python scripts/run_verify.py    <span class="flag">--study</span> aes-002</code></pre>
+
+  <h2>Using it for a different study</h2>
+  <p class="deck">
+    One new file. The engine, the skills and the shared defaults are the same for every
+    study; the study file supplies only what is genuinely study-specific.
+  </p>
+
+  <figure>
+    <div class="figframe">
+      <svg viewBox="0 0 900 292" role="img"
+           aria-label="Study independence: several study config files feed one unchanged engine, which writes to a separate output folder per study. Only the study file varies.">
+        <defs>
+          <marker id="ah3" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+          </marker>
+          <marker id="ah3-petrol" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#0d6d70"/>
+          </marker>
+        </defs>
+
+        <text x="20" y="30" font-family="IBM Plex Mono, monospace" font-size="10"
+              letter-spacing="1.4" fill="#0d6d70">VARIES PER STUDY</text>
+
+        <g font-family="IBM Plex Mono, monospace" font-size="11">
+          <rect x="20" y="44" width="188" height="34" rx="4" fill="none" stroke="#0d6d70" stroke-width="1.4"/>
+          <text x="36" y="66" fill="currentColor">studies/aes-002.yaml</text>
+
+          <rect x="20" y="88" width="188" height="34" rx="4" fill="none" stroke="#0d6d70" stroke-width="1.4"/>
+          <text x="36" y="110" fill="currentColor">studies/onc-114.yaml</text>
+
+          <rect x="20" y="132" width="188" height="34" rx="4" fill="none" stroke="#0d6d70" stroke-width="1.4"/>
+          <text x="36" y="154" fill="currentColor">studies/derm-07.yaml</text>
+        </g>
+
+        <g stroke="#0d6d70" stroke-width="1.3" fill="none" marker-end="url(#ah3-petrol)">
+          <path d="M 208 61 C 260 61, 268 105, 316 105"/>
+          <path d="M 208 105 L 316 105"/>
+          <path d="M 208 149 C 260 149, 268 105, 316 105"/>
+        </g>
+
+        <!-- engine -->
+        <rect x="318" y="56" width="228" height="130" rx="5"
+              fill="currentColor" fill-opacity=".04" stroke="currentColor" stroke-opacity=".45"/>
+        <text x="432" y="82" text-anchor="middle" font-family="IBM Plex Serif, serif" font-size="14" fill="currentColor">Unchanged engine</text>
+        <g font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor" opacity=".72">
+          <text x="432" y="106" text-anchor="middle">src/rave_agent/</text>
+          <text x="432" y="126" text-anchor="middle">.claude/skills/</text>
+          <text x="432" y="146" text-anchor="middle">config/defaults.yaml</text>
+          <text x="432" y="166" text-anchor="middle">config/config.schema.json</text>
+        </g>
+
+        <path d="M 546 121 L 610 121" stroke="currentColor" stroke-opacity=".5" fill="none" marker-end="url(#ah3)"/>
+
+        <!-- outputs -->
+        <text x="614" y="30" font-family="IBM Plex Mono, monospace" font-size="10"
+              letter-spacing="1.4" fill="currentColor" opacity=".55">ISOLATED PER STUDY</text>
+        <g font-family="IBM Plex Mono, monospace" font-size="11">
+          <rect x="614" y="44" width="266" height="34" rx="4" fill="none" stroke="currentColor" stroke-opacity=".4"/>
+          <text x="630" y="66" fill="currentColor">output/AES-002/</text>
+
+          <rect x="614" y="88" width="266" height="34" rx="4" fill="none" stroke="currentColor" stroke-opacity=".4"/>
+          <text x="630" y="110" fill="currentColor">output/ONC-114/</text>
+
+          <rect x="614" y="132" width="266" height="34" rx="4" fill="none" stroke="currentColor" stroke-opacity=".4"/>
+          <text x="630" y="154" fill="currentColor">output/DERM-07/</text>
+        </g>
+
+        <line x1="20" y1="212" x2="880" y2="212" stroke="currentColor" stroke-opacity=".18"/>
+        <text x="20" y="238" font-size="11" fill="currentColor" opacity=".7">
+          A test greps every source file and skill for study identifiers. A match fails the build,
+        </text>
+        <text x="20" y="256" font-size="11" fill="currentColor" opacity=".7">
+          which is what keeps the engine column genuinely unchanged rather than merely intended to be.
+        </text>
+      </svg>
+    </div>
+    <figcaption>
+      Study, site, folder, form and field identifiers appear only in
+      <span class="mono">config/studies/</span>. Two fixture studies with deliberately opposite
+      conventions — uppercase versus lowercase OIDs, <span class="mono">Y/N</span> versus
+      <span class="mono">1/0</span> codelists, different date formats, one with dynamics and one
+      without — both parse with no code changes, which is what the regression suite proves.
+    </figcaption>
+  </figure>
+
+  <h3>What to check on a study nobody has run before</h3>
+
+  <p class="prose">
+    The procedure is the same as <em>Getting started</em> above — write the config, prove access,
+    add the ALS, dry run, go live. What changes is how carefully you read A3's output before
+    committing to a long run.
+  </p>
+
+  <h4>Read the model warnings</h4>
+  <p class="prose">
+    <span class="mono">run_model.py</span> is offline and takes seconds, so run it and read what
+    it says before spending an hour of generation. Three numbers tell you what the run can reach:
+  </p>
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Warning</th><th>What it means for the run</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Form assignments by source</td>
+          <td>How much of the structure came from the ALS versus was inferred by sampling existing subjects. Inferred assignments prove a form <em>can</em> appear in a folder, not that it is there at baseline.</td>
+        </tr>
+        <tr>
+          <td>Folders with no form assignments</td>
+          <td>Nothing can be written to them. Usually means the ALS is missing, or those folders genuinely hold no forms.</td>
+        </tr>
+        <tr>
+          <td>Most powerful trigger fields</td>
+          <td>The report lists which field values unlock the most. Most studies have one eligibility or enrolment flag that opens the bulk of the visit schedule; if that list is empty, dynamics will be discovered by trial rather than predicted.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h4>Each study needs its own ALS</h4>
+  <p class="prose">
+    Nothing carries over between studies. A study whose ALS you have not exported will populate
+    its seed folders and stop there, which looks like success until you read the coverage
+    fraction in the report.
+  </p>
+
+  <h4>Custom functions need declaring</h4>
+  <p class="prose">
+    If A3 reports unresolvable custom-function checks and the folders they drive matter to you,
+    read the function source — the ALS carries it — and declare its effect under
+    <code>dynamics.custom_function_overrides</code> in the study file. Until then those targets
+    are reported as unreachable rather than silently dropped.
+  </p>
+
+  <h4>Some limits are discovered, not declared</h4>
+  <p class="prose">
+    Rave enforces a maximum number of log records per form that appears in neither the metadata
+    nor the ALS. The tool finds it by being refused, shrinks the record list, and caches what
+    worked in <span class="mono">model/log_limits.json</span> — so the first run on a new study
+    does more retrying than later ones. That file is per study and safe to delete if the design
+    changes.
+  </p>
+
+  <h2>Reading the report</h2>
+  <p class="deck">
+    The report is built from what Rave returns, not from what the tool believes it sent. Those
+    two disagree more often than you would expect.
+  </p>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>Verdict</th><th>Meaning</th><th>Action</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="mono">match</span></td>
+          <td>Stored exactly as sent.</td>
+          <td>None.</td>
+        </tr>
+        <tr>
+          <td><span class="mono">normalised</span></td>
+          <td>Rave reshaped it and kept the meaning — text upper-cased, a datetime re-spelled to full ISO, a decimal padded to the field's precision.</td>
+          <td>None. This is Rave being Rave.</td>
+        </tr>
+        <tr>
+          <td><span class="mono">narrowed</span></td>
+          <td>The field is smaller than the value; a year-only date keeps the year.</td>
+          <td>None, but worth knowing which fields do it.</td>
+        </tr>
+        <tr>
+          <td><span class="mono">absent</span></td>
+          <td>Generated and sent, but Rave does not hold it — that form's submission was refused.</td>
+          <td>Check the rejection in <span class="mono">state/</span>; usually a folder or form that never activated.</td>
+        </tr>
+        <tr>
+          <td><span class="mono">mismatch</span></td>
+          <td>Rave holds something different. Rare, and always interesting.</td>
+          <td>Investigate. It usually means an undeclared derivation or a field mask.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p class="prose">
+    The report also lists every folder the dynamics graph predicted that never accepted data.
+    Silence there would be the real failure: a study can look fully populated while a third of
+    it was never reachable.
+  </p>
+
+  <h2>What the tool cannot do for you</h2>
+
+  <div class="prose">
+    <h4>Edit checks are not in RWS</h4>
+    <p>
+      The metadata endpoint returns structure only, and drafts can be listed but not downloaded.
+      Dynamics come from a hand-exported ALS or they are discovered empirically. Architect exports
+      that workbook as SpreadsheetML — it is XML despite the <span class="mono">.xls</span> name,
+      so no spreadsheet library is involved.
+    </p>
+
+    <h4>Custom functions are opaque</h4>
+    <p>
+      A check whose action is a custom function can be detected and named, but its logic is not
+      derivable from any export. Declare its effect under
+      <code>dynamics.custom_function_overrides</code> once you know it; until then it is reported
+      as unresolvable rather than silently dropped.
+    </p>
+
+    <h4>Derived fields belong to Rave</h4>
+    <p>
+      Rave computes them and refuses any value you send. They are excluded from generation and the
+      exclusion is reported, so the field count in the report is writable fields, not all fields.
+    </p>
+
+    <h4>Some things need a person</h4>
+    <p>
+      Creating a site needs administrative-data write permission, which a data-entry service account
+      usually lacks — and Rave reports that missing permission as
+      <span class="mono">Study does not exist</span>, which reads exactly like a typo. If clinical
+      writes to the same study succeed while the site POST fails, it is access, not naming.
+    </p>
+  </div>
+
+  <h2>Safety</h2>
+  <div class="prose">
+    <p>
+      Production is refused twice: the config loader rejects any environment matching a production
+      pattern regardless of the allow-list, and a pre-tool hook blocks a hand-written command that
+      would bypass the loader. No configuration flag unblocks either.
+    </p>
+    <p>
+      TLS verification cannot be disabled. Credentials come from <span class="mono">.env</span>,
+      are registered for redaction the moment they load, and never reach logs, reports, prompts or
+      output. Every request and response is archived for audit, and all generated data is synthetic
+      and marked as such in the report.
+    </p>
+  </div>
+
+</div>

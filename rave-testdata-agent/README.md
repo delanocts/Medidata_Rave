@@ -121,7 +121,16 @@ Claude API. Two are read by the running tool, not just by a human:
 Editing either changes behaviour with no code change. When you learn something
 new about Rave, add it to the skill rather than to a comment.
 
-See `CLAUDE.md` for the project rules and `docs/requirements.md` for the spec.
+## Documentation
+
+| Where | What |
+|---|---|
+| `docs/pipeline-guide.html` | Illustrated walkthrough: how the stages fit together, how the dynamics loop detects activation, and the step-by-step for pointing the tool at a new study. Open it in a browser. |
+| `CLAUDE.md` | Project rules — the constraints that must hold in any change. |
+| `.claude/skills/` | What this project learned about Rave, rwslib and the Claude API, one skill per activity. |
+
+The requirements specification this was built against is held outside the repo;
+`CLAUDE.md` is the operative rule set for day-to-day work.
 
 ## Safety
 

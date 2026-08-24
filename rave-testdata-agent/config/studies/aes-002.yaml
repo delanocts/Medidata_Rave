@@ -17,7 +17,7 @@ site:
   create_if_missing: false   # created manually; the account cannot write AdminData
 
 subjects:
-  count: 3
+  count: 4
   id_prefix: "TST-"
   id_start_number: 1
   id_pad_width: 3            # -> TST-001, TST-002

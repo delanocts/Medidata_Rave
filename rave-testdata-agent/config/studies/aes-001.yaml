@@ -6,20 +6,20 @@ rave:
   environment: "DEV"
 
 study:
-  name: "AES-002"
+  name: "AES-001"
 
 site:
   # Rave's site *number* is the ODM Location OID; the name is the label.
-  # Confirmed from Sites.odm: OID=11002, Name=DEV-AES-002.
-  number: "11002"
-  name: "DEV-AES-002"
+  # Confirmed from Sites.odm: OID=001234, Name=DEV-AES-001.
+  number: "001234"
+  name: "DEV-AES-001"
   country: "US"              # ISO 3166 alpha-2
   create_if_missing: false   # created manually; the account cannot write AdminData
 
 subjects:
   count: 1
   id_prefix: "TST-"
-  id_start_number: 4
+  id_start_number: 1
   id_pad_width: 3            # -> TST-001, TST-002
 
 generation:

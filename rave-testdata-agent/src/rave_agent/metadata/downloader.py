@@ -51,6 +51,8 @@ class MetadataAcquisition:
             self.manifest_path, config.study_name, config.environment
         )
         self.outcomes: list[DownloadOutcome] = []
+        self.version_source = ""
+        self.version_notes: list[str] = []
 
     # ------------------------------------------------------------------
     def _store(
@@ -105,29 +107,98 @@ class MetadataAcquisition:
             return f"{self.client.base_url}/<unavailable>"
 
     # ------------------------------------------------------------------
-    def resolve_version(self) -> tuple[str, str]:
-        """Pick the CRF version to use: config pin, else newest (OQ-5)."""
+    def site_versions(self, sites_xml: Path) -> list[tuple[str, str]]:
+        """CRF versions assigned to the configured site, newest effective first.
+
+        `Sites.odm` carries a MetaDataVersionRef per Location. A site can hold
+        several, one per amendment it has been migrated through; the one with
+        the latest EffectiveDate is what data entry at that site uses.
+        """
+        site_oid = str(self.config.get("site.number") or "")
+        site_name = str(self.config.get("site.name") or "")
+        if not sites_xml.is_file():
+            return []
+
+        root = parse_xml_file(sites_xml)
+        for location in root.findall(f".//{{{ODM_NS}}}Location"):
+            oid = location.get("OID") or ""
+            name = location.get("Name") or ""
+            if oid != site_oid and name != site_oid and oid != site_name:
+                continue
+            refs = []
+            for ref in location.findall(f"{{{ODM_NS}}}MetaDataVersionRef"):
+                version = ref.get("MetaDataVersionOID")
+                if version:
+                    refs.append((version, ref.get("EffectiveDate") or ""))
+            refs.sort(key=lambda r: r[1], reverse=True)
+            return refs
+        return []
+
+    def resolve_version(self, sites_xml: Path | None = None) -> tuple[str, str]:
+        """Pick the CRF version to use (OQ-5).
+
+        Order of authority:
+          1. `study.crf_version` in config - an explicit pin always wins.
+          2. The version assigned to **the configured site**. Data entry is
+             judged against the site's version, not the study's newest one, and
+             those differ whenever an amendment has not been rolled out
+             everywhere. Using the study's latest against a site still on an
+             earlier version makes Rave reject fields and forms that genuinely
+             do not exist there.
+          3. The study's newest published version, with a warning.
+        """
         from rwslib.rws_requests import StudyVersionsRequest
 
         request = StudyVersionsRequest(self.config.study_name)
         versions = self.client.send(request).value
-        listed = [{"oid": v.oid, "name": v.name} for v in versions]
+        listed = [{"oid": str(v.oid), "name": str(v.name)} for v in versions]
         if not listed:
             raise RaveError(f"no CRF versions published for {self.config.study_name}")
-
         self._versions = listed
+        by_oid = {v["oid"]: v["name"] for v in listed}
+
         pinned = self.config.get("study.crf_version")
         if pinned is not None:
-            match = next((v for v in listed if str(v["oid"]) == str(pinned)), None)
+            match = next((v for v in listed if v["oid"] == str(pinned)), None)
             if match is None:
                 raise RaveError(
                     f"study.crf_version {pinned!r} not among published versions "
                     f"{[v['oid'] for v in listed]}"
                 )
-            return str(match["oid"]), str(match["name"])
+            self.version_source = "config pin"
+            return match["oid"], match["name"]
 
-        # Newest first, as returned by RWS.
-        return str(listed[0]["oid"]), str(listed[0]["name"])
+        site_refs = self.site_versions(sites_xml) if sites_xml else []
+        if site_refs:
+            oid, effective = site_refs[0]
+            name = by_oid.get(oid, "")
+            self.version_source = (
+                f"assigned to site {self.config.get('site.number')}"
+                + (f", effective {effective}" if effective else "")
+            )
+            if listed and oid != listed[0]["oid"]:
+                log.warning(
+                    "site is not on the study's newest version",
+                    extra={"site_version": oid,
+                           "study_newest": listed[0]["oid"]},
+                )
+                self.version_notes.append(
+                    f"The site runs CRF version {oid} ({name or 'unnamed'}), while the "
+                    f"study's newest is {listed[0]['oid']} ({listed[0]['name']}). The "
+                    "site's version is used, because that is what data entry there is "
+                    "judged against. Export the ALS from the draft behind "
+                    f"{oid}, not the newest one."
+                )
+            return oid, name
+
+        self.version_source = "study newest (site version unknown)"
+        self.version_notes.append(
+            "Could not determine the CRF version assigned to "
+            f"{self.config.get('site.number')!r} from Sites.odm, so the study's newest "
+            "version was used. If the site is on an earlier amendment, expect Rave to "
+            "reject fields and forms that do not exist there."
+        )
+        return listed[0]["oid"], listed[0]["name"]
 
     # ------------------------------------------------------------------
     def run(self, force: bool = False) -> dict:
@@ -142,9 +213,21 @@ class MetadataAcquisition:
         study = self.config.study_name
         env = self.config.environment
 
-        version_oid, version_name = self.resolve_version()
+        # Sites first: the CRF version is resolved from the site's assignment,
+        # so Sites.odm has to be on disk before anything else is chosen.
+        def fetch_sites():
+            request = SitesMetadataRequest(study, env)
+            return self.client.send(request).value, self._url_for(request)
+
+        # Always re-fetch: this file decides which CRF version the whole run
+        # uses, and a cached copy from before a site was added or migrated
+        # would silently pick the wrong one. It is ~2 KB.
+        self._store("sites", "sites.xml", fetch_sites, force=True)
+
+        version_oid, version_name = self.resolve_version(self.dir / "sites.xml")
         log.info("crf version selected",
-                 extra={"version_oid": version_oid, "version_name": version_name})
+                 extra={"version_oid": version_oid, "version_name": version_name,
+                        "source": self.version_source})
 
         # 1. Study versions list (FR-2.3)
         def fetch_versions():
@@ -179,13 +262,6 @@ class MetadataAcquisition:
 
         self._store("version_folders", "version_folders.xml", fetch_folders, force,
                     study_version=version_oid)
-
-        # 5. Sites (FR-2.3)
-        def fetch_sites():
-            request = SitesMetadataRequest(study, env)
-            return self.client.send(request).value, self._url_for(request)
-
-        self._store("sites", "sites.xml", fetch_sites, force)
 
         # 6. Subjects (FR-2.3, feeds FR-5.2 collision policy)
         def fetch_subjects():
@@ -329,7 +405,9 @@ class MetadataAcquisition:
         return {
             "study": self.config.study_name,
             "environment": self.config.environment,
-            "crf_version": {"oid": version_oid, "name": version_name},
+            "crf_version": {"oid": version_oid, "name": version_name,
+                            "source": self.version_source},
+            "version_notes": self.version_notes,
             "directory": str(self.dir),
             "artifacts": [o.__dict__ for o in self.outcomes],
             "structure": stats,

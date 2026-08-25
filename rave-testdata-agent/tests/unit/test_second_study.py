@@ -472,3 +472,100 @@ def test_token_usage_survives_concurrent_updates():
     assert usage.calls == 4000
     assert usage.input_tokens == 4000
     assert usage.output_tokens == 8000
+
+
+# ------------------------------------------- CRF version follows the site
+SITES_ODM = """<?xml version="1.0" encoding="utf-8"?>
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata" ODMVersion="1.3">
+  <AdminData>
+    <Location OID="001234" Name="DEV-SITE-A" LocationType="Site">
+      <MetaDataVersionRef StudyOID="S(DEV)" MetaDataVersionOID="17199" EffectiveDate="2026-03-27"/>
+      <MetaDataVersionRef StudyOID="S(DEV)" MetaDataVersionOID="17001" EffectiveDate="2026-03-23"/>
+    </Location>
+    <Location OID="999" Name="OTHER" LocationType="Site">
+      <MetaDataVersionRef StudyOID="S(DEV)" MetaDataVersionOID="17481" EffectiveDate="2026-06-01"/>
+    </Location>
+  </AdminData>
+</ODM>"""
+
+
+class _Version:
+    def __init__(self, oid, name): self.oid, self.name = oid, name
+
+
+class _StubClient:
+    """Returns the study's published versions, newest first."""
+    base_url = "https://example.invalid/RaveWebServices"
+
+    def send(self, request, label=None):
+        class R:
+            value = [_Version("17481", "3.0"), _Version("17199", "2.0"),
+                     _Version("17001", "0.1")]
+            correlation_id = "x"
+        return R()
+
+
+def _acquisition(tmp_path, site_number, pinned=None):
+    from rave_agent.config.loader import load_config
+    from rave_agent.metadata.downloader import MetadataAcquisition
+
+    overrides = {"site.number": site_number,
+                 "execution.output_root": str(tmp_path)}
+    if pinned is not None:
+        overrides["study.crf_version"] = pinned
+    config = load_config("aes-002", config_dir=REPO_ROOT / "config",
+                         cli_overrides=overrides)
+    return MetadataAcquisition(_StubClient(), config)
+
+
+def test_version_follows_the_site_not_the_study_newest(tmp_path):
+    """A site on an earlier amendment must not be sent the newest version.
+
+    Using the study's newest against such a site makes Rave reject fields and
+    forms that genuinely do not exist there.
+    """
+    acq = _acquisition(tmp_path, "001234")
+    sites = tmp_path / "sites.xml"
+    sites.write_text(SITES_ODM, encoding="utf-8")
+
+    oid, name = acq.resolve_version(sites)
+    assert (oid, name) == ("17199", "2.0")
+    assert "site" in acq.version_source
+    assert any("newest is 17481" in n for n in acq.version_notes)
+
+
+def test_latest_effective_date_wins_when_a_site_has_several(tmp_path):
+    acq = _acquisition(tmp_path, "001234")
+    sites = tmp_path / "sites.xml"
+    sites.write_text(SITES_ODM, encoding="utf-8")
+    assert acq.site_versions(sites)[0] == ("17199", "2026-03-27")
+
+
+def test_a_site_already_on_the_newest_version_raises_no_note(tmp_path):
+    acq = _acquisition(tmp_path, "999")
+    sites = tmp_path / "sites.xml"
+    sites.write_text(SITES_ODM, encoding="utf-8")
+    oid, _ = acq.resolve_version(sites)
+    assert oid == "17481"
+    assert acq.version_notes == []
+
+
+def test_config_pin_beats_the_site_assignment(tmp_path):
+    acq = _acquisition(tmp_path, "001234", pinned="17481")
+    sites = tmp_path / "sites.xml"
+    sites.write_text(SITES_ODM, encoding="utf-8")
+    oid, _ = acq.resolve_version(sites)
+    assert oid == "17481"
+    assert acq.version_source == "config pin"
+
+
+def test_unknown_site_falls_back_to_newest_and_says_so(tmp_path):
+    """Falling back silently is what produced a whole run against the wrong version."""
+    acq = _acquisition(tmp_path, "not-a-site")
+    sites = tmp_path / "sites.xml"
+    sites.write_text(SITES_ODM, encoding="utf-8")
+    oid, _ = acq.resolve_version(sites)
+    assert oid == "17481"
+    assert "site version unknown" in acq.version_source
+    assert acq.version_notes, "a silent fallback must not be possible"

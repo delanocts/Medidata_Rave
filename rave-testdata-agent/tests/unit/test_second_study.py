@@ -280,3 +280,81 @@ def test_rave_padding_a_decimal_is_not_a_mismatch():
     assert _compare(model, item.oid, "10.0", "10.00") == "normalised"
     # A genuinely different number is still a mismatch.
     assert _compare(model, item.oid, "2", "1") == "mismatch"
+
+
+# ------------------------------------------------- ALS data dictionaries win
+def _dict_model():
+    """A field whose ODM CodeListRef disagrees with its Rave data dictionary."""
+    from rave_agent.model.study_model import CodeList, CodeListEntry, Item, StudyModel
+
+    model = StudyModel(study_name="S", environment="D",
+                       crf_version_oid="1", crf_version_name="v")
+    model.codelists["NY"] = CodeList(
+        oid="NY", name="NY", data_type="text",
+        entries=[CodeListEntry(coded_value="N"), CodeListEntry(coded_value="Y")],
+    )
+    # The export points this field at NY; Rave actually enforces 1/2.
+    model.items["F.RATE"] = Item(oid="F.RATE", name="RATE", form_oid="F",
+                                 data_type="text", codelist_oid="NY")
+    # This one the export got right.
+    model.items["F.YN"] = Item(oid="F.YN", name="YN", form_oid="F",
+                               data_type="text", codelist_oid="NY")
+    return model
+
+
+class _StubAls:
+    data_dictionaries = {
+        "COMPRATE": [
+            {"coded_value": "1", "decode": "Complete", "order": 1, "specify": False},
+            {"coded_value": "2", "decode": "Partial", "order": 2, "specify": False},
+        ],
+        "NY": [
+            {"coded_value": "N", "decode": "No", "order": 1, "specify": False},
+            {"coded_value": "Y", "decode": "Yes", "order": 2, "specify": False},
+        ],
+    }
+    field_dictionaries = {"F.RATE": "COMPRATE", "F.YN": "NY"}
+
+
+def test_als_dictionary_overrides_a_wrong_odm_codelist():
+    """Rave judges a submission against the dictionary, not the ODM codelist."""
+    from rave_agent.model.matrix_resolver import apply_als_dictionaries
+
+    model = _dict_model()
+    apply_als_dictionaries(model, _StubAls())
+
+    corrected = model.codelists[model.items["F.RATE"].codelist_oid]
+    assert corrected.coded_values == ["1", "2"]
+    assert any("data dictionary" in w for w in model.warnings)
+
+
+def test_a_correct_odm_codelist_is_left_alone():
+    """Only disagreements are rewritten - agreement must not churn the model."""
+    from rave_agent.model.matrix_resolver import apply_als_dictionaries
+
+    model = _dict_model()
+    apply_als_dictionaries(model, _StubAls())
+    assert model.items["F.YN"].codelist_oid == "NY"
+
+
+def test_the_shared_codelist_is_not_mutated():
+    """NY is shared; correcting one field must not corrupt the other's list."""
+    from rave_agent.model.matrix_resolver import apply_als_dictionaries
+
+    model = _dict_model()
+    apply_als_dictionaries(model, _StubAls())
+    assert model.codelists["NY"].coded_values == ["N", "Y"]
+
+
+def test_validation_then_rejects_the_value_rave_would_reject():
+    """The whole point: the generator must stop offering the ODM's wrong value."""
+    from rave_agent.generation.validators import validate_value
+    from rave_agent.model.matrix_resolver import apply_als_dictionaries
+
+    model = _dict_model()
+    item = model.items["F.RATE"]
+    assert validate_value(model, item, "N") == []      # before: wrongly allowed
+
+    apply_als_dictionaries(model, _StubAls())
+    assert validate_value(model, item, "N") != []      # after: correctly refused
+    assert validate_value(model, item, "1") == []

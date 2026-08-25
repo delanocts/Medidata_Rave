@@ -23,6 +23,7 @@ from rave_agent.model.dynamics_graph import build_graph  # noqa: E402
 from rave_agent.metadata.observed_structure import ObservedStructure  # noqa: E402
 from rave_agent.model.matrix_resolver import (  # noqa: E402
     apply_als_derivations,
+    apply_als_dictionaries,
     apply_als_matrices,
     apply_observed_structure,
     apply_version_folders,
@@ -102,6 +103,7 @@ def main(argv: list[str] | None = None) -> int:
         als = parse_als(metadata_dir / als_record.filename)
         apply_als_matrices(model, als)
         apply_als_derivations(model, als)
+        apply_als_dictionaries(model, als)
         print(f"ALS      : {als_record.filename} - "
               f"{als.counts.get('activating_actions', 0)} activating action(s), "
               f"{als.counts.get('matrices', 0)} matrix grid(s), "

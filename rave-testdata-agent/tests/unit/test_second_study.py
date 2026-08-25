@@ -358,3 +358,117 @@ def test_validation_then_rejects_the_value_rave_would_reject():
     apply_als_dictionaries(model, _StubAls())
     assert validate_value(model, item, "N") != []      # after: correctly refused
     assert validate_value(model, item, "1") == []
+
+
+# --------------------------------------------------------- parallel generation
+class _CountingGenerator:
+    """Stands in for the real generator to check ordering and call counts."""
+
+    def __init__(self, model, max_parallel_forms=4):
+        import threading
+        from concurrent.futures import ThreadPoolExecutor
+        self.model = model
+        self.max_parallel_forms = max_parallel_forms
+        self.calls = []
+        self._lock = threading.Lock()
+        self._pool = ThreadPoolExecutor
+        self.unsatisfiable_triggers = {}
+
+    def generate_form(self, subject_id, folder_oid, form_oid, context):
+        from rave_agent.generation.generator import FormOutcome
+        with self._lock:
+            self.calls.append(form_oid)
+        return FormOutcome(subject_id, folder_oid, form_oid, "generated",
+                           values={f"{form_oid}.A": "1"})
+
+    def generate_forms(self, subject_id, folder_oid, form_oids, context):
+        from rave_agent.generation.generator import Generator
+        return Generator.generate_forms(self, subject_id, folder_oid, form_oids, context)
+
+    def _update_context(self, context, outcome):
+        pass
+
+
+def test_generate_forms_preserves_request_order():
+    """Submissions stay serialised per subject, so results must not be reordered."""
+    from rave_agent.model.study_model import StudyModel
+
+    gen = _CountingGenerator(StudyModel(study_name="S", environment="D",
+                                        crf_version_oid="1", crf_version_name="v"))
+    wanted = [f"F{i}" for i in range(10)]
+    out = gen.generate_forms("SUBJ", "FOLDER", wanted, {})
+    assert [o.form_oid for o in out] == wanted
+    assert sorted(gen.calls) == sorted(wanted)
+
+
+def test_generate_forms_runs_concurrently():
+    """With parallelism enabled the calls must actually overlap."""
+    import threading
+    import time
+    from rave_agent.generation.generator import FormOutcome, Generator
+    from rave_agent.model.study_model import StudyModel
+
+    class Slow(_CountingGenerator):
+        def __init__(self):
+            super().__init__(StudyModel(study_name="S", environment="D",
+                                        crf_version_oid="1", crf_version_name="v"),
+                             max_parallel_forms=4)
+            self.live = 0
+            self.peak = 0
+
+        def generate_form(self, subject_id, folder_oid, form_oid, context):
+            with self._lock:
+                self.live += 1
+                self.peak = max(self.peak, self.live)
+            time.sleep(0.05)
+            with self._lock:
+                self.live -= 1
+            return FormOutcome(subject_id, folder_oid, form_oid, "generated")
+
+    slow = Slow()
+    slow.generate_forms("SUBJ", "FOLDER", [f"F{i}" for i in range(8)], {})
+    assert slow.peak > 1, "forms were generated one at a time"
+    assert slow.peak <= 4, f"exceeded max_parallel_forms: {slow.peak}"
+
+
+def test_max_parallel_forms_one_stays_sequential():
+    """The setting must be able to turn concurrency off entirely."""
+    import time
+    from rave_agent.generation.generator import FormOutcome
+    from rave_agent.model.study_model import StudyModel
+
+    class Serial(_CountingGenerator):
+        def __init__(self):
+            super().__init__(StudyModel(study_name="S", environment="D",
+                                        crf_version_oid="1", crf_version_name="v"),
+                             max_parallel_forms=1)
+            self.live = 0
+            self.peak = 0
+
+        def generate_form(self, subject_id, folder_oid, form_oid, context):
+            self.live += 1
+            self.peak = max(self.peak, self.live)
+            time.sleep(0.01)
+            self.live -= 1
+            return FormOutcome(subject_id, folder_oid, form_oid, "generated")
+
+    s = Serial()
+    s.generate_forms("SUBJ", "FOLDER", [f"F{i}" for i in range(5)], {})
+    assert s.peak == 1
+
+
+def test_token_usage_survives_concurrent_updates():
+    """Counts are shared across generation threads."""
+    import threading
+    from rave_agent.generation.llm_client import TokenUsage
+
+    usage = TokenUsage()
+    def bump():
+        for _ in range(500):
+            usage.add(1, 2)
+    threads = [threading.Thread(target=bump) for _ in range(8)]
+    for t in threads: t.start()
+    for t in threads: t.join()
+    assert usage.calls == 4000
+    assert usage.input_tokens == 4000
+    assert usage.output_tokens == 8000

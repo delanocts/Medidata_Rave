@@ -174,6 +174,32 @@ class DynamicsResolver:
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(limits, indent=2, sort_keys=True), encoding="utf-8")
 
+    def _record(self, result, state, folder_oid, form_oid, outcome,
+                submission, error, pass_number, context) -> bool:
+        """Record one submission. Returns False when the folder is absent.
+
+        A dry run writes the payload and posts nothing, so it proves nothing
+        about activation; recording it would leave a state file claiming
+        coverage Rave does not have.
+        """
+        if submission is not None and submission.status == "DRY_RUN":
+            result.forms_submitted += 1
+            self.generator._update_context(context, outcome)
+            return True
+
+        if submission is not None and submission.ok:
+            if state.mark_active(folder_oid, form_oid, pass_number):
+                result.newly_activated.append(folder_oid)
+            result.forms_submitted += 1
+            self.generator._update_context(context, outcome)
+            return True
+
+        result.forms_rejected += 1
+        result.rejections[f"{folder_oid}/{form_oid}"] = error
+        state.mark_refused(folder_oid, form_oid, error)
+        # A missing *form* leaves the folder live; a missing folder does not.
+        return classify_rejection(error)[0] != FOLDER_INACTIVE
+
     # ------------------------------------------------------------------
     def run_pass(
         self,
@@ -190,43 +216,48 @@ class DynamicsResolver:
             if folder is None:
                 continue
 
-            for assignment in folder.forms:
-                form_oid = assignment.form_oid
-                if state.is_populated(folder_oid, form_oid):
-                    continue  # FR-8.4: never overwrite what is already there
+            pending = [a.form_oid for a in folder.forms
+                       if not state.is_populated(folder_oid, a.form_oid)]
+            if not pending:
+                continue
 
-                outcome = self.generator.generate_form(
-                    subject_id, folder_oid, form_oid, context)
+            # Probe the folder with its first form before generating the rest.
+            # A folder that is not part of this subject yet refuses everything,
+            # so finding that out after generating twenty forms wastes twenty
+            # LLM calls. One call answers the question.
+            probe, rest = pending[0], pending[1:]
+            outcome = self.generator.generate_form(
+                subject_id, folder_oid, probe, context)
+
+            if not outcome.ok:
+                result.generation_failures[f"{folder_oid}/{probe}"] = (
+                    outcome.detail or "; ".join(outcome.violations[:2]))
+            else:
+                submission, error = self._submit_one(
+                    subject_id, folder_oid, outcome, pass_number)
+                if not self._record(result, state, folder_oid, probe, outcome,
+                                    submission, error, pass_number, context):
+                    # Folder is absent: skip its remaining forms *before*
+                    # paying to generate them.
+                    continue
+
+            if not rest:
+                continue
+
+            # The folder is live, so generate the rest together and submit them
+            # in order - submissions for one subject stay serialised (C-5).
+            for form_oid, outcome in zip(
+                    rest, self.generator.generate_forms(
+                        subject_id, folder_oid, rest, context)):
                 if not outcome.ok:
                     result.generation_failures[f"{folder_oid}/{form_oid}"] = (
                         outcome.detail or "; ".join(outcome.violations[:2]))
                     continue
-
                 submission, error = self._submit_one(
                     subject_id, folder_oid, outcome, pass_number)
-
-                # A dry run writes the payload and posts nothing, so it proves
-                # nothing about activation. Recording it would leave a state file
-                # claiming coverage that does not exist in Rave.
-                if submission is not None and submission.status == "DRY_RUN":
-                    result.forms_submitted += 1
-                    self.generator._update_context(context, outcome)
-                elif submission is not None and submission.ok:
-                    if state.mark_active(folder_oid, form_oid, pass_number):
-                        result.newly_activated.append(folder_oid)
-                    result.forms_submitted += 1
-                    self.generator._update_context(context, outcome)
-                else:
-                    result.forms_rejected += 1
-                    result.rejections[f"{folder_oid}/{form_oid}"] = error
-                    state.mark_refused(folder_oid, form_oid, error)
-                    if classify_rejection(error)[0] == FOLDER_INACTIVE:
-                        # The folder itself is absent, so its remaining forms
-                        # cannot land either. A missing *form* is a different
-                        # class: the folder is live and its other forms may
-                        # still be writable, so that falls through to the next
-                        # form rather than abandoning the folder.
-                        break
+                if not self._record(result, state, folder_oid, form_oid, outcome,
+                                    submission, error, pass_number, context):
+                    break
 
         return result
 

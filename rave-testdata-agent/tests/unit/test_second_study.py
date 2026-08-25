@@ -21,6 +21,8 @@ from rave_agent.generation.prompt_builder import (  # noqa: E402
 )
 from rave_agent.generation.validators import (  # noqa: E402
     format_for_rave,
+    strftime_pattern,
+    untranslatable_formats,
     validate_form,
     validate_value,
 )
@@ -34,6 +36,7 @@ from rave_agent.model.matrix_resolver import (  # noqa: E402
     resolve_primary_form_placement,
 )
 from rave_agent.model.odm_parser import parse_odm  # noqa: E402
+from rave_agent.model.study_model import Item  # noqa: E402
 
 FIXTURES = REPO_ROOT / "tests" / "fixtures"
 
@@ -170,6 +173,59 @@ def test_each_study_renders_dates_in_its_own_format(study_a, study_b):
     model_b, _, _ = study_b
     assert format_for_rave(study_a.items["OBS.WHEN"], "2026-03-14") == "14 MAR 2026"
     assert format_for_rave(model_b.items["scr_entry.scr_dt"], "2026-03-14") == "2026-03-14"
+
+
+def test_unknown_allowed_marker_is_not_written_into_the_value():
+    """`dd- MMM- yyyy` is a full date whose parts may be unknown.
+
+    The trailing hyphen is a property of the field, not a separator. Writing it
+    out produced `01- SEP- 2012`, which Rave stored but flagged with "Clinical
+    Data entered in incorrect format"; the day and year still parsed, the month
+    did not, so the field looked half-entered in the CRF.
+    """
+    assert strftime_pattern("dd- MMM- yyyy") == "%d %b %Y"
+    assert strftime_pattern("dd- MMM yyyy") == "%d %b %Y"
+    assert strftime_pattern("MMM- yyyy") == "%b %Y"
+    item = Item(oid="MH.END", name="END", form_oid="MH", data_type="date",
+                datetime_format="dd- MMM- yyyy")
+    assert format_for_rave(item, "2012-09-01") == "01 SEP 2012"
+
+
+def test_hyphen_separator_survives():
+    """Only a hyphen that ends a part is a marker; `yyyy-MM-dd` is a real format."""
+    assert strftime_pattern("yyyy-MM-dd") == "%Y-%m-%d"
+
+
+def test_lowercase_month_is_a_month_not_minutes():
+    """`nn` is minutes in Rave, so `mm` is free to mean month - and does.
+
+    Mapping `mm` to minutes rendered every `dd mm yyyy` field as `15 00 2024`,
+    which Rave dropped on the floor.
+    """
+    assert strftime_pattern("dd mm yyyy") == "%d %m %Y"
+    item = Item(oid="D.DATE", name="DATE", form_oid="D", data_type="date",
+                datetime_format="dd mm yyyy")
+    assert format_for_rave(item, "2024-01-15") == "15 01 2024"
+
+
+def test_twelve_hour_clock_with_meridiem():
+    """`hh:nn rr` left `hh` and `rr` untranslated, emitting the literal `hh:30 rr`."""
+    assert strftime_pattern("hh:nn rr") == "%I:%M %p"
+    item = Item(oid="D.TIME", name="TIME", form_oid="D", data_type="time",
+                datetime_format="hh:nn rr")
+    assert format_for_rave(item, "14:30") == "02:30 PM"
+
+
+def test_unknown_format_token_is_reported_not_emitted(study_a):
+    """The guard that would have caught `hh:nn rr` before it reached a study."""
+    assert untranslatable_formats(study_a) == {}
+    item = study_a.items["OBS.WHEN"]
+    original = item.datetime_format
+    try:
+        item.datetime_format = "dd MMM yyyy zz"
+        assert untranslatable_formats(study_a) == {"dd MMM yyyy zz": ["OBS.WHEN"]}
+    finally:
+        item.datetime_format = original
 
 
 def test_time_field_is_not_treated_as_a_date(study_b):

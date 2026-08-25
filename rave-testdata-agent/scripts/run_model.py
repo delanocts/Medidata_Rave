@@ -18,6 +18,7 @@ from _bootstrap import REPO_ROOT, check_dependencies  # noqa: E402
 check_dependencies(include_optional=False)
 
 from rave_agent.config.loader import ConfigError, load_config  # noqa: E402
+from rave_agent.generation.validators import untranslatable_formats  # noqa: E402
 from rave_agent.metadata.manifest import MetadataManifest  # noqa: E402
 from rave_agent.model.dynamics_graph import build_graph  # noqa: E402
 from rave_agent.metadata.observed_structure import ObservedStructure  # noqa: E402
@@ -116,6 +117,15 @@ def main(argv: list[str] | None = None) -> int:
     finalise_assignments(model)
 
     graph = build_graph(model, config.get("dynamics") or {}, als)
+
+    # Every date format must translate before a live run. An unknown token is
+    # emitted literally and Rave answers with a non-conformance query that no
+    # load response mentions, so it would otherwise surface only in the CRF.
+    for fmt, oids in untranslatable_formats(model).items():
+        model.warnings.append(
+            f"date format {fmt!r} cannot be translated - {len(oids)} field(s) "
+            f"including {oids[0]} would be written with the token left literal"
+        )
 
     model_dir = model_dir_for(config)
     model_path = model.save(model_dir / "study_model.json")

@@ -17,14 +17,25 @@ from datetime import date, datetime
 from ..model.study_model import Item, StudyModel
 
 # Rave mdsol:DateTimeFormat tokens -> strftime, longest token first so that
-# "yyyy" is consumed before "yy" and "MMM" before "MM".
+# "yyyy" is consumed before "yy" and "MMM" before "MM". Matching is
+# case-sensitive, which is what separates `MM` (month) from `mm` (also month,
+# in the lowercase dialect some fields use) and `HH` (24-hour) from `hh`.
 _FORMAT_TOKENS = [
     ("yyyy", "%Y"), ("yy", "%y"),
-    ("MMM", "%b"), ("MM", "%m"),
+    ("MMM", "%b"), ("MM", "%m"), ("mm", "%m"),
     ("dd", "%d"),
-    # Rave writes minutes as `nn` (`mm` is months), e.g. a time format of `HH:nn`.
-    ("HH", "%H"), ("nn", "%M"), ("mm", "%M"), ("ss", "%S"),
+    # Rave writes minutes as `nn`; `mm` is always a month, never minutes.
+    ("HH", "%H"), ("hh", "%I"), ("nn", "%M"), ("ss", "%S"), ("rr", "%p"),
 ]
+
+# A hyphen glued to the end of a date part - `dd- MMM- yyyy`, `MMM- yyyy` -
+# marks that part as allowed to be unknown. It is a property of the field, not
+# a character in the value: the separator is the space that follows it. Emitting
+# the hyphen produces `01- SEP- 2012`, which Rave stores but flags with
+# "Clinical Data entered in incorrect format", so it is stripped first. A
+# hyphen used as a real separator (`yyyy-MM-dd`) is followed by a letter, not
+# by whitespace, and is left alone.
+_PART_MODIFIER = re.compile(r"-(?=\s|$)")
 
 _ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _ISO_TIME = re.compile(r"^([01]\d|2[0-3]):[0-5]\d$")
@@ -48,9 +59,31 @@ class Violation:
 
 def strftime_pattern(rave_format: str) -> str:
     """Translate a Rave DateTimeFormat such as `dd MMM yyyy` to a strftime pattern."""
-    out = rave_format or ""
+    out = _PART_MODIFIER.sub("", rave_format or "")
     for token, replacement in _FORMAT_TOKENS:
         out = out.replace(token, replacement)
+    return out
+
+
+_UNTRANSLATED = re.compile(r"(?<!%)[A-Za-z]")
+
+
+def untranslatable_formats(model: StudyModel) -> dict[str, list[str]]:
+    """Date formats this module cannot fully translate, mapped to their fields.
+
+    A token nobody has met before is not an error anywhere: it survives into
+    the strftime pattern as a literal, `strftime` returns it unchanged, and
+    Rave raises a non-conformance query that appears in no load response. That
+    is how `hh:nn rr` reached a live study as `hh:30 rr`. Checking the model up
+    front turns a silent per-value failure into one message before the run.
+    """
+    out: dict[str, list[str]] = {}
+    for item in model.items.values():
+        if not item.is_date_like or not item.datetime_format:
+            continue
+        pattern = strftime_pattern(item.datetime_format)
+        if _UNTRANSLATED.search(pattern):
+            out.setdefault(item.datetime_format, []).append(item.oid)
     return out
 
 

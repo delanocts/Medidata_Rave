@@ -57,6 +57,28 @@ Ask the model for ISO dates and validate that. Convert to each field's
 (`yyyy`, `MMM`, `dd`) to strftime must replace longest-first, or `yyyy` is
 consumed as `yy` + `yy`. Rave stores month abbreviations upper-cased.
 
+The token dialect is case-sensitive and wider than it first appears. `nn` is
+minutes, which frees `mm` to mean **month** - mapping `mm` to minutes renders
+every `dd mm yyyy` field as `15 00 2024`. `hh` is the 12-hour clock and pairs
+with `rr`, the AM/PM marker; leaving either untranslated emits the literal
+`hh:30 rr`. Cover at least: `yyyy yy MMM MM mm dd HH hh nn ss rr`.
+
+**A hyphen glued to the end of a part - `dd- MMM- yyyy`, `MMM- yyyy` - marks
+that part as allowed to be unknown.** It is a property of the field, not a
+character in the value, and the separator is the space that follows it. Strip
+it before translating. Writing it out produces `01- SEP- 2012`, which Rave
+accepts into storage and then flags with the system query *"Clinical Data
+entered in incorrect format. Please correct."* - the day and year still parse,
+the month does not, so the field looks half-entered in the CRF. A hyphen that
+is a real separator (`yyyy-MM-dd`) is followed by a letter rather than by
+whitespace, so `-(?=\s|$)` distinguishes them.
+
+Enumerate every distinct `mdsol:DateTimeFormat` in a new study's metadata and
+render one value through each before a live run. A study using ten formats will
+happen to exercise three in the common forms; the rest fail silently, because
+a non-conformance query is raised in Rave and reported nowhere in the load
+response.
+
 ## Exclusions that are not failures
 Two field classes cannot be written and must be excluded before generation, not
 reported as violations:

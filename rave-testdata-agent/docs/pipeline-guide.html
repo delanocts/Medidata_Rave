@@ -212,6 +212,12 @@
   .lede-in { color: var(--ink-soft); }
   hr.soft { border: none; border-top: 1px solid var(--rule); margin: 3rem 0; }
 
+  /* ---- wiring map (uses the palette tokens so both themes resolve) ---- */
+  .wiring .fill-accent  { fill: var(--petrol); }
+  .wiring .fill-write   { fill: var(--amber); }
+  .wiring .fill-live    { fill: var(--moss); }
+  .wiring .stroke-write { stroke: var(--amber); }
+
   :focus-visible { outline: 2px solid var(--petrol); outline-offset: 3px; border-radius: 2px; }
   @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
   @media (max-width: 40rem) { :root { --step-4: 2.1rem; --step-3: 1.65rem; } .wrap { padding-top: 2.25rem; } }
@@ -726,6 +732,211 @@ python scripts/run_all.py <span class="flag">--study</span> onc-114</code></pre>
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <h2>How agents, skills and scripts connect</h2>
+  <p class="deck">
+    Three layers, and they are deliberately unequal. The scripts are thin, the modules hold
+    every decision, and the skills hold what the project has learned about Rave. Two of those
+    skill files are read by the running tool, not only by a person.
+  </p>
+
+  <figure>
+    <div class="figframe">
+      <svg class="wiring" viewBox="0 0 980 660" role="img"
+           aria-label="Wiring map with eight rows, one per stage. Each row links a script under scripts to the agent modules under src rave_agent that do the work, and to the skills under .claude skills that document them. Stages A5 and A6 are driven in passes by A8. Two skills, clinical-data-generation and rave-submission, are read by the running tool.">
+        <defs>
+          <marker id="ah4" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor"/>
+          </marker>
+          <marker id="ah4-loop" viewBox="0 0 10 10" refX="9" refY="5"
+                  markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" class="fill-write"/>
+          </marker>
+        </defs>
+
+        <g font-family="IBM Plex Mono, monospace" font-size="10" letter-spacing="1.4"
+           fill="currentColor" opacity=".55">
+          <text x="48" y="30">SCRIPTS/</text>
+          <text x="262" y="30">SRC/RAVE_AGENT/</text>
+          <text x="578" y="30">.CLAUDE/SKILLS/</text>
+        </g>
+
+        <g fill="none" stroke="currentColor" stroke-opacity=".22" stroke-dasharray="3 3">
+          <rect x="40" y="38" width="188" height="586" rx="4"/>
+          <rect x="248" y="38" width="296" height="586" rx="4"/>
+          <rect x="564" y="38" width="400" height="586" rx="4"/>
+        </g>
+
+        <line x1="24" y1="82" x2="24" y2="572" stroke="currentColor" stroke-opacity=".25"/>
+        <g fill="currentColor" fill-opacity=".35">
+          <circle cx="24" cy="82" r="2.5"/><circle cx="24" cy="152" r="2.5"/>
+          <circle cx="24" cy="222" r="2.5"/><circle cx="24" cy="292" r="2.5"/>
+          <circle cx="24" cy="362" r="2.5"/><circle cx="24" cy="432" r="2.5"/>
+          <circle cx="24" cy="502" r="2.5"/><circle cx="24" cy="572" r="2.5"/>
+        </g>
+
+        <path d="M 22 502 C 6 502 6 362 22 362" fill="none" class="stroke-write"
+              stroke-width="1.3" marker-end="url(#ah4-loop)"/>
+        <text transform="rotate(-90 13 432)" x="13" y="432" text-anchor="middle"
+              font-family="IBM Plex Mono, monospace" font-size="9"
+              class="fill-write" letter-spacing=".4">PASSES</text>
+
+        <g stroke="currentColor" stroke-opacity=".3" marker-end="url(#ah4)">
+          <line x1="230" y1="82" x2="243" y2="82"/><line x1="548" y1="82" x2="559" y2="82"/>
+          <line x1="230" y1="152" x2="243" y2="152"/><line x1="548" y1="152" x2="559" y2="152"/>
+          <line x1="230" y1="222" x2="243" y2="222"/><line x1="548" y1="222" x2="559" y2="222"/>
+          <line x1="230" y1="292" x2="243" y2="292"/><line x1="548" y1="292" x2="559" y2="292"/>
+          <line x1="230" y1="362" x2="243" y2="362"/><line x1="548" y1="362" x2="559" y2="362"/>
+          <line x1="230" y1="432" x2="243" y2="432"/><line x1="548" y1="432" x2="559" y2="432"/>
+          <line x1="230" y1="502" x2="243" y2="502"/><line x1="548" y1="502" x2="559" y2="502"/>
+          <line x1="230" y1="572" x2="243" y2="572"/><line x1="548" y1="572" x2="559" y2="572"/>
+        </g>
+
+        <g fill="none" stroke="currentColor" stroke-opacity=".45">
+          <rect x="48" y="62" width="172" height="40" rx="4"/>
+          <rect x="48" y="132" width="172" height="40" rx="4"/>
+          <rect x="48" y="202" width="172" height="40" rx="4"/>
+          <rect x="48" y="272" width="172" height="40" rx="4"/>
+          <rect x="48" y="342" width="172" height="40" rx="4"/>
+          <rect x="48" y="412" width="172" height="40" rx="4"/>
+          <rect x="48" y="482" width="172" height="40" rx="4"/>
+          <rect x="48" y="552" width="172" height="40" rx="4"/>
+        </g>
+        <g font-family="IBM Plex Mono, monospace" font-size="10" class="fill-accent"
+           letter-spacing=".5">
+          <text x="60" y="87">A1</text><text x="60" y="157">A2</text>
+          <text x="60" y="227">A3</text><text x="60" y="297">A4</text>
+          <text x="60" y="367">A5</text><text x="60" y="437">A6</text>
+          <text x="60" y="507">A8</text><text x="60" y="577">A7</text>
+        </g>
+        <g font-family="IBM Plex Mono, monospace" font-size="11" fill="currentColor">
+          <text x="84" y="87">test_connection.py</text>
+          <text x="84" y="157">run_metadata.py</text>
+          <text x="84" y="227">run_model.py</text>
+          <text x="84" y="297">run_provision.py</text>
+          <text x="84" y="367">run_generate.py</text>
+          <text x="84" y="437">run_submit.py</text>
+          <text x="84" y="507">run_dynamics.py</text>
+          <text x="84" y="577">run_verify.py</text>
+        </g>
+
+        <g font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor">
+          <text x="262" y="78">connection/checks</text>
+          <text x="262" y="94" opacity=".62">rave/client &#183; endpoints &#183; errors</text>
+          <text x="262" y="148">metadata/downloader &#183; manifest</text>
+          <text x="262" y="164" opacity=".62">metadata/observed_structure</text>
+          <text x="262" y="218">model/odm_parser &#183; als_parser</text>
+          <text x="262" y="234" opacity=".62">model/matrix_resolver &#183; dynamics_graph</text>
+          <text x="262" y="296">provisioning/sites &#183; subjects</text>
+          <text x="262" y="358">generation/prompt_builder &#183; llm_client</text>
+          <text x="262" y="374" opacity=".62">generation/validators &#183; generator</text>
+          <text x="262" y="428">submission/odm_builder &#183; submitter</text>
+          <text x="262" y="444" opacity=".62">submission/rejections</text>
+          <text x="262" y="506">dynamics/resolver &#183; activation_state</text>
+          <text x="262" y="576">reporting/reconciler &#183; report</text>
+        </g>
+
+        <g font-family="IBM Plex Mono, monospace" font-size="10.5" fill="currentColor">
+          <text x="578" y="78">rave-connection</text>
+          <text x="578" y="94" opacity=".62">rave-permissions-diagnosis</text>
+          <text x="578" y="156">rave-metadata-fetch</text>
+          <text x="578" y="218">study-model-building &#183; als-parsing</text>
+          <text x="578" y="234" opacity=".62">dynamics-analysis</text>
+          <text x="578" y="296">odm-authoring</text>
+          <text x="592" y="358">clinical-data-generation</text>
+          <text x="578" y="374" opacity=".62">clinical-data-validation &#183; llm-structured-generation</text>
+          <text x="578" y="428">odm-authoring</text>
+          <text x="592" y="444">rave-submission</text>
+          <text x="578" y="506">dynamics-resolution</text>
+          <text x="578" y="576">run-reporting</text>
+        </g>
+        <g class="fill-live">
+          <rect x="578" y="351" width="7" height="7" rx="1.5"/>
+          <rect x="578" y="437" width="7" height="7" rx="1.5"/>
+        </g>
+
+        <rect x="48" y="641" width="7" height="7" rx="1.5" class="fill-live"/>
+        <text x="63" y="648" font-family="IBM Plex Mono, monospace" font-size="10"
+              fill="currentColor" opacity=".62">read by the running tool, not only by a person</text>
+      </svg>
+    </div>
+    <figcaption>
+      Every row is one stage. <b>Left</b> is the command you type, <b>middle</b> is the code that
+      does the work, <b>right</b> is the skill that documents it. A5 and A6 are never run on their
+      own in a full run &#8212; A8 drives them pass after pass, which is what the arc on the far
+      left stands for.
+    </figcaption>
+  </figure>
+
+  <div class="prose">
+    <h3>The scripts are deliberately thin</h3>
+    <p>
+      A script parses flags, loads the config and the secrets, builds one agent, and prints a
+      summary. No study logic lives in <span class="mono">scripts/</span> at all. That is what
+      makes every stage runnable on its own, and it is why <span class="mono">run_all.py</span>
+      can be little more than an ordered list &#8212; the stage table in
+      <span class="mono">orchestrator.py</span>, which also records which stages write to Rave
+      and which run once per subject.
+    </p>
+
+    <h3>The modules are the agents</h3>
+    <p>
+      One package per concern, and the boundaries are load-bearing. Everything that speaks to
+      Rave goes through <span class="mono">rave/client.py</span>, so retry, rate limiting and
+      credential redaction cannot be bypassed by a caller that forgets. Everything the model
+      produces goes through <span class="mono">generation/validators.py</span> before it can be
+      submitted, so a value is never trusted because the model sounded confident.
+    </p>
+
+    <h3>Two skills are read at run time</h3>
+    <p>
+      Most of the thirteen skills are written for a person, or for a Claude Code subagent working
+      on this repository. Two are read by the running process itself &#8212; one through
+      <span class="mono">generation/skill_rules.py</span>, the other by the submitter directly
+      &#8212; which means editing a Markdown file changes what the tool does with no code change:
+    </p>
+
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Skill file</th><th>Read by</th><th>Editing it changes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="mono">clinical-data-generation/<wbr>reference/data-rules.md</span></td>
+            <td><span class="mono">prompt_builder.py</span></td>
+            <td>The rules handed to the model in <em>every</em> generation prompt &#8212; coded
+                values over labels, date handling, clinical plausibility, and the ban on real
+                personal data.</td>
+          </tr>
+          <tr>
+            <td><span class="mono">rave-submission/<wbr>reference/error-codes.md</span></td>
+            <td><span class="mono">submission/rejections.py</span></td>
+            <td>How a Rave rejection is classified &#8212; and so whether the dynamics loop reads
+                it as a dead folder, a missing form, or something to retry smaller.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="note">
+      <span class="note-label">Degrades safely</span>
+      <p>
+        A missing skill file falls back to a built-in default rather than failing. The pipeline
+        still runs from a checkout with no <span class="mono">.claude/</span> directory at all.
+        You lose the editable rules, not the tool.
+      </p>
+    </div>
+
+    <h3>Where a new lesson goes</h3>
+    <p>
+      When you learn something about Rave that the code had to work around, it belongs in the
+      skill for that activity rather than in a comment beside the fix. The skills are why a
+      second study did not have to repeat the first one's discoveries, and the two files above
+      are why some of those lessons take effect without anyone editing Python.
+    </p>
   </div>
 
   <h2>The dynamics loop</h2>

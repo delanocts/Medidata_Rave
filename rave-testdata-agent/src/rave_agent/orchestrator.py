@@ -7,9 +7,11 @@ on a resume. Nothing here reimplements a stage.
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -138,6 +140,8 @@ class Orchestrator:
         self.only = set(only or [])
         self.stop_after = stop_after
         self.manifest_path = config.study_output_dir / "run_manifest.json"
+        self.max_parallel_subjects = max(
+            1, int(config.get("execution.max_parallel_subjects") or 1))
 
     # ------------------------------------------------------------------
     def _subjects(self) -> list[str]:
@@ -154,7 +158,16 @@ class Orchestrator:
             if entry.get("status") in ("created", "exists")
         ]
 
-    def _run(self, stage: Stage, extra: list[str]) -> tuple[int, float]:
+    def _run(self, stage: Stage, extra: list[str], capture: bool = False,
+             rate_share: int = 1) -> tuple[int, float, str]:
+        """Run one stage as its own process, exactly as a user would by hand.
+
+        `capture` buffers the child's output instead of letting it stream, so
+        that concurrent subjects produce readable blocks rather than interleaved
+        lines. `rate_share` is how many siblings this child shares the Rave
+        request budget with; its share is handed over as an ordinary config
+        override, so the child validates and reports it like any other setting.
+        """
         command = [sys.executable, str(SCRIPTS / stage.script),
                    "--study", self.study_arg]
         if stage.needs_env:
@@ -163,10 +176,69 @@ class Orchestrator:
             command.append("--dry-run")
         command += extra
 
+        env = None
+        if rate_share > 1:
+            # `requests_per_minute` is a budget for the study, not for one
+            # process, so split it. Note the name has to go through the
+            # RAVE_AGENT_<SECTION>__<KEY> override the loader already defines -
+            # any other RAVE_AGENT_* name is read as a config key of its own and
+            # rejected by the schema.
+            budget = int(self.config.get("rave.requests_per_minute") or 30)
+            env = dict(os.environ,
+                       RAVE_AGENT_RAVE__REQUESTS_PER_MINUTE=str(max(1, budget // rate_share)))
+
         log.info("stage start", extra={"stage": stage.key})
         started = time.monotonic()
-        completed = subprocess.run(command, cwd=REPO_ROOT)
-        return completed.returncode, round(time.monotonic() - started, 1)
+        completed = subprocess.run(
+            command, cwd=REPO_ROOT, env=env,
+            capture_output=capture, text=True, errors="replace" if capture else None)
+        output = ""
+        if capture:
+            output = (completed.stdout or "") + (completed.stderr or "")
+        return completed.returncode, round(time.monotonic() - started, 1), output
+
+    def _run_per_subject(self, stage: Stage, subjects: list[str]) -> tuple[list[str], float]:
+        """Drive a per-subject stage, `max_parallel_subjects` at a time.
+
+        Subjects are independent: each has its own generated data, its own
+        activation state and its own submission archive. The serialisation that
+        matters is *within* a subject (C-5), and that is enforced a level down in
+        the resolver, so running several subjects at once does not weaken it.
+
+        The Rave request budget is the one thing genuinely shared, and it lives in
+        each child process rather than here - so the children are told how many
+        ways to split it.
+        """
+        workers = min(self.max_parallel_subjects, len(subjects))
+        started = time.monotonic()
+
+        if workers == 1:
+            failures = []
+            for subject in subjects:
+                code, _, _ = self._run(stage, ["--subject", subject])
+                if code != 0:
+                    failures.append(subject)
+            return failures, round(time.monotonic() - started, 1)
+
+        print("[" + str(workers) + " subjects at a time: "
+              + ", ".join(subjects) + "]")
+        print()
+        with ThreadPoolExecutor(max_workers=workers,
+                                thread_name_prefix="subject") as pool:
+            results = list(pool.map(
+                lambda subject: (subject, *self._run(
+                    stage, ["--subject", subject], capture=True, rate_share=workers)),
+                subjects))
+
+        failures = []
+        for subject, code, elapsed, output in results:
+            mark = "ok" if code == 0 else f"FAILED (exit {code})"
+            print(f"----- {subject}  {mark}  {elapsed}s " + "-" * 24)
+            print(output.rstrip())
+            print()
+            if code != 0:
+                failures.append(subject)
+        return failures, round(time.monotonic() - started, 1)
 
     # ------------------------------------------------------------------
     def run(self) -> RunManifest:
@@ -209,12 +281,7 @@ class Orchestrator:
                     manifest.save(self.manifest_path)
                     return manifest
 
-                failures, seconds = [], 0.0
-                for subject in subjects:
-                    code, elapsed = self._run(stage, ["--subject", subject])
-                    seconds += elapsed
-                    if code != 0:
-                        failures.append(subject)
+                failures, seconds = self._run_per_subject(stage, subjects)
                 outcome = StageOutcome(
                     stage.key, stage.name,
                     "failed" if failures else "ok",
@@ -223,7 +290,7 @@ class Orchestrator:
                     detail=(f"failed for {', '.join(failures)}" if failures else ""),
                 )
             else:
-                code, seconds = self._run(stage, [])
+                code, seconds, _ = self._run(stage, [])
                 outcome = StageOutcome(
                     stage.key, stage.name, "ok" if code == 0 else "failed",
                     exit_code=code, seconds=seconds,

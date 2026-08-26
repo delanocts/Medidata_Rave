@@ -137,7 +137,7 @@ def main(argv: list[str] | None = None) -> int:
     level = args.log_level or config.get("execution.log_level", "INFO")
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     configure_logging(level=level,
-                      log_file=config.study_output_dir / "logs" / f"submit_{stamp}.log")
+                      log_file=config.study_output_dir / "logs" / f"submit_{args.subject}_{stamp}.log")
 
     try:
         model = load_model(config.study_output_dir / "model" / "study_model.json")

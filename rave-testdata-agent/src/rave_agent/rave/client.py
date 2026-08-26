@@ -56,7 +56,10 @@ class RaveClient:
         self.timeout = rave.get("timeout_seconds", 60)
         self.max_retries = rave.get("max_retries", 3)
         self.backoff = rave.get("retry_backoff_seconds", 2)
-        self.limiter = RateLimiter(rave.get("requests_per_minute", 30))
+        # A budget for the study, not for this process. When several subjects
+        # run at once the orchestrator divides it between them and passes each
+        # child its share as a config override, so this stays a plain read.
+        self.limiter = RateLimiter(max(1, int(rave.get("requests_per_minute", 30))))
         self.base_url = self._conn.base_url
 
     # ------------------------------------------------------------------

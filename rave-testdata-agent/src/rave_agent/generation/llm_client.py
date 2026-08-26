@@ -73,7 +73,11 @@ class LlmClient:
             import anthropic
         except ImportError as exc:  # pragma: no cover - environment problem
             raise LlmError("the `anthropic` package is not installed") from exc
-        self._client = anthropic.Anthropic(api_key=self.api_key)
+        # Running several subjects at once multiplies concurrent calls by that
+        # many, which makes a 429 far likelier than it was when one subject ran
+        # alone. A rate-limited form would otherwise be recorded as a generation
+        # failure and simply left empty, so let the SDK wait it out.
+        self._client = anthropic.Anthropic(api_key=self.api_key, max_retries=5)
         self._anthropic = anthropic
 
     # ------------------------------------------------------------------

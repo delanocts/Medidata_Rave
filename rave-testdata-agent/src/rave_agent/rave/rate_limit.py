@@ -9,7 +9,10 @@ from collections import deque
 class RateLimiter:
     """Sliding-window limiter: at most *per_minute* acquisitions in any 60s window.
 
-    Thread-safe so it still holds when subjects are processed concurrently.
+    Thread-safe, so it holds across the threads of one process. It cannot hold
+    across *processes* - concurrent subjects each run their own - so the caller
+    divides the budget between them instead, overriding
+    `rave.requests_per_minute` per child.
     """
 
     def __init__(self, per_minute: int, window_seconds: float = 60.0):

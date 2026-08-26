@@ -515,7 +515,12 @@ dynamics:
 <pre><code>python scripts/run_all.py <span class="flag">--study</span> onc-114 <span class="flag">--dry-run</span>
 python scripts/run_all.py <span class="flag">--study</span> onc-114</code></pre>
       <p class="lede-in">
-        Expect roughly half an hour per subject on a mid-size study. The report lands in
+        Expect the better part of an hour for the first subject on a mid-size study; almost
+        all of it is Rave answering one POST at a time. Subjects are independent, so raise
+        <span class="mono">execution.max_parallel_subjects</span> and ten of them cost close
+        to what one costs &#8212; the request budget in
+        <span class="mono">rave.requests_per_minute</span> is divided between them, so the
+        load on Rave does not rise with it. The report lands in
         <span class="mono">output/&lt;STUDY&gt;/reports/</span> as JSON and HTML.
       </p>
     </li>

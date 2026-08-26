@@ -85,6 +85,11 @@ dynamics:
 
 execution:
   output_root: "./output"
-  max_parallel_subjects: 1
+  # Subjects are independent - separate data, state and archives - so they run
+  # concurrently, each in its own process. The serialisation that matters is
+  # within a subject and is enforced a level down, so this does not weaken it.
+  # `rave.requests_per_minute` is a budget for the whole study and is divided
+  # between them, so raising this does not raise the load on Rave.
+  max_parallel_subjects: 4
   dry_run: false
   log_level: "INFO"

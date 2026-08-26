@@ -919,3 +919,88 @@ def test_reporting_falls_back_when_the_run_provisioned_nothing(tmp_path):
     command = _verify_only_run(tmp_path, provisioned=[], also_on_disk=["TST-001"])
 
     assert "--subject" not in command, command
+
+
+# ------------------------------------- A4 re-checks the version against the site
+_SITES_ODM = """<?xml version="1.0" encoding="utf-8"?>
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata" ODMVersion="1.3">
+  <AdminData>
+    <Location OID="001234" Name="DEV-SITE-ONE" LocationType="Site">
+      <MetaDataVersionRef StudyOID="S(DEV)" MetaDataVersionOID="17001"
+                          EffectiveDate="2026-03-23"/>
+      <MetaDataVersionRef StudyOID="S(DEV)" MetaDataVersionOID="17199"
+                          EffectiveDate="2026-03-27"/>
+    </Location>
+    <Location OID="009999" Name="DEV-SITE-TWO" LocationType="Site"/>
+  </AdminData>
+</ODM>
+"""
+
+
+def _sites_via_client():
+    """list_sites over a stubbed transport, so the parsing is the real thing."""
+    from rave_agent.config.loader import Config
+    from rave_agent.provisioning.sites import list_sites
+
+    class Result:
+        value = _SITES_ODM
+
+    class FakeClient:
+        def send(self, request, label=None):
+            return Result()
+
+    config = Config(data={"study": {"name": "S"}, "rave": {"environment": "DEV"}},
+                    study_file=Path("x"), defaults_file=Path("y"), config_hash="h")
+    return list_sites(FakeClient(), config)
+
+
+def test_list_sites_carries_the_version_each_site_is_on():
+    """A4 needs the assignment, and must not pay a second round trip for it."""
+    sites = _sites_via_client()
+    one = next(s for s in sites if s["oid"] == "001234")
+
+    # Newest effective date first, not document order.
+    assert one["versions"][0] == ("17199", "2026-03-27")
+    assert one["versions"][1] == ("17001", "2026-03-23")
+
+
+def test_assigned_version_matches_by_number_or_by_name():
+    from rave_agent.provisioning.sites import assigned_version
+
+    sites = _sites_via_client()
+    assert assigned_version(sites, "001234", "DEV-SITE-ONE") == ("17199", "2026-03-27")
+    assert assigned_version(sites, "DEV-SITE-ONE", "DEV-SITE-ONE") == ("17199", "2026-03-27")
+
+
+def test_no_assignment_is_not_a_disagreement():
+    """An unknown site and a site with no version must both read as 'no answer'.
+
+    The caller refuses to provision on a disagreement, so 'I could not tell' has
+    to be distinguishable from 'the site is on something else' - otherwise a
+    site Rave simply does not describe would block every run.
+    """
+    from rave_agent.provisioning.sites import assigned_version
+
+    sites = _sites_via_client()
+    assert assigned_version(sites, "009999", "DEV-SITE-TWO") == ("", "")
+    assert assigned_version(sites, "NOSUCH", "NOSUCH") == ("", "")
+
+
+def test_the_two_stages_read_the_site_the_same_way(tmp_path):
+    """A2 reads a file, A4 reads a live response; they must agree.
+
+    Two copies of the matching rule is how the stage that chooses a version and
+    the stage that uses it drift apart, which is the failure this check exists
+    to catch in the first place.
+    """
+    from rave_agent.metadata.downloader import site_version_refs
+    from rave_agent.utils.xml import parse_xml
+
+    path = tmp_path / "sites.xml"
+    path.write_text(_SITES_ODM, encoding="utf-8")
+
+    from_file = site_version_refs(
+        parse_xml(path.read_text(encoding="utf-8")), "001234", "DEV-SITE-ONE")
+    from_live = _sites_via_client()[0]["versions"]
+    assert from_file == from_live == [("17199", "2026-03-27"), ("17001", "2026-03-23")]

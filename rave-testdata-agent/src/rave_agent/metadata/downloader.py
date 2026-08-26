@@ -40,6 +40,34 @@ class DownloadOutcome:
     detail: str = ""
 
 
+
+def site_version_refs(root, site_oid: str, site_name: str) -> list[tuple[str, str]]:
+    """CRF versions assigned to one site, newest effective date first.
+
+    `Sites.odm` carries a MetaDataVersionRef per Location. A site can hold
+    several, one per amendment it has been migrated through; the one with the
+    latest EffectiveDate is what data entry at that site is judged against.
+
+    Kept module-level and given the parsed root rather than a path, because two
+    stages need the same answer from two different sources - A2 from the file it
+    downloaded, A4 from the live response it already has in hand - and a second
+    copy of the matching rule is how the two would drift apart.
+    """
+    for location in root.findall(f".//{{{ODM_NS}}}Location"):
+        oid = location.get("OID") or ""
+        name = location.get("Name") or ""
+        if oid != site_oid and name != site_oid and oid != site_name:
+            continue
+        refs = []
+        for ref in location.findall(f"{{{ODM_NS}}}MetaDataVersionRef"):
+            version = ref.get("MetaDataVersionOID")
+            if version:
+                refs.append((version, ref.get("EffectiveDate") or ""))
+        refs.sort(key=lambda r: r[1], reverse=True)
+        return refs
+    return []
+
+
 class MetadataAcquisition:
     def __init__(self, client: RaveClient, config: Config):
         self.client = client
@@ -108,31 +136,14 @@ class MetadataAcquisition:
 
     # ------------------------------------------------------------------
     def site_versions(self, sites_xml: Path) -> list[tuple[str, str]]:
-        """CRF versions assigned to the configured site, newest effective first.
-
-        `Sites.odm` carries a MetaDataVersionRef per Location. A site can hold
-        several, one per amendment it has been migrated through; the one with
-        the latest EffectiveDate is what data entry at that site uses.
-        """
-        site_oid = str(self.config.get("site.number") or "")
-        site_name = str(self.config.get("site.name") or "")
+        """CRF versions assigned to the configured site, newest effective first."""
         if not sites_xml.is_file():
             return []
-
-        root = parse_xml_file(sites_xml)
-        for location in root.findall(f".//{{{ODM_NS}}}Location"):
-            oid = location.get("OID") or ""
-            name = location.get("Name") or ""
-            if oid != site_oid and name != site_oid and oid != site_name:
-                continue
-            refs = []
-            for ref in location.findall(f"{{{ODM_NS}}}MetaDataVersionRef"):
-                version = ref.get("MetaDataVersionOID")
-                if version:
-                    refs.append((version, ref.get("EffectiveDate") or ""))
-            refs.sort(key=lambda r: r[1], reverse=True)
-            return refs
-        return []
+        return site_version_refs(
+            parse_xml_file(sites_xml),
+            str(self.config.get("site.number") or ""),
+            str(self.config.get("site.name") or ""),
+        )
 
     def resolve_version(self, sites_xml: Path | None = None) -> tuple[str, str]:
         """Pick the CRF version to use (OQ-5).

@@ -19,7 +19,11 @@ check_dependencies(include_optional=False)
 from rave_agent.config.loader import ConfigError, load_config  # noqa: E402
 from rave_agent.config.secrets import MissingSecretError, load_secrets  # noqa: E402
 from rave_agent.model.loader import load_model  # noqa: E402
-from rave_agent.provisioning.sites import ensure_site  # noqa: E402
+from rave_agent.provisioning.sites import (  # noqa: E402
+    assigned_version,
+    ensure_site,
+    list_sites,
+)
 from rave_agent.provisioning.subjects import SubjectPolicyError, enrol_subjects  # noqa: E402
 from rave_agent.rave.client import RaveClient  # noqa: E402
 from rave_agent.submission.odm_builder import OdmBuildError  # noqa: E402
@@ -35,6 +39,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--dry-run", action="store_true",
                         help="build payloads and write them to disk without posting")
     parser.add_argument("--site-only", action="store_true", help="stop after the site check")
+    parser.add_argument("--ignore-version-drift", action="store_true",
+                        help="provision even when the model was built against a "
+                             "different CRF version than the site is on")
     parser.add_argument("--log-level", default=None, choices=["DEBUG", "INFO", "WARNING", "ERROR"])
     return parser.parse_args(argv)
 
@@ -67,17 +74,55 @@ def main(argv: list[str] | None = None) -> int:
         print(f"\n{exc}\n", file=sys.stderr)
         return 2
 
-    print(f"\nStudy       : {config.study_env}")
-    print(f"CRF version : {model.crf_version_oid} ({model.crf_version_name})")
-    print(f"Site        : {config.get('site.number')} ({config.get('site.name')})")
-    print(f"Mode        : {'DRY RUN - nothing will be posted' if dry_run else 'LIVE - will write to Rave'}\n")
-
     client = RaveClient(config, secrets)
     submitter = Submitter(client,
                           archive_root=config.study_output_dir / "submissions",
                           dry_run=dry_run)
 
-    site = ensure_site(client, config, model.crf_version_oid, submitter)
+    number = str(config.get("site.number"))
+    name = str(config.get("site.name"))
+
+    # Ask the site itself, now, rather than trusting the version frozen into the
+    # study model. A2 does resolve it from the site, but A2 is skipped on
+    # --resume and on --only, so the model can be older than the site it
+    # describes. This is a read, and it happens before anything is written.
+    sites = list_sites(client, config)
+    site_version, effective = assigned_version(sites, number, name)
+
+    if not site_version:
+        reason = "no version assigned to the site; using the model's"
+    elif site_version == model.crf_version_oid:
+        reason = f"assigned to site {number}"
+        if effective:
+            reason += f", effective {effective}"
+    else:
+        reason = f"DISAGREES WITH SITE {number}"
+
+    print()
+    print(f"Study       : {config.study_env}")
+    print(f"CRF version : {model.crf_version_oid} ({model.crf_version_name})  - {reason}")
+    print(f"Site        : {number} ({name})")
+    print(f"Mode        : {'DRY RUN - nothing will be posted' if dry_run else 'LIVE - will write to Rave'}")
+    print()
+
+    if site_version and site_version != model.crf_version_oid:
+        where = f" (effective {effective})" if effective else ""
+        print(f"  WARNING: site {number} is on CRF version {site_version}{where}, but the")
+        print(f"           study model was built against {model.crf_version_oid}. Posting now would")
+        print("           use the wrong version: fields that do not exist there are")
+        print("           rejected, and forms land in the wrong folders.")
+        print()
+        print("           Rebuild against the site's version first:")
+        print(f"             python scripts/run_metadata.py --study {args.study} --force-download")
+        print(f"             python scripts/run_model.py --study {args.study}")
+        print()
+        if not args.ignore_version_drift:
+            print("Refusing to provision against a stale CRF version.",
+                  file=sys.stderr)
+            print("Pass --ignore-version-drift to override.", file=sys.stderr)
+            return 1
+
+    site = ensure_site(client, config, model.crf_version_oid, submitter, sites=sites)
     print(f"SITE  [{site.action.upper()}] {site.number}: {site.detail}")
     if site.known_sites:
         print(f"      existing sites: {site.known_sites[:8]}")

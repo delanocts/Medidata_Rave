@@ -10,6 +10,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from ..config.loader import Config
+from ..metadata.downloader import site_version_refs
 from ..rave.client import RaveClient
 from ..rave.errors import RaveError
 from ..submission.odm_builder import build_site_odm
@@ -49,9 +50,27 @@ def list_sites(client: RaveClient, config: Config) -> list[dict]:
     ).value
     root = parse_xml(payload)
     return [
-        {"oid": loc.get("OID"), "name": loc.get("Name"), "type": loc.get("LocationType")}
+        {"oid": loc.get("OID"), "name": loc.get("Name"), "type": loc.get("LocationType"),
+         # The CRF versions this site is on, newest effective first. Carried here
+         # so the caller can check the model against the site as it is *now*,
+         # without a second round trip.
+         "versions": site_version_refs(root, loc.get("OID") or "", "")}
         for loc in root.findall(f".//{{{ODM}}}Location")
     ]
+
+
+def assigned_version(sites: list[dict], number: str, name: str) -> tuple[str, str]:
+    """The CRF version the given site is currently on, as (version OID, date).
+
+    ("", "") when the site is unknown or carries no MetaDataVersionRef - the
+    caller must be able to tell "no assignment" from "assigned to something
+    else", because only the second is a disagreement worth shouting about.
+    """
+    for site in sites:
+        if site.get("oid") in (number, name) or site.get("name") in (number, name):
+            versions = site.get("versions") or []
+            return versions[0] if versions else ("", "")
+    return ("", "")
 
 
 def _diagnose(error: str) -> str:
@@ -81,13 +100,18 @@ def ensure_site(
     config: Config,
     crf_version_oid: str,
     submitter: Submitter,
+    sites: list[dict] | None = None,
 ) -> SiteState:
-    """Verify the configured site exists; create it when allowed (FR-4.1, FR-4.2)."""
+    """Verify the configured site exists; create it when allowed (FR-4.1, FR-4.2).
+
+    `sites` lets a caller that has already listed them pass the result in rather
+    than pay for a second round trip.
+    """
     number = str(config.get("site.number"))
     name = str(config.get("site.name"))
     create_if_missing = bool(config.get("site.create_if_missing"))
 
-    sites = list_sites(client, config)
+    sites = list_sites(client, config) if sites is None else sites
     known = [s["oid"] for s in sites if s["oid"]]
     match = next((s for s in sites if s["oid"] == number or s["name"] == number), None)
 

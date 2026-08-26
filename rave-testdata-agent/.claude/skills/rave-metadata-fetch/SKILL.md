@@ -6,6 +6,22 @@ allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 
 # Rave metadata acquisition
 
+## Resolve the version from the site, then check it again before writing
+The version a study is judged against is the one assigned to the *site*, not the
+study's newest - a site left on an older amendment has different forms, fields
+and dictionaries, and posting the newest against it is rejected field by field.
+
+Resolving it once is not enough. The stage that resolves it and the stages that
+use it are separated by a file on disk, and the resolving stage is skipped on a
+resume or a partial run - so the model can be older than the site it describes,
+and nothing notices. Re-read the assignment from the live response at the point
+of first write, compare, and **refuse** rather than warn: a run against the wrong
+version does not fail, it silently produces a subject full of rejected fields.
+
+Keep one copy of the matching rule and give it the parsed document, not a path:
+one stage reads the file it downloaded, the other the response it already holds,
+and two copies of the rule drift apart exactly where this check is meant to bite.
+
 ## Output
 `output/<study>/metadata/`, plus a manifest recording source URL, retrieval
 time, SHA-256 and study version per artifact.

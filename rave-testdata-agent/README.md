@@ -61,6 +61,11 @@ and A6 separately for a full run.
 Run `run_verify.py --study <name>` on its own to report on all of them, or pass
 `--subject` (repeatable) to pick.
 
+A4 re-reads the site's assigned CRF version before it writes anything and
+refuses if the study model was built against a different one — the model is
+resolved in A2, which `--resume` skips, so it can be older than the site.
+`--ignore-version-drift` overrides.
+
 Start with `test_connection.py`. It reports a PASS/FAIL matrix and exits non-zero
 on any mandatory failure. The check that matters most is **design-metadata
 access**: without it, edit checks cannot be read and dynamics must come from a

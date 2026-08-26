@@ -98,6 +98,22 @@ active". Measure first - in the same run, 15 of 19 visits contained at least one
 rejection and held 48.8 of the 50 minutes, so batching would have fallen back to
 per-form on everything that mattered.
 
+## Scale across subjects, not inside one
+Everything above makes a single subject faster by a bounded amount, because the
+floor is the time Rave takes to answer. Subjects have no such floor between them:
+separate data, separate state, separate archives, and the serialisation rule
+constrains writes *within* a subject, not between two of them. Run them at once
+and ten subjects cost close to what one costs.
+
+Three things are shared and have to be handled, or concurrency corrupts them:
+- **the request budget** - it is per study, but each subject is its own process
+  with its own limiter, so divide it between them rather than letting N subjects
+  issue N times the agreed rate
+- **log file names** - a timestamp to the second collides when subjects start
+  together; put the subject in the name
+- **any discovered-limit cache** - no lock exists across processes, so write it
+  atomically; losing an entry to a race is fine, a truncated file is not
+
 ## Constraints
 - One subject's submissions stay serialised; parallelism is across subjects.
 - Generation may run ahead of posting; posting order may not change.

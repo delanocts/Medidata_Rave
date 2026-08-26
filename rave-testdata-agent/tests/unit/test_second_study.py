@@ -6,6 +6,7 @@ assertion here names the trap it guards.
 """
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -724,3 +725,197 @@ def test_lookahead_counts_what_an_absent_visit_wasted():
     assert events.count("gen V2") == 3        # generated before the probe answered
     assert result.forms_discarded == 2        # two of them never posted
     assert events.count("post V2") == 1       # and posting stopped at the probe
+
+
+# --------------------------------------------------- parallel subjects (A-all)
+def _orchestrator(max_parallel_subjects, failing=()):
+    """An orchestrator whose stage runs are stubbed, to observe scheduling only."""
+    import threading
+    import time
+    from rave_agent.config.loader import Config
+    from rave_agent.orchestrator import Orchestrator, Stage
+
+    config = Config(
+        data={"study": {"name": "S"}, "rave": {"environment": "DEV"},
+              "execution": {"output_root": "./output",
+                            "max_parallel_subjects": max_parallel_subjects}},
+        study_file=Path("x"), defaults_file=Path("y"), config_hash="h")
+
+    live = {"now": 0, "peak": 0}
+    lock = threading.Lock()
+    seen = []
+
+    class Stub(Orchestrator):
+        def _run(self, stage, extra, capture=False, rate_share=1):
+            subject = extra[extra.index("--subject") + 1]
+            with lock:
+                live["now"] += 1
+                live["peak"] = max(live["peak"], live["now"])
+                seen.append((subject, capture, rate_share))
+            time.sleep(0.05)
+            with lock:
+                live["now"] -= 1
+            return (1 if subject in failing else 0), 0.05, f"output for {subject}"
+
+    orch = Stub(config, "S", Path(".env"))
+    stage = Stage("dynamics", "Dynamics", "run_dynamics.py", per_subject=True)
+    return orch, stage, live, seen
+
+
+def test_subjects_run_concurrently_when_allowed():
+    """Ten subjects must not queue behind each other one at a time."""
+    orch, stage, live, _ = _orchestrator(max_parallel_subjects=5)
+    subjects = [f"TST-{i:03d}" for i in range(10)]
+
+    failures, seconds = orch._run_per_subject(stage, subjects)
+
+    assert failures == []
+    assert live["peak"] > 1, "subjects ran one at a time"
+    assert live["peak"] <= 5, f"exceeded max_parallel_subjects: {live['peak']}"
+
+
+def test_one_subject_at_a_time_is_still_the_default():
+    """The default must behave exactly as it did before, streaming and serial."""
+    orch, stage, live, seen = _orchestrator(max_parallel_subjects=1)
+
+    orch._run_per_subject(stage, ["TST-001", "TST-002", "TST-003"])
+
+    assert live["peak"] == 1
+    assert [s for s, _, _ in seen] == ["TST-001", "TST-002", "TST-003"]
+    # Serial runs keep streaming their output; only concurrent ones are buffered.
+    assert all(capture is False for _, capture, _ in seen)
+
+
+def test_parallel_subjects_split_the_rave_budget():
+    """N subjects must not quietly issue N times the agreed request rate."""
+    orch, stage, _, seen = _orchestrator(max_parallel_subjects=4)
+
+    orch._run_per_subject(stage, ["TST-001", "TST-002", "TST-003", "TST-004"])
+
+    assert all(share == 4 for _, _, share in seen), seen
+    assert all(capture is True for _, capture, _ in seen)
+
+
+def test_a_failing_subject_does_not_take_the_others_with_it():
+    orch, stage, _, _ = _orchestrator(max_parallel_subjects=4, failing={"TST-002"})
+
+    failures, _ = orch._run_per_subject(stage, ["TST-001", "TST-002", "TST-003"])
+
+    assert failures == ["TST-002"]
+
+
+def test_the_budget_override_is_a_key_the_loader_accepts(monkeypatch):
+    """Every RAVE_AGENT_* name the orchestrator sets must be a real config key.
+
+    None of them are private. The loader turns every RAVE_AGENT_* variable into a
+    config key - RAVE_AGENT_SUBJECTS__COUNT becomes subjects.count - and the
+    schema rejects anything it does not know. A made-up name therefore does not
+    quietly do nothing; it fails every child at startup, before any work begins.
+    """
+    import subprocess
+    import yaml
+    from rave_agent import orchestrator as orch_mod
+    from rave_agent.config.loader import _ENV_PREFIX
+
+    from rave_agent.config.loader import Config
+    from rave_agent.orchestrator import Orchestrator, Stage
+
+    # The real Orchestrator, not the stub: this is about what _run puts in the
+    # child's environment, which the stub replaces wholesale.
+    config = Config(
+        data={"study": {"name": "S"}, "rave": {"environment": "DEV",
+                                               "requests_per_minute": 120},
+              "execution": {"output_root": "./output", "max_parallel_subjects": 4}},
+        study_file=Path("x"), defaults_file=Path("y"), config_hash="h")
+    orch = Orchestrator(config, "S", Path(".env"))
+    stage = Stage("dynamics", "Dynamics", "run_dynamics.py", per_subject=True)
+    captured = {}
+
+    def fake_run(command, cwd=None, env=None, **kwargs):
+        captured["env"] = env
+        return subprocess.CompletedProcess(command, 0, "", "")
+
+    monkeypatch.setattr(orch_mod.subprocess, "run", fake_run)
+    orch._run(stage, ["--subject", "TST-001"], capture=True, rate_share=4)
+
+    added = {k: v for k, v in (captured["env"] or {}).items()
+             if k.startswith(_ENV_PREFIX) and os.environ.get(k) != v}
+    assert added, "no budget override was passed to the child"
+
+    defaults = yaml.safe_load((REPO_ROOT / "config" / "defaults.yaml").read_text(encoding="utf-8"))
+    for key, value in added.items():
+        dotted = key[len(_ENV_PREFIX):].lower().replace("__", ".")
+        node = defaults
+        for part in dotted.split("."):
+            assert isinstance(node, dict) and part in node, (
+                f"{key} maps to config key {dotted!r}, which does not exist - "
+                "the schema will reject it and every subject will fail")
+            node = node[part]
+        # 120 a minute for the study, four subjects, so 30 each.
+        assert value == "30", f"{dotted} = {value}, expected the budget divided by 4"
+
+
+def test_a_budget_smaller_than_the_subject_count_still_lets_everyone_call():
+    """Integer division must never hand a child a rate of zero."""
+    from rave_agent.rave.rate_limit import RateLimiter
+
+    assert RateLimiter(max(1, 2 // 4)).per_minute == 1
+
+
+# ------------------------------------------- reporting is scoped to the run
+def _verify_only_run(tmp_path, provisioned, also_on_disk=()):
+    """Run just the reporting stage and return the argv it would have used."""
+    import subprocess
+    import json as _json
+    from rave_agent import orchestrator as orch_mod
+    from rave_agent.config.loader import Config
+
+    out = tmp_path / "S"
+    (out / "generated").mkdir(parents=True)
+    for subject in set(provisioned) | set(also_on_disk):
+        (out / "generated" / subject).mkdir()
+    if provisioned is not None:
+        (out / "subjects.json").write_text(_json.dumps(
+            {"subjects": [{"subject_id": s, "status": "created"} for s in provisioned]}),
+            encoding="utf-8")
+
+    config = Config(
+        data={"study": {"name": "S"}, "rave": {"environment": "DEV"},
+              "execution": {"output_root": str(tmp_path)}},
+        study_file=Path("x"), defaults_file=Path("y"), config_hash="h")
+
+    seen = {}
+
+    def fake_run(command, cwd=None, env=None, **kwargs):
+        seen["command"] = list(command)
+        return subprocess.CompletedProcess(command, 0, "", "")
+
+    orch_mod.subprocess.run, original = fake_run, orch_mod.subprocess.run
+    try:
+        orch_mod.Orchestrator(config, "S", Path(".env"), only=["verify"]).run()
+    finally:
+        orch_mod.subprocess.run = original
+    return seen["command"]
+
+
+def test_reporting_covers_only_the_subjects_this_run_made(tmp_path):
+    """The output directory accumulates; a run of two must not report on five.
+
+    Discovering subjects from `generated/` meant a single-subject run produced a
+    report about every subject the study had ever had.
+    """
+    command = _verify_only_run(
+        tmp_path,
+        provisioned=["TST-006", "TST-007"],
+        also_on_disk=["TST-001", "TST-002", "TST-003"])
+
+    passed = [command[i + 1] for i, a in enumerate(command) if a == "--subject"]
+    assert passed == ["TST-006", "TST-007"], command
+    assert "TST-001" not in command
+
+
+def test_reporting_falls_back_when_the_run_provisioned_nothing(tmp_path):
+    """A --only verify has no subjects of its own; report on what is there."""
+    command = _verify_only_run(tmp_path, provisioned=[], also_on_disk=["TST-001"])
+
+    assert "--subject" not in command, command

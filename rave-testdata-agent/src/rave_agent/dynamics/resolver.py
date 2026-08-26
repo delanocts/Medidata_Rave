@@ -10,6 +10,7 @@ Already-populated forms are never rewritten (FR-8.4).
 from __future__ import annotations
 
 import json
+import os
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -168,7 +169,14 @@ class DynamicsResolver:
         return result, (result.error or result.reason if not result.ok else "")
 
     def _record_limit(self, form_oid: str, group_oid: str, count: int) -> None:
-        """Remember a discovered log-record cap so later runs stay inside it."""
+        """Remember a discovered log-record cap so later runs stay inside it.
+
+        This is the one file several subjects write to at once, and they are
+        separate processes, so there is no lock to take. The write is made
+        atomic instead: a concurrent writer can cost us an entry, which the next
+        refusal rediscovers, but it can never leave a half-written file that
+        every later run fails to parse.
+        """
         path = self.config.study_output_dir / "model" / "log_limits.json"
         limits = {}
         if path.is_file():
@@ -178,7 +186,9 @@ class DynamicsResolver:
                 limits = {}
         limits[f"{form_oid}.{group_oid}"] = count
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(limits, indent=2, sort_keys=True), encoding="utf-8")
+        tmp = path.with_suffix(f".{os.getpid()}.tmp")
+        tmp.write_text(json.dumps(limits, indent=2, sort_keys=True), encoding="utf-8")
+        os.replace(tmp, path)
 
     def _record(self, result, state, folder_oid, form_oid, outcome,
                 submission, error, pass_number, context) -> bool:

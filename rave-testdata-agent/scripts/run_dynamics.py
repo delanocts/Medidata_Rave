@@ -77,7 +77,7 @@ def main(argv: list[str] | None = None) -> int:
     level = args.log_level or config.get("execution.log_level", "INFO")
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     configure_logging(level=level,
-                      log_file=config.study_output_dir / "logs" / f"dynamics_{stamp}.log")
+                      log_file=config.study_output_dir / "logs" / f"dynamics_{args.subject}_{stamp}.log")
 
     model_dir = config.study_output_dir / "model"
     try:

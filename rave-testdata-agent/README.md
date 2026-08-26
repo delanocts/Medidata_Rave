@@ -56,6 +56,11 @@ reproducible one command at a time:
 `run_dynamics.py` generates and submits per pass, so it supersedes running A5
 and A6 separately for a full run.
 
+`run_all.py` reports on the subjects *that run* provisioned, taken from
+`subjects.json` — not on every subject the output directory has accumulated.
+Run `run_verify.py --study <name>` on its own to report on all of them, or pass
+`--subject` (repeatable) to pick.
+
 Start with `test_connection.py`. It reports a PASS/FAIL matrix and exits non-zero
 on any mandatory failure. The check that matters most is **design-metadata
 access**: without it, edit checks cannot be read and dynamics must come from a
@@ -98,6 +103,7 @@ calls. Pass `--regenerate` to override.
 | `generation.log_records` | Records per log form. Capped by any limit discovered from Rave. |
 | `dynamics.custom_function_overrides` | Declare what a custom function activates. Its logic is not derivable from any export. |
 | `metadata.sample_subjects` | Sample existing subjects to learn folder/form assignments the metadata omits. Read-only. |
+| `execution.max_parallel_subjects` | How many subjects load at once, each in its own process. Subjects are independent, so this is the one axis that genuinely scales; `rave.requests_per_minute` is a study-wide budget and is divided between them. |
 | `generation.lookahead_folders` | Generate this many visits ahead of the one being posted. Posting is ~3x generation, so without it a pass costs the sum of both. Speculating wastes work on a visit that turns out absent; the count is reported. `0` restores probe-then-generate. |
 
 ## Development

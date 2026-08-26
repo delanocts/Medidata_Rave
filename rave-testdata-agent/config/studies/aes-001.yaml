@@ -19,7 +19,7 @@ site:
 subjects:
   count: 4
   id_prefix: "CAN-"
-  id_start_number: 1
+  id_start_number: 5
   id_pad_width: 3            # -> CAN-001, CAN-002
 
 generation:

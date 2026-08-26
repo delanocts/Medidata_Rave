@@ -11,16 +11,16 @@ study:
 site:
   # Rave's site *number* is the ODM Location OID; the name is the label.
   # Confirmed from Sites.odm: OID=11002, Name=DEV-AES-002.
-  number: "11002"
-  name: "DEV-AES-002"
+  number: "USA-101"
+  name: "Mayo Clinic - Rochester"
   country: "US"              # ISO 3166 alpha-2
   create_if_missing: false   # created manually; the account cannot write AdminData
 
 subjects:
-  count: 1
-  id_prefix: "TST-"
-  id_start_number: 8
-  id_pad_width: 3            # -> TST-001, TST-002
+  count: 2
+  id_prefix: "USA101-"
+  id_start_number: 5
+  id_pad_width: 3            # -> USA101-001, USA101-002
 
 generation:
   # Rave's own derivation on ADMIN/EX_MNMX_F reports the indication as

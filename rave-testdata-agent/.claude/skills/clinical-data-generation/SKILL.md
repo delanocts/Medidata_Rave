@@ -6,6 +6,41 @@ allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 
 # Clinical data generation
 
+## One visit, one date - and it is the visit's own field
+A CRF collects many dates and only one of them is when the visit happened: a
+demographics form carries a birth date, a history form an onset years back, a
+substance-use form a quit date. Carrying "the earliest date on the form, from
+whichever form finished last" forward as the visit date is wrong twice over, and
+it compounds - the next visit is prompted with it and agrees, so one bad pick
+moves a whole run of visits into the wrong decade.
+
+Prefer a field that names itself as the visit date, matching on name and label
+so the rule stays the platform's convention rather than one study's identifiers.
+Failing that, let the first form in the visit set it and refuse to overwrite:
+first-wins is the safe direction, because the visit-date form is normally first.
+
+Exclude time-only fields explicitly. They are date-like to the metadata, and a
+clock time sorts before every real date as a string, so `09:30` silently becomes
+the date the visit happened.
+
+Keep bookkeeping - how a value was chosen - under a key the prompt filters out.
+The model should see the value, never the reasoning about it.
+
+## Generate visits in schedule order, not OID order
+Each visit's date is carried into the next visit's prompt, so the sequence
+visits are generated in *is* the sequence the dates are built in. Anything that
+hands the loop a set of folders has probably sorted it by OID for determinism,
+and OID order is not visit order: a final-visit folder can sort before the
+baseline folder it is measured from, and a day-91 folder after a day-331 one
+because `9` > `3` as characters. The visit then has no earlier date to anchor
+to and the model invents one - a Day 420 visit dated eleven months before Day 1
+passes every field-level check there is.
+
+Use the StudyEventRef ordinal the metadata already carries, sort at the single
+point that plans the work rather than at each call site, and give folders with
+no ordinal a stable tail so studies that publish none still order the same way
+twice.
+
 ## Division of responsibility
 Every clinical **value** comes from the LLM. Deterministic code does metadata
 parsing, prompt construction, validation, ODM assembly, retries and persistence.

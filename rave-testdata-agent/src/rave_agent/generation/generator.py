@@ -37,6 +37,14 @@ log = get_logger(__name__)
 # Fields carried forward as subject context, matched on the variable name.
 _CONTEXT_HINTS = ("SEX", "BRTH", "DOB", "AGE", "RACE", "ETHNIC", "HEIGHT", "WEIGHT")
 
+# How a CRF says "this is the date the visit happened". Names are Rave and CDISC
+# conventions, not one study's; labels catch the studies that use neither.
+_VISIT_DATE_NAMES = ("DCMDATE", "VISDAT", "VISITDAT", "SVSTDTC", "DSSTDTC")
+_VISIT_DATE_LABELS = (
+    "date of visit", "visit date", "date of this visit", "date of the visit",
+    "date of examination", "date of assessment", "assessment date",
+)
+
 
 @dataclass
 class FormOutcome:
@@ -437,6 +445,39 @@ class Generator:
             ))
 
     # ------------------------------------------------------------------
+    def _visit_date_candidate(self, outcome: FormOutcome) -> tuple[str, bool]:
+        """The date this visit happened, and whether the field said it was.
+
+        A CRF collects many dates and only one of them is the visit: a
+        demographics form carries a birth date, a history form an onset years
+        back, a substance-use form a quit date. Picking any of those as "the
+        visit date" tells the next visit's prompt the subject was seen decades
+        ago, and it dutifully agrees.
+
+        Fields are matched on name and label rather than OID, because the
+        convention is Rave's and the study's identifiers are its own. Time-only
+        fields are excluded: they are date-like to the metadata but a clock time
+        sorts before every real date as a string.
+        """
+        named: list[str] = []
+        other: list[str] = []
+        for oid, value in (outcome.values or {}).items():
+            item = self.model.items.get(oid)
+            if item is None or not value or item.data_type not in ("date", "datetime"):
+                continue
+            name = (item.name or "").upper()
+            label = (item.label or "").lower()
+            if (any(hint in name for hint in _VISIT_DATE_NAMES)
+                    or any(hint in label for hint in _VISIT_DATE_LABELS)):
+                named.append(str(value))
+            else:
+                other.append(str(value))
+        if named:
+            return sorted(named)[0], True
+        if other:
+            return sorted(other)[0], False
+        return "", False
+
     def _update_context(self, context: dict[str, Any], outcome: FormOutcome) -> None:
         """Carry stable subject facts forward so later forms agree (FR-6.5)."""
         for oid, value in (outcome.values or {}).items():
@@ -445,11 +486,22 @@ class Generator:
                 continue
             if any(hint in item.name.upper() for hint in _CONTEXT_HINTS):
                 context.setdefault(f"{item.label or item.name} [{oid}]", value)
-        if outcome.values:
-            dates = [v for oid, v in outcome.values.items()
-                     if (self.model.items.get(oid) or Item("", "", "", "")).is_date_like]
-            if dates:
-                context[f"{outcome.folder_oid} visit date"] = sorted(dates)[0]
+
+        # One visit, one date. A field that names itself as the visit date wins
+        # and then holds; anything else only fills an empty slot, so the first
+        # form in the visit sets it and later forms cannot overwrite it. The old
+        # rule was the opposite - last form wins, earliest date on it - which
+        # let a smoking-cessation date become the date of a screening visit.
+        value, is_named = self._visit_date_candidate(outcome)
+        if not value:
+            return
+        key = f"{outcome.folder_oid} visit date"
+        claimed = f"_{outcome.folder_oid} visit date claimed"
+        if is_named and not context.get(claimed):
+            context[key] = value
+            context[claimed] = True
+        else:
+            context.setdefault(key, value)
 
     def generate_subject(
         self,

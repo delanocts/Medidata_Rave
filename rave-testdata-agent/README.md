@@ -56,6 +56,11 @@ reproducible one command at a time:
 `run_dynamics.py` generates and submits per pass, so it supersedes running A5
 and A6 separately for a full run.
 
+`run_all.py` reports on the subjects *that run* provisioned, taken from
+`subjects.json` — not on every subject the output directory has accumulated.
+Run `run_verify.py --study <name>` on its own to report on all of them, or pass
+`--subject` (repeatable) to pick.
+
 Start with `test_connection.py`. It reports a PASS/FAIL matrix and exits non-zero
 on any mandatory failure. The check that matters most is **design-metadata
 access**: without it, edit checks cannot be read and dynamics must come from a

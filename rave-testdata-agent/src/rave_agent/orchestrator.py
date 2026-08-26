@@ -30,7 +30,8 @@ class Stage:
     key: str
     name: str
     script: str
-    per_subject: bool = False
+    per_subject: bool = False    # run once per subject, several at a time
+    scoped_to_subjects: bool = False  # run once, told which subjects this run owns
     optional: bool = False       # a failure is reported, not fatal
     writes_to_rave: bool = False
     needs_env: bool = True       # False for stages that only read local artifacts
@@ -46,7 +47,11 @@ STAGES: list[Stage] = [
     Stage("provision", "Site and subjects", "run_provision.py", writes_to_rave=True),
     Stage("dynamics", "Generate, submit, resolve dynamics", "run_dynamics.py",
           per_subject=True, writes_to_rave=True),
-    Stage("verify", "Verification and reporting", "run_verify.py", optional=True),
+    # Reporting covers this run's subjects, not every subject the study has
+    # ever had. Left unscoped it discovers them from the output directory, which
+    # accumulates, so a one-subject run produced a report about three.
+    Stage("verify", "Verification and reporting", "run_verify.py",
+          scoped_to_subjects=True, optional=True),
 ]
 
 STAGE_KEYS = [s.key for s in STAGES]
@@ -290,10 +295,21 @@ class Orchestrator:
                     detail=(f"failed for {', '.join(failures)}" if failures else ""),
                 )
             else:
-                code, seconds, _ = self._run(stage, [])
+                extra, scope = [], []
+                if stage.scoped_to_subjects:
+                    scope = self._subjects()
+                    for subject in scope:
+                        extra += ["--subject", subject]
+                    if not scope:
+                        # Nothing provisioned in this run - a --only verify, say.
+                        # Fall back to whatever is on disk rather than reporting
+                        # on nothing, and say so.
+                        print("[no subjects recorded for this run; "
+                              "reporting on everything found on disk]")
+                code, seconds, _ = self._run(stage, extra)
                 outcome = StageOutcome(
                     stage.key, stage.name, "ok" if code == 0 else "failed",
-                    exit_code=code, seconds=seconds,
+                    exit_code=code, seconds=seconds, subjects=scope,
                 )
 
             manifest.record(outcome)

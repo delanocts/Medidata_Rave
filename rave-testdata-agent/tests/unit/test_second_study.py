@@ -860,3 +860,62 @@ def test_a_budget_smaller_than_the_subject_count_still_lets_everyone_call():
     from rave_agent.rave.rate_limit import RateLimiter
 
     assert RateLimiter(max(1, 2 // 4)).per_minute == 1
+
+
+# ------------------------------------------- reporting is scoped to the run
+def _verify_only_run(tmp_path, provisioned, also_on_disk=()):
+    """Run just the reporting stage and return the argv it would have used."""
+    import subprocess
+    import json as _json
+    from rave_agent import orchestrator as orch_mod
+    from rave_agent.config.loader import Config
+
+    out = tmp_path / "S"
+    (out / "generated").mkdir(parents=True)
+    for subject in set(provisioned) | set(also_on_disk):
+        (out / "generated" / subject).mkdir()
+    if provisioned is not None:
+        (out / "subjects.json").write_text(_json.dumps(
+            {"subjects": [{"subject_id": s, "status": "created"} for s in provisioned]}),
+            encoding="utf-8")
+
+    config = Config(
+        data={"study": {"name": "S"}, "rave": {"environment": "DEV"},
+              "execution": {"output_root": str(tmp_path)}},
+        study_file=Path("x"), defaults_file=Path("y"), config_hash="h")
+
+    seen = {}
+
+    def fake_run(command, cwd=None, env=None, **kwargs):
+        seen["command"] = list(command)
+        return subprocess.CompletedProcess(command, 0, "", "")
+
+    orch_mod.subprocess.run, original = fake_run, orch_mod.subprocess.run
+    try:
+        orch_mod.Orchestrator(config, "S", Path(".env"), only=["verify"]).run()
+    finally:
+        orch_mod.subprocess.run = original
+    return seen["command"]
+
+
+def test_reporting_covers_only_the_subjects_this_run_made(tmp_path):
+    """The output directory accumulates; a run of two must not report on five.
+
+    Discovering subjects from `generated/` meant a single-subject run produced a
+    report about every subject the study had ever had.
+    """
+    command = _verify_only_run(
+        tmp_path,
+        provisioned=["TST-006", "TST-007"],
+        also_on_disk=["TST-001", "TST-002", "TST-003"])
+
+    passed = [command[i + 1] for i, a in enumerate(command) if a == "--subject"]
+    assert passed == ["TST-006", "TST-007"], command
+    assert "TST-001" not in command
+
+
+def test_reporting_falls_back_when_the_run_provisioned_nothing(tmp_path):
+    """A --only verify has no subjects of its own; report on what is there."""
+    command = _verify_only_run(tmp_path, provisioned=[], also_on_disk=["TST-001"])
+
+    assert "--subject" not in command, command

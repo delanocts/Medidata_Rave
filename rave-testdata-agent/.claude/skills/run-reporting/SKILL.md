@@ -6,6 +6,14 @@ allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 
 # Run reporting
 
+## Report on the run, not on the directory
+Discovering subjects from the output tree is the obvious default and the wrong
+one: that tree accumulates across every run the study has ever had, so a
+one-subject run reports on all of its predecessors, and the coverage figures
+describe a population nobody asked about. Take the subject list from what the
+run itself provisioned, and keep directory discovery as the fallback for a
+report invoked on its own - saying out loud which of the two happened.
+
 ## Reconcile against Rave, not against intent
 Read the subject's data back and compare field by field with what was
 submitted. A submission Rave acknowledged is not proof the value landed as sent:

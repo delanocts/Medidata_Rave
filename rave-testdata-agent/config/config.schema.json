@@ -273,6 +273,11 @@
           "type": "integer",
           "minimum": 1,
           "maximum": 16
+        },
+        "lookahead_folders": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 4
         }
       }
     },

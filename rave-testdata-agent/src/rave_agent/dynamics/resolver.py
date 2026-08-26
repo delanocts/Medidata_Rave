@@ -10,6 +10,7 @@ Already-populated forms are never rewritten (FR-8.4).
 from __future__ import annotations
 
 import json
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -35,12 +36,16 @@ class PassResult:
     newly_activated: list[str] = field(default_factory=list)
     rejections: dict[str, str] = field(default_factory=dict)
     generation_failures: dict[str, str] = field(default_factory=dict)
+    # Forms generated ahead of time for a folder that then turned out absent.
+    # The price of the lookahead, kept visible rather than hidden.
+    forms_discarded: int = 0
 
     def summary(self) -> dict:
         return {
             "folders_attempted": self.folders_attempted,
             "forms_submitted": self.forms_submitted,
             "forms_rejected": self.forms_rejected,
+            "forms_discarded": self.forms_discarded,
             "newly_activated": self.newly_activated,
             "rejections": self.rejections,
             "generation_failures": self.generation_failures,
@@ -109,6 +114,7 @@ class DynamicsResolver:
         self.submitter = submitter
         self.site_oid = site_oid
         self.max_iterations = int(config.get("dynamics.max_iterations") or 5)
+        self.lookahead = int(config.get("generation.lookahead_folders") or 0)
         self.generated_root = config.study_output_dir / "generated"
 
     # ------------------------------------------------------------------
@@ -201,6 +207,79 @@ class DynamicsResolver:
         return classify_rejection(error)[0] != FOLDER_INACTIVE
 
     # ------------------------------------------------------------------
+    def _submit_folder(
+        self,
+        subject_id: str,
+        folder_oid: str,
+        form_oids: list[str],
+        outcomes: list,
+        state: ActivationState,
+        result: PassResult,
+        context: dict,
+        pass_number: int,
+    ) -> bool:
+        """Post one folder's generated forms in order. False once it is absent.
+
+        Submissions for a single subject stay serialised (C-5), so this is the
+        slow half of a pass and the half the lookahead runs against.
+        """
+        for index, (form_oid, outcome) in enumerate(zip(form_oids, outcomes)):
+            if not outcome.ok:
+                result.generation_failures[f"{folder_oid}/{form_oid}"] = (
+                    outcome.detail or "; ".join(outcome.violations[:2]))
+                continue
+            submission, error = self._submit_one(
+                subject_id, folder_oid, outcome, pass_number)
+            if not self._record(result, state, folder_oid, form_oid, outcome,
+                                submission, error, pass_number, context):
+                # The folder is not part of this subject. Whatever was already
+                # generated for the rest of it is thrown away unposted.
+                result.forms_discarded += len(form_oids) - index - 1
+                return False
+        return True
+
+    def _pass_plan(self, folders: list[str], state: ActivationState) -> list[tuple[str, list[str]]]:
+        """Folders still worth attempting, with the forms each one owes."""
+        plan: list[tuple[str, list[str]]] = []
+        for folder_oid in folders:
+            folder = self.model.folders.get(folder_oid)
+            if folder is None:
+                continue
+            pending = [a.form_oid for a in folder.forms
+                       if not state.is_populated(folder_oid, a.form_oid)]
+            if pending:
+                plan.append((folder_oid, pending))
+        return plan
+
+    def _run_folder_probed(
+        self,
+        subject_id: str,
+        folder_oid: str,
+        form_oids: list[str],
+        state: ActivationState,
+        result: PassResult,
+        context: dict,
+        pass_number: int,
+    ) -> None:
+        """Generate a folder only as far as its answer justifies.
+
+        The first form is generated and posted alone. A folder that is not part
+        of this subject yet refuses everything, so finding that out after
+        generating twenty forms wastes twenty LLM calls; one call answers it.
+        This is the `lookahead_folders: 0` path - it never speculates, and it
+        leaves generation and submission strictly alternating.
+        """
+        probe, rest = form_oids[:1], form_oids[1:]
+        outcome = self.generator.generate_form(
+            subject_id, folder_oid, probe[0], context)
+        alive = self._submit_folder(subject_id, folder_oid, probe, [outcome],
+                                    state, result, context, pass_number)
+        if not alive or not rest:
+            return
+        outcomes = self.generator.generate_forms(subject_id, folder_oid, rest, context)
+        self._submit_folder(subject_id, folder_oid, rest, outcomes,
+                            state, result, context, pass_number)
+
     def run_pass(
         self,
         subject_id: str,
@@ -210,54 +289,46 @@ class DynamicsResolver:
     ) -> PassResult:
         result = PassResult(pass_number=pass_number, folders_attempted=list(folders))
         context: dict = {}
+        plan = self._pass_plan(folders, state)
+        if not plan:
+            return result
 
-        for folder_oid in folders:
-            folder = self.model.folders.get(folder_oid)
-            if folder is None:
-                continue
+        if self.lookahead < 1:
+            for folder_oid, form_oids in plan:
+                self._run_folder_probed(subject_id, folder_oid, form_oids, state,
+                                        result, context, pass_number)
+            return result
 
-            pending = [a.form_oid for a in folder.forms
-                       if not state.is_populated(folder_oid, a.form_oid)]
-            if not pending:
-                continue
-
-            # Probe the folder with its first form before generating the rest.
-            # A folder that is not part of this subject yet refuses everything,
-            # so finding that out after generating twenty forms wastes twenty
-            # LLM calls. One call answers the question.
-            probe, rest = pending[0], pending[1:]
-            outcome = self.generator.generate_form(
-                subject_id, folder_oid, probe, context)
-
-            if not outcome.ok:
-                result.generation_failures[f"{folder_oid}/{probe}"] = (
-                    outcome.detail or "; ".join(outcome.violations[:2]))
-            else:
-                submission, error = self._submit_one(
-                    subject_id, folder_oid, outcome, pass_number)
-                if not self._record(result, state, folder_oid, probe, outcome,
-                                    submission, error, pass_number, context):
-                    # Folder is absent: skip its remaining forms *before*
-                    # paying to generate them.
-                    continue
-
-            if not rest:
-                continue
-
-            # The folder is live, so generate the rest together and submit them
-            # in order - submissions for one subject stay serialised (C-5).
-            for form_oid, outcome in zip(
-                    rest, self.generator.generate_forms(
-                        subject_id, folder_oid, rest, context)):
-                if not outcome.ok:
-                    result.generation_failures[f"{folder_oid}/{form_oid}"] = (
-                        outcome.detail or "; ".join(outcome.violations[:2]))
-                    continue
-                submission, error = self._submit_one(
-                    subject_id, folder_oid, outcome, pass_number)
-                if not self._record(result, state, folder_oid, form_oid, outcome,
-                                    submission, error, pass_number, context):
-                    break
+        # Pipelined: generate the next folder while this one is being posted.
+        #
+        # Posting dominates a pass - Rave charges per message, not per value, so
+        # a folder costs roughly ten seconds a form however small the form is,
+        # while generating one costs about three. Left alternating, the two
+        # never overlap and the pass takes the sum. Run one folder ahead and the
+        # generation disappears behind the posting.
+        #
+        # The cost is that the next folder is generated before this one's probe
+        # has proved it exists, so an absent folder wastes what was prepared for
+        # it. That is counted in `forms_discarded`. Set `lookahead_folders: 0`
+        # to trade the speed back for the probe.
+        with ThreadPoolExecutor(max_workers=1, thread_name_prefix="lookahead") as lane:
+            ahead = lane.submit(self.generator.generate_forms,
+                                subject_id, plan[0][0], plan[0][1], dict(context))
+            for index, (folder_oid, form_oids) in enumerate(plan):
+                outcomes = ahead.result()
+                if index + 1 < len(plan):
+                    # The next folder is prompted with what this one generated,
+                    # so visit dates still advance in order. Only the authoritative
+                    # `context` is confined to what Rave actually accepted.
+                    speculative = dict(context)
+                    for outcome in outcomes:
+                        if outcome.ok:
+                            self.generator._update_context(speculative, outcome)
+                    nxt_folder, nxt_forms = plan[index + 1]
+                    ahead = lane.submit(self.generator.generate_forms,
+                                        subject_id, nxt_folder, nxt_forms, speculative)
+                self._submit_folder(subject_id, folder_oid, form_oids, outcomes,
+                                    state, result, context, pass_number)
 
         return result
 

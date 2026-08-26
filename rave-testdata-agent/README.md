@@ -98,6 +98,7 @@ calls. Pass `--regenerate` to override.
 | `generation.log_records` | Records per log form. Capped by any limit discovered from Rave. |
 | `dynamics.custom_function_overrides` | Declare what a custom function activates. Its logic is not derivable from any export. |
 | `metadata.sample_subjects` | Sample existing subjects to learn folder/form assignments the metadata omits. Read-only. |
+| `generation.lookahead_folders` | Generate this many visits ahead of the one being posted. Posting is ~3x generation, so without it a pass costs the sum of both. Speculating wastes work on a visit that turns out absent; the count is reported. `0` restores probe-then-generate. |
 
 ## Development
 

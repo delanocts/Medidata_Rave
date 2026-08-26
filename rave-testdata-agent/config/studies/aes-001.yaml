@@ -1,4 +1,4 @@
-# Study: AES-002 (DEV) - Aesthetics
+# Study: AES-001 (DEV) - Aesthetics
 # The only file that changes when targeting a different study (NFR-1).
 
 rave:
@@ -17,9 +17,9 @@ site:
   create_if_missing: false   # created manually; the account cannot write AdminData
 
 subjects:
-  count: 1
+  count: 4
   id_prefix: "TST-"
-  id_start_number: 6
+  id_start_number: 9
   id_pad_width: 3            # -> TST-001, TST-002
 
 generation:

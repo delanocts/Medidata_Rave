@@ -625,3 +625,102 @@ def test_unknown_site_falls_back_to_newest_and_says_so(tmp_path):
     assert oid == "17481"
     assert "site version unknown" in acq.version_source
     assert acq.version_notes, "a silent fallback must not be possible"
+
+
+# ------------------------------------------------------- generation lookahead
+def _resolver_fixture(lookahead, absent_folders=()):
+    """A resolver whose posting is stubbed, to observe scheduling only."""
+    import threading
+    import time
+    from rave_agent.config.loader import Config
+    from rave_agent.dynamics.resolver import DynamicsResolver
+    from rave_agent.generation.generator import FormOutcome
+    from rave_agent.model.dynamics_graph import DynamicsGraph
+    from rave_agent.model.study_model import FormAssignment, Folder, StudyModel
+
+    model = StudyModel(study_name="S", environment="D",
+                       crf_version_oid="1", crf_version_name="v")
+    for folder in ("V1", "V2", "V3"):
+        model.folders[folder] = Folder(
+            oid=folder, name=folder,
+            forms=[FormAssignment(form_oid=f"{folder}_F{i}") for i in range(3)])
+
+    events: list[str] = []
+    lock = threading.Lock()
+
+    class Gen:
+        max_parallel_forms = 1
+        unsatisfiable_triggers: dict = {}
+
+        def generate_form(self, subject_id, folder_oid, form_oid, context):
+            with lock:
+                events.append(f"gen {folder_oid}")
+            time.sleep(0.01)
+            return FormOutcome(subject_id, folder_oid, form_oid, "generated",
+                               values={f"{form_oid}.A": "1"})
+
+        def generate_forms(self, subject_id, folder_oid, form_oids, context):
+            return [self.generate_form(subject_id, folder_oid, o, context)
+                    for o in form_oids]
+
+        def _update_context(self, context, outcome):
+            pass
+
+    class Res(DynamicsResolver):
+        def _submit_one(self, subject_id, folder_oid, outcome, pass_number):
+            with lock:
+                events.append(f"post {folder_oid}")
+            time.sleep(0.03)
+            if folder_oid in absent_folders:
+                return None, "RWSException: Folder not found."
+
+            class Ok:
+                ok = True
+                status = "SUCCESS"
+            return Ok(), ""
+
+    config = Config(
+        data={"study": {"name": "S"}, "rave": {"environment": "DEV"},
+              "execution": {"output_root": "./output"},
+              "generation": {"lookahead_folders": lookahead},
+              "dynamics": {"max_iterations": 5}},
+        study_file=Path("x"), defaults_file=Path("y"), config_hash="h")
+    return Res(model, DynamicsGraph(study_name="S", crf_version_oid="1"), config,
+               Gen(), object(), "SITE"), events
+
+
+def test_lookahead_overlaps_generation_with_posting():
+    """The next visit must be generated while this one is still being posted."""
+    from rave_agent.dynamics.activation_state import ActivationState
+
+    resolver, events = _resolver_fixture(lookahead=1)
+    resolver.run_pass("SUBJ", ["V1", "V2", "V3"], ActivationState("SUBJ", "S", "DEV"), 0)
+
+    # V2 has to start generating before V1 has finished posting, or nothing
+    # was overlapped and the pass still costs generation + posting.
+    first_v2_gen = events.index("gen V2")
+    last_v1_post = len(events) - 1 - events[::-1].index("post V1")
+    assert first_v2_gen < last_v1_post, f"no overlap: {events}"
+
+
+def test_lookahead_zero_keeps_the_probe():
+    """Without a lookahead an absent visit must cost exactly one generation."""
+    from rave_agent.dynamics.activation_state import ActivationState
+
+    resolver, events = _resolver_fixture(lookahead=0, absent_folders={"V2"})
+    result = resolver.run_pass("SUBJ", ["V1", "V2", "V3"], ActivationState("SUBJ", "S", "DEV"), 0)
+
+    assert events.count("gen V2") == 1, f"generated past the probe: {events}"
+    assert result.forms_discarded == 0
+
+
+def test_lookahead_counts_what_an_absent_visit_wasted():
+    """Speculating has a price; it must be reported, not swallowed."""
+    from rave_agent.dynamics.activation_state import ActivationState
+
+    resolver, events = _resolver_fixture(lookahead=1, absent_folders={"V2"})
+    result = resolver.run_pass("SUBJ", ["V1", "V2", "V3"], ActivationState("SUBJ", "S", "DEV"), 0)
+
+    assert events.count("gen V2") == 3        # generated before the probe answered
+    assert result.forms_discarded == 2        # two of them never posted
+    assert events.count("post V2") == 1       # and posting stopped at the probe

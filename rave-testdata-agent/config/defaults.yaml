@@ -56,6 +56,13 @@ generation:
   # so demographics carried forward and advancing visit dates are unaffected.
   # 1 restores fully sequential generation.
   max_parallel_forms: 4
+  # Generate this many visits ahead of the one being posted. Posting dominates a
+  # pass - Rave charges per message, not per value - so without a lookahead the
+  # two phases alternate and the pass costs their sum. The price is that a visit
+  # is prepared before the probe proves it exists; an absent one wastes what was
+  # generated for it, counted as `forms_discarded`. 0 restores the strict
+  # probe-then-generate order.
+  lookahead_folders: 1
   therapeutic_area: null
   visits:
     mode: "all"              # all | subset  (OQ-6)

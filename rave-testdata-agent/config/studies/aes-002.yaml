@@ -19,7 +19,7 @@ site:
 subjects:
   count: 1
   id_prefix: "TST-"
-  id_start_number: 4
+  id_start_number: 8
   id_pad_width: 3            # -> TST-001, TST-002
 
 generation:

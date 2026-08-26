@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 import re
+import threading
 from dataclasses import dataclass, field
 
 from ..utils.logging import get_logger
@@ -23,14 +24,17 @@ class LlmError(RuntimeError):
 
 @dataclass
 class TokenUsage:
+    """Accumulated cost. Guarded because forms are generated concurrently."""
     input_tokens: int = 0
     output_tokens: int = 0
     calls: int = 0
+    _lock: threading.Lock = field(default_factory=threading.Lock, repr=False)
 
     def add(self, input_tokens: int, output_tokens: int) -> None:
-        self.input_tokens += input_tokens
-        self.output_tokens += output_tokens
-        self.calls += 1
+        with self._lock:
+            self.input_tokens += input_tokens
+            self.output_tokens += output_tokens
+            self.calls += 1
 
     def to_dict(self) -> dict:
         return {

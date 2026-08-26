@@ -75,6 +75,30 @@ A form's log-record maximum is published nowhere. Discover it by being refused,
 shrink the record list, retry, and cache what worked so later runs and later
 subjects stay inside it. Share that cache with the generator.
 
+## Posting dominates a pass - overlap it
+Rave charges per message, not per value. A measured pass: 308 posts carrying
+3,383 values in total - a median of **10 fields each** - cost 50.7 minutes,
+against 15.4 minutes of generation. Posts of 1-5 fields still averaged 5.4
+seconds, and field count explained almost none of the latency (r = 0.30).
+
+Left strictly alternating - generate a visit, post it, generate the next - the
+two phases never overlap and a pass costs their sum. Generating one visit ahead
+of the one being posted hides the generation entirely.
+
+The tension is with the probe: a visit prepared before its probe answers is
+wasted work if the visit turns out absent. Both are right, so make the depth a
+setting, keep the probe as the zero case, and **count the discarded forms** so
+the trade is visible in the run's own output rather than inferred from a bill.
+
+Batching many forms into one message looks like the bigger win and usually is
+not. A batched message is all-or-nothing: one bad form rejects the whole thing
+and forces a per-form retry of that visit, and it destroys the per-form
+attribution the loop needs to tell "form not in this folder" from "folder not
+active". Measure first - in the same run, 15 of 19 visits contained at least one
+rejection and held 48.8 of the 50 minutes, so batching would have fallen back to
+per-form on everything that mattered.
+
 ## Constraints
 - One subject's submissions stay serialised; parallelism is across subjects.
+- Generation may run ahead of posting; posting order may not change.
 - No study, folder or form identifier in this skill or the resolver.

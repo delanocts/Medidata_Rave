@@ -1,0 +1,1176 @@
+13:17:23 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:17:25 INFO    rave_agent.generation.llm_client: llm call
+13:17:29 WARNING rave_agent.rave.client: rws call failed
+13:17:29 ERROR   rave_agent.submission.submitter: submission failed
+13:17:31 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:17:31 INFO    rave_agent.generation.llm_client: llm call
+13:17:35 WARNING rave_agent.rave.client: rws call failed
+13:17:35 ERROR   rave_agent.submission.submitter: submission failed
+13:17:36 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:17:37 INFO    rave_agent.generation.llm_client: llm call
+13:17:41 WARNING rave_agent.rave.client: rws call failed
+13:17:41 ERROR   rave_agent.submission.submitter: submission failed
+13:17:42 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:17:43 INFO    rave_agent.generation.llm_client: llm call
+13:17:47 WARNING rave_agent.rave.client: rws call failed
+13:17:47 ERROR   rave_agent.submission.submitter: submission failed
+13:17:49 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:18:09 INFO    rave_agent.generation.llm_client: llm call
+13:18:13 WARNING rave_agent.rave.client: rws call failed
+13:18:13 ERROR   rave_agent.submission.submitter: submission failed
+13:18:15 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:18:45 INFO    rave_agent.generation.llm_client: llm call
+13:18:49 WARNING rave_agent.rave.client: rws call failed
+13:18:49 ERROR   rave_agent.submission.submitter: submission failed
+13:18:51 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:18:54 INFO    rave_agent.generation.llm_client: llm call
+13:18:57 WARNING rave_agent.rave.client: rws call failed
+13:18:57 ERROR   rave_agent.submission.submitter: submission failed
+13:18:59 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:19:02 INFO    rave_agent.generation.llm_client: llm call
+13:19:06 WARNING rave_agent.rave.client: rws call failed
+13:19:06 ERROR   rave_agent.submission.submitter: submission failed
+13:19:08 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:19:12 INFO    rave_agent.generation.llm_client: llm call
+13:19:16 WARNING rave_agent.rave.client: rws call failed
+13:19:16 ERROR   rave_agent.submission.submitter: submission failed
+13:19:18 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:19:47 INFO    rave_agent.generation.llm_client: llm call
+13:20:47 WARNING rave_agent.rave.client: rws call failed
+13:20:47 ERROR   rave_agent.submission.submitter: submission failed
+13:20:49 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:20:50 INFO    rave_agent.generation.llm_client: llm call
+13:20:58 INFO    rave_agent.rave.client: rws call ok
+13:20:58 INFO    rave_agent.submission.submitter: submission accepted
+13:20:59 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:20:59 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:00 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:00 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:00 INFO    rave_agent.generation.llm_client: llm call
+13:21:01 INFO    rave_agent.generation.llm_client: llm call
+13:21:01 INFO    rave_agent.generation.llm_client: llm call
+13:21:02 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:03 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:03 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:04 INFO    rave_agent.generation.llm_client: llm call
+13:21:05 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:10 INFO    rave_agent.generation.llm_client: llm call
+13:21:11 INFO    rave_agent.generation.llm_client: llm call
+13:21:13 INFO    rave_agent.generation.llm_client: llm call
+13:21:13 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:13 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:14 INFO    rave_agent.generation.llm_client: llm call
+13:21:14 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:15 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:15 INFO    rave_agent.generation.llm_client: llm call
+13:21:15 INFO    rave_agent.generation.llm_client: llm call
+13:21:16 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:16 INFO    rave_agent.generation.llm_client: llm call
+13:21:16 WARNING rave_agent.generation.generator: validation failed
+13:21:17 INFO    rave_agent.generation.llm_client: llm call
+13:21:17 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:18 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:18 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:18 INFO    rave_agent.generation.llm_client: llm call
+13:21:20 INFO    rave_agent.generation.llm_client: llm call
+13:21:20 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:20 INFO    rave_agent.generation.llm_client: llm call
+13:21:21 INFO    rave_agent.generation.llm_client: llm call
+13:21:22 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:23 INFO    rave_agent.generation.llm_client: llm call
+13:21:23 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:23 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:24 INFO    rave_agent.generation.llm_client: llm call
+13:21:24 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:26 INFO    rave_agent.generation.llm_client: llm call
+13:21:26 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:27 INFO    rave_agent.generation.llm_client: llm call
+13:21:27 INFO    rave_agent.generation.llm_client: llm call
+13:21:28 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:21:31 INFO    rave_agent.generation.llm_client: llm call
+13:21:49 INFO    rave_agent.generation.llm_client: llm call
+13:21:52 WARNING rave_agent.rave.client: rws call failed
+13:21:52 ERROR   rave_agent.submission.submitter: submission failed
+13:21:56 WARNING rave_agent.rave.client: rws call failed
+13:21:56 ERROR   rave_agent.submission.submitter: submission failed
+13:22:20 INFO    rave_agent.rave.client: rws call ok
+13:22:20 INFO    rave_agent.submission.submitter: submission accepted
+13:22:30 INFO    rave_agent.rave.client: rws call ok
+13:22:30 INFO    rave_agent.submission.submitter: submission accepted
+13:23:07 INFO    rave_agent.rave.client: rws call ok
+13:23:07 INFO    rave_agent.submission.submitter: submission accepted
+13:23:45 INFO    rave_agent.rave.client: rws call ok
+13:23:45 INFO    rave_agent.submission.submitter: submission accepted
+13:24:11 INFO    rave_agent.rave.client: rws call ok
+13:24:11 INFO    rave_agent.submission.submitter: submission accepted
+13:24:33 INFO    rave_agent.rave.client: rws call ok
+13:24:33 INFO    rave_agent.submission.submitter: submission accepted
+13:24:39 INFO    rave_agent.rave.client: rws call ok
+13:24:39 INFO    rave_agent.submission.submitter: submission accepted
+13:24:47 INFO    rave_agent.rave.client: rws call ok
+13:24:47 INFO    rave_agent.submission.submitter: submission accepted
+13:24:55 INFO    rave_agent.rave.client: rws call ok
+13:24:55 INFO    rave_agent.submission.submitter: submission accepted
+13:24:58 WARNING rave_agent.rave.client: rws call failed
+13:24:58 ERROR   rave_agent.submission.submitter: submission failed
+13:25:12 INFO    rave_agent.rave.client: rws call ok
+13:25:12 INFO    rave_agent.submission.submitter: submission accepted
+13:25:24 INFO    rave_agent.rave.client: rws call ok
+13:25:24 INFO    rave_agent.submission.submitter: submission accepted
+13:25:28 WARNING rave_agent.rave.client: rws call failed
+13:25:28 ERROR   rave_agent.submission.submitter: submission failed
+13:25:34 INFO    rave_agent.rave.client: rws call ok
+13:25:34 INFO    rave_agent.submission.submitter: submission accepted
+13:25:39 INFO    rave_agent.rave.client: rws call ok
+13:25:39 INFO    rave_agent.submission.submitter: submission accepted
+13:25:50 INFO    rave_agent.rave.client: rws call ok
+13:25:50 INFO    rave_agent.submission.submitter: submission accepted
+13:25:55 WARNING rave_agent.rave.client: rws call failed
+13:25:55 ERROR   rave_agent.submission.submitter: submission failed
+13:26:00 WARNING rave_agent.rave.client: rws call failed
+13:26:00 ERROR   rave_agent.submission.submitter: submission failed
+13:26:05 WARNING rave_agent.rave.client: rws call failed
+13:26:05 ERROR   rave_agent.submission.submitter: submission failed
+13:26:51 INFO    rave_agent.rave.client: rws call ok
+13:26:51 INFO    rave_agent.submission.submitter: submission accepted
+13:26:53 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:26:55 INFO    rave_agent.generation.llm_client: llm call
+13:26:56 INFO    rave_agent.rave.client: rws call ok
+13:26:56 INFO    rave_agent.submission.submitter: submission accepted
+13:26:58 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:26:58 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:26:58 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:26:58 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:27:00 INFO    rave_agent.generation.llm_client: llm call
+13:27:00 INFO    rave_agent.generation.llm_client: llm call
+13:27:00 INFO    rave_agent.generation.llm_client: llm call
+13:27:01 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:27:01 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:27:02 INFO    rave_agent.generation.llm_client: llm call
+13:27:03 INFO    rave_agent.generation.llm_client: llm call
+13:27:04 INFO    rave_agent.generation.llm_client: llm call
+13:27:05 INFO    rave_agent.rave.client: rws call ok
+13:27:05 INFO    rave_agent.submission.submitter: submission accepted
+13:27:05 WARNING rave_agent.rave.client: rws call failed
+13:27:05 ERROR   rave_agent.submission.submitter: submission failed
+13:27:06 WARNING rave_agent.rave.client: rws call failed
+13:27:06 ERROR   rave_agent.submission.submitter: submission failed
+13:27:07 INFO    rave_agent.rave.client: rws call ok
+13:27:07 INFO    rave_agent.submission.submitter: submission accepted
+13:27:07 INFO    rave_agent.rave.client: rws call ok
+13:27:07 INFO    rave_agent.submission.submitter: submission accepted
+13:27:08 INFO    rave_agent.rave.client: rws call ok
+13:27:08 INFO    rave_agent.submission.submitter: submission accepted
+13:27:10 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:27:11 INFO    rave_agent.generation.llm_client: llm call
+13:27:12 INFO    rave_agent.rave.client: rws call ok
+13:27:12 INFO    rave_agent.submission.submitter: submission accepted
+13:27:14 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:08 INFO    rave_agent.generation.llm_client: llm call
+13:28:09 WARNING rave_agent.rave.client: rws call failed
+13:28:09 ERROR   rave_agent.submission.submitter: submission failed
+13:28:09 INFO    rave_agent.dynamics.resolver: pass complete
+13:28:09 WARNING rave_agent.rave.client: rws call failed
+13:28:09 ERROR   rave_agent.submission.submitter: submission failed
+13:28:11 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:14 INFO    rave_agent.generation.llm_client: llm call
+13:28:15 INFO    rave_agent.rave.client: rws call ok
+13:28:15 INFO    rave_agent.submission.submitter: submission accepted
+13:28:16 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:23 INFO    rave_agent.generation.llm_client: llm call
+13:28:23 WARNING rave_agent.rave.client: rws call failed
+13:28:23 ERROR   rave_agent.submission.submitter: submission failed
+13:28:25 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:26 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:27 INFO    rave_agent.generation.llm_client: llm call
+13:28:32 INFO    rave_agent.generation.llm_client: llm call
+13:28:32 INFO    rave_agent.rave.client: rws call ok
+13:28:32 INFO    rave_agent.submission.submitter: submission accepted
+13:28:33 INFO    rave_agent.rave.client: rws call ok
+13:28:33 INFO    rave_agent.submission.submitter: submission accepted
+13:28:34 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:35 INFO    rave_agent.generation.llm_client: llm call
+13:28:35 WARNING rave_agent.rave.client: rws call failed
+13:28:35 ERROR   rave_agent.submission.submitter: submission failed
+13:28:37 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:37 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:37 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:37 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:37 INFO    rave_agent.generation.llm_client: llm call
+13:28:37 INFO    rave_agent.generation.llm_client: llm call
+13:28:38 INFO    rave_agent.generation.llm_client: llm call
+13:28:38 INFO    rave_agent.generation.llm_client: llm call
+13:28:39 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:39 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:39 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:40 INFO    rave_agent.generation.llm_client: llm call
+13:28:41 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:41 INFO    rave_agent.generation.llm_client: llm call
+13:28:41 INFO    rave_agent.generation.llm_client: llm call
+13:28:43 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:43 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:43 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:46 INFO    rave_agent.generation.llm_client: llm call
+13:28:47 INFO    rave_agent.generation.llm_client: llm call
+13:28:48 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:49 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:49 INFO    rave_agent.generation.llm_client: llm call
+13:28:51 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:52 INFO    rave_agent.generation.llm_client: llm call
+13:28:52 INFO    rave_agent.generation.llm_client: llm call
+13:28:53 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:54 INFO    rave_agent.generation.llm_client: llm call
+13:28:54 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:28:54 INFO    rave_agent.generation.llm_client: llm call
+13:28:58 INFO    rave_agent.generation.llm_client: llm call
+13:29:06 INFO    rave_agent.generation.llm_client: llm call
+13:29:06 WARNING rave_agent.rave.client: rws call failed
+13:29:06 ERROR   rave_agent.submission.submitter: submission failed
+13:29:07 INFO    rave_agent.rave.client: rws call ok
+13:29:07 INFO    rave_agent.submission.submitter: submission accepted
+13:29:08 INFO    rave_agent.rave.client: rws call ok
+13:29:08 INFO    rave_agent.submission.submitter: submission accepted
+13:29:08 INFO    rave_agent.rave.client: rws call ok
+13:29:08 INFO    rave_agent.submission.submitter: submission accepted
+13:29:09 INFO    rave_agent.rave.client: rws call ok
+13:29:09 INFO    rave_agent.submission.submitter: submission accepted
+13:29:10 INFO    rave_agent.rave.client: rws call ok
+13:29:10 INFO    rave_agent.submission.submitter: submission accepted
+13:29:10 INFO    rave_agent.rave.client: rws call ok
+13:29:10 INFO    rave_agent.submission.submitter: submission accepted
+13:29:10 WARNING rave_agent.rave.client: rws call failed
+13:29:10 ERROR   rave_agent.submission.submitter: submission failed
+13:29:11 INFO    rave_agent.rave.client: rws call ok
+13:29:11 INFO    rave_agent.submission.submitter: submission accepted
+13:29:12 INFO    rave_agent.rave.client: rws call ok
+13:29:12 INFO    rave_agent.submission.submitter: submission accepted
+13:29:13 INFO    rave_agent.rave.client: rws call ok
+13:29:13 INFO    rave_agent.submission.submitter: submission accepted
+13:29:13 WARNING rave_agent.rave.client: rws call failed
+13:29:13 ERROR   rave_agent.submission.submitter: submission failed
+13:29:14 INFO    rave_agent.rave.client: rws call ok
+13:29:14 INFO    rave_agent.submission.submitter: submission accepted
+13:29:14 INFO    rave_agent.rave.client: rws call ok
+13:29:14 INFO    rave_agent.submission.submitter: submission accepted
+13:29:15 INFO    rave_agent.rave.client: rws call ok
+13:29:15 INFO    rave_agent.submission.submitter: submission accepted
+13:29:15 WARNING rave_agent.rave.client: rws call failed
+13:29:15 ERROR   rave_agent.submission.submitter: submission failed
+13:29:17 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:29:18 INFO    rave_agent.generation.llm_client: llm call
+13:29:19 WARNING rave_agent.rave.client: rws call failed
+13:29:19 ERROR   rave_agent.submission.submitter: submission failed
+13:29:20 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:29:20 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:29:20 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:29:21 INFO    rave_agent.generation.llm_client: llm call
+13:29:22 INFO    rave_agent.generation.llm_client: llm call
+13:29:22 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:29:22 INFO    rave_agent.generation.llm_client: llm call
+13:29:23 INFO    rave_agent.generation.llm_client: llm call
+13:29:23 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:29:23 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:29:23 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:29:24 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:29:30 INFO    rave_agent.generation.llm_client: llm call
+13:29:32 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:29:32 INFO    rave_agent.generation.llm_client: llm call
+13:29:34 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:29:34 INFO    rave_agent.generation.llm_client: llm call
+13:29:36 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:29:37 INFO    rave_agent.generation.llm_client: llm call
+13:29:38 INFO    rave_agent.generation.llm_client: llm call
+13:29:39 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:29:41 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:29:42 INFO    rave_agent.generation.llm_client: llm call
+13:29:43 INFO    rave_agent.generation.llm_client: llm call
+13:29:44 INFO    rave_agent.generation.llm_client: llm call
+13:29:50 INFO    rave_agent.generation.llm_client: llm call
+13:29:51 INFO    rave_agent.rave.client: rws call ok
+13:29:51 INFO    rave_agent.submission.submitter: submission accepted
+13:29:52 INFO    rave_agent.rave.client: rws call ok
+13:29:52 INFO    rave_agent.submission.submitter: submission accepted
+13:29:52 INFO    rave_agent.rave.client: rws call ok
+13:29:52 INFO    rave_agent.submission.submitter: submission accepted
+13:29:53 INFO    rave_agent.rave.client: rws call ok
+13:29:53 INFO    rave_agent.submission.submitter: submission accepted
+13:29:53 WARNING rave_agent.rave.client: rws call failed
+13:29:53 ERROR   rave_agent.submission.submitter: submission failed
+13:29:54 INFO    rave_agent.rave.client: rws call ok
+13:29:54 INFO    rave_agent.submission.submitter: submission accepted
+13:29:55 INFO    rave_agent.rave.client: rws call ok
+13:29:55 INFO    rave_agent.submission.submitter: submission accepted
+13:29:55 INFO    rave_agent.rave.client: rws call ok
+13:29:55 INFO    rave_agent.submission.submitter: submission accepted
+13:29:56 WARNING rave_agent.rave.client: rws call failed
+13:29:56 ERROR   rave_agent.submission.submitter: submission failed
+13:29:56 INFO    rave_agent.rave.client: rws call ok
+13:29:56 INFO    rave_agent.submission.submitter: submission accepted
+13:29:57 INFO    rave_agent.rave.client: rws call ok
+13:29:57 INFO    rave_agent.submission.submitter: submission accepted
+13:29:57 INFO    rave_agent.rave.client: rws call ok
+13:29:57 INFO    rave_agent.submission.submitter: submission accepted
+13:29:58 WARNING rave_agent.rave.client: rws call failed
+13:29:58 ERROR   rave_agent.submission.submitter: submission failed
+13:29:59 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:01 INFO    rave_agent.generation.llm_client: llm call
+13:30:02 WARNING rave_agent.rave.client: rws call failed
+13:30:02 ERROR   rave_agent.submission.submitter: submission failed
+13:30:03 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:03 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:04 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:04 INFO    rave_agent.generation.llm_client: llm call
+13:30:05 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:06 INFO    rave_agent.generation.llm_client: llm call
+13:30:06 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:07 INFO    rave_agent.generation.llm_client: llm call
+13:30:07 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:08 INFO    rave_agent.generation.llm_client: llm call
+13:30:08 INFO    rave_agent.generation.llm_client: llm call
+13:30:09 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:10 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:11 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:15 INFO    rave_agent.generation.llm_client: llm call
+13:30:17 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:20 INFO    rave_agent.generation.llm_client: llm call
+13:30:21 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:22 INFO    rave_agent.generation.llm_client: llm call
+13:30:23 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:25 INFO    rave_agent.generation.llm_client: llm call
+13:30:27 INFO    rave_agent.generation.llm_client: llm call
+13:30:27 INFO    rave_agent.generation.llm_client: llm call
+13:30:29 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:29 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:32 INFO    rave_agent.generation.llm_client: llm call
+13:30:37 INFO    rave_agent.generation.llm_client: llm call
+13:30:38 INFO    rave_agent.generation.llm_client: llm call
+13:30:39 INFO    rave_agent.rave.client: rws call ok
+13:30:39 INFO    rave_agent.submission.submitter: submission accepted
+13:30:39 INFO    rave_agent.rave.client: rws call ok
+13:30:39 INFO    rave_agent.submission.submitter: submission accepted
+13:30:40 INFO    rave_agent.rave.client: rws call ok
+13:30:40 INFO    rave_agent.submission.submitter: submission accepted
+13:30:40 INFO    rave_agent.rave.client: rws call ok
+13:30:40 INFO    rave_agent.submission.submitter: submission accepted
+13:30:41 INFO    rave_agent.rave.client: rws call ok
+13:30:41 INFO    rave_agent.submission.submitter: submission accepted
+13:30:41 WARNING rave_agent.rave.client: rws call failed
+13:30:41 ERROR   rave_agent.submission.submitter: submission failed
+13:30:42 INFO    rave_agent.rave.client: rws call ok
+13:30:42 INFO    rave_agent.submission.submitter: submission accepted
+13:30:43 INFO    rave_agent.rave.client: rws call ok
+13:30:43 INFO    rave_agent.submission.submitter: submission accepted
+13:30:44 INFO    rave_agent.rave.client: rws call ok
+13:30:44 INFO    rave_agent.submission.submitter: submission accepted
+13:30:44 WARNING rave_agent.rave.client: rws call failed
+13:30:44 ERROR   rave_agent.submission.submitter: submission failed
+13:30:44 INFO    rave_agent.rave.client: rws call ok
+13:30:44 INFO    rave_agent.submission.submitter: submission accepted
+13:30:45 INFO    rave_agent.rave.client: rws call ok
+13:30:45 INFO    rave_agent.submission.submitter: submission accepted
+13:30:46 INFO    rave_agent.rave.client: rws call ok
+13:30:46 INFO    rave_agent.submission.submitter: submission accepted
+13:30:46 WARNING rave_agent.rave.client: rws call failed
+13:30:46 ERROR   rave_agent.submission.submitter: submission failed
+13:30:48 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:50 INFO    rave_agent.generation.llm_client: llm call
+13:30:50 WARNING rave_agent.rave.client: rws call failed
+13:30:50 ERROR   rave_agent.submission.submitter: submission failed
+13:30:51 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:52 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:52 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:52 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:53 INFO    rave_agent.generation.llm_client: llm call
+13:30:54 INFO    rave_agent.generation.llm_client: llm call
+13:30:54 INFO    rave_agent.generation.llm_client: llm call
+13:30:54 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:55 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:55 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:56 INFO    rave_agent.generation.llm_client: llm call
+13:30:57 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:30:58 INFO    rave_agent.generation.llm_client: llm call
+13:30:59 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:31:03 INFO    rave_agent.generation.llm_client: llm call
+13:31:04 INFO    rave_agent.generation.llm_client: llm call
+13:31:04 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:31:05 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:31:05 INFO    rave_agent.generation.llm_client: llm call
+13:31:07 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:31:11 INFO    rave_agent.generation.llm_client: llm call
+13:31:12 INFO    rave_agent.generation.llm_client: llm call
+13:31:13 INFO    rave_agent.generation.llm_client: llm call
+13:31:13 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:31:13 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:31:15 INFO    rave_agent.generation.llm_client: llm call
+13:31:19 INFO    rave_agent.generation.llm_client: llm call
+13:31:29 INFO    rave_agent.generation.llm_client: llm call
+13:31:30 INFO    rave_agent.rave.client: rws call ok
+13:31:30 INFO    rave_agent.submission.submitter: submission accepted
+13:31:31 INFO    rave_agent.rave.client: rws call ok
+13:31:31 INFO    rave_agent.submission.submitter: submission accepted
+13:31:32 INFO    rave_agent.rave.client: rws call ok
+13:31:32 INFO    rave_agent.submission.submitter: submission accepted
+13:31:32 INFO    rave_agent.rave.client: rws call ok
+13:31:32 INFO    rave_agent.submission.submitter: submission accepted
+13:31:33 INFO    rave_agent.rave.client: rws call ok
+13:31:33 INFO    rave_agent.submission.submitter: submission accepted
+13:31:33 WARNING rave_agent.rave.client: rws call failed
+13:31:33 ERROR   rave_agent.submission.submitter: submission failed
+13:31:34 INFO    rave_agent.rave.client: rws call ok
+13:31:34 INFO    rave_agent.submission.submitter: submission accepted
+13:31:35 INFO    rave_agent.rave.client: rws call ok
+13:31:35 INFO    rave_agent.submission.submitter: submission accepted
+13:31:35 INFO    rave_agent.rave.client: rws call ok
+13:31:35 INFO    rave_agent.submission.submitter: submission accepted
+13:31:36 WARNING rave_agent.rave.client: rws call failed
+13:31:36 ERROR   rave_agent.submission.submitter: submission failed
+13:31:36 INFO    rave_agent.rave.client: rws call ok
+13:31:36 INFO    rave_agent.submission.submitter: submission accepted
+13:31:37 INFO    rave_agent.rave.client: rws call ok
+13:31:37 INFO    rave_agent.submission.submitter: submission accepted
+13:31:37 INFO    rave_agent.rave.client: rws call ok
+13:31:37 INFO    rave_agent.submission.submitter: submission accepted
+13:31:38 WARNING rave_agent.rave.client: rws call failed
+13:31:38 ERROR   rave_agent.submission.submitter: submission failed
+13:31:39 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:31:41 INFO    rave_agent.generation.llm_client: llm call
+13:31:41 WARNING rave_agent.rave.client: rws call failed
+13:31:41 ERROR   rave_agent.submission.submitter: submission failed
+13:31:42 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:31:42 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:31:43 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:31:43 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:31:44 INFO    rave_agent.generation.llm_client: llm call
+13:31:45 INFO    rave_agent.generation.llm_client: llm call
+13:31:45 INFO    rave_agent.generation.llm_client: llm call
+13:31:46 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:31:46 INFO    rave_agent.generation.llm_client: llm call
+13:31:46 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:31:46 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:31:48 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:31:54 INFO    rave_agent.generation.llm_client: llm call
+13:31:56 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:31:59 INFO    rave_agent.generation.llm_client: llm call
+13:32:01 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:01 INFO    rave_agent.generation.llm_client: llm call
+13:32:03 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:04 INFO    rave_agent.generation.llm_client: llm call
+13:32:05 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:06 INFO    rave_agent.generation.llm_client: llm call
+13:32:07 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:09 INFO    rave_agent.generation.llm_client: llm call
+13:32:09 INFO    rave_agent.generation.llm_client: llm call
+13:32:13 INFO    rave_agent.generation.llm_client: llm call
+13:32:20 INFO    rave_agent.generation.llm_client: llm call
+13:32:21 INFO    rave_agent.rave.client: rws call ok
+13:32:21 INFO    rave_agent.submission.submitter: submission accepted
+13:32:21 INFO    rave_agent.rave.client: rws call ok
+13:32:21 INFO    rave_agent.submission.submitter: submission accepted
+13:32:22 INFO    rave_agent.rave.client: rws call ok
+13:32:22 INFO    rave_agent.submission.submitter: submission accepted
+13:32:23 INFO    rave_agent.rave.client: rws call ok
+13:32:23 INFO    rave_agent.submission.submitter: submission accepted
+13:32:23 WARNING rave_agent.rave.client: rws call failed
+13:32:23 ERROR   rave_agent.submission.submitter: submission failed
+13:32:24 INFO    rave_agent.rave.client: rws call ok
+13:32:24 INFO    rave_agent.submission.submitter: submission accepted
+13:32:24 INFO    rave_agent.rave.client: rws call ok
+13:32:24 INFO    rave_agent.submission.submitter: submission accepted
+13:32:25 INFO    rave_agent.rave.client: rws call ok
+13:32:25 INFO    rave_agent.submission.submitter: submission accepted
+13:32:26 WARNING rave_agent.rave.client: rws call failed
+13:32:26 ERROR   rave_agent.submission.submitter: submission failed
+13:32:26 INFO    rave_agent.rave.client: rws call ok
+13:32:26 INFO    rave_agent.submission.submitter: submission accepted
+13:32:27 INFO    rave_agent.rave.client: rws call ok
+13:32:27 INFO    rave_agent.submission.submitter: submission accepted
+13:32:27 INFO    rave_agent.rave.client: rws call ok
+13:32:27 INFO    rave_agent.submission.submitter: submission accepted
+13:32:27 WARNING rave_agent.rave.client: rws call failed
+13:32:27 ERROR   rave_agent.submission.submitter: submission failed
+13:32:29 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:31 INFO    rave_agent.generation.llm_client: llm call
+13:32:31 WARNING rave_agent.rave.client: rws call failed
+13:32:31 ERROR   rave_agent.submission.submitter: submission failed
+13:32:32 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:32 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:32 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:33 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:33 INFO    rave_agent.generation.llm_client: llm call
+13:32:33 INFO    rave_agent.generation.llm_client: llm call
+13:32:34 INFO    rave_agent.generation.llm_client: llm call
+13:32:34 INFO    rave_agent.generation.llm_client: llm call
+13:32:35 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:35 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:35 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:35 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:36 INFO    rave_agent.generation.llm_client: llm call
+13:32:37 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:44 INFO    rave_agent.generation.llm_client: llm call
+13:32:45 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:51 INFO    rave_agent.generation.llm_client: llm call
+13:32:52 INFO    rave_agent.generation.llm_client: llm call
+13:32:53 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:53 INFO    rave_agent.generation.llm_client: llm call
+13:32:54 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:54 INFO    rave_agent.generation.llm_client: llm call
+13:32:55 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:56 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:57 INFO    rave_agent.generation.llm_client: llm call
+13:32:58 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:32:59 INFO    rave_agent.generation.llm_client: llm call
+13:32:59 INFO    rave_agent.generation.llm_client: llm call
+13:33:00 INFO    rave_agent.generation.llm_client: llm call
+13:33:01 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:01 INFO    rave_agent.generation.llm_client: llm call
+13:33:11 INFO    rave_agent.generation.llm_client: llm call
+13:33:11 INFO    rave_agent.rave.client: rws call ok
+13:33:11 INFO    rave_agent.submission.submitter: submission accepted
+13:33:12 INFO    rave_agent.rave.client: rws call ok
+13:33:12 INFO    rave_agent.submission.submitter: submission accepted
+13:33:13 INFO    rave_agent.rave.client: rws call ok
+13:33:13 INFO    rave_agent.submission.submitter: submission accepted
+13:33:13 INFO    rave_agent.rave.client: rws call ok
+13:33:13 INFO    rave_agent.submission.submitter: submission accepted
+13:33:14 INFO    rave_agent.rave.client: rws call ok
+13:33:14 INFO    rave_agent.submission.submitter: submission accepted
+13:33:14 WARNING rave_agent.rave.client: rws call failed
+13:33:14 ERROR   rave_agent.submission.submitter: submission failed
+13:33:15 INFO    rave_agent.rave.client: rws call ok
+13:33:15 INFO    rave_agent.submission.submitter: submission accepted
+13:33:16 INFO    rave_agent.rave.client: rws call ok
+13:33:16 INFO    rave_agent.submission.submitter: submission accepted
+13:33:16 INFO    rave_agent.rave.client: rws call ok
+13:33:16 INFO    rave_agent.submission.submitter: submission accepted
+13:33:17 WARNING rave_agent.rave.client: rws call failed
+13:33:17 ERROR   rave_agent.submission.submitter: submission failed
+13:33:17 INFO    rave_agent.rave.client: rws call ok
+13:33:17 INFO    rave_agent.submission.submitter: submission accepted
+13:33:18 INFO    rave_agent.rave.client: rws call ok
+13:33:18 INFO    rave_agent.submission.submitter: submission accepted
+13:33:18 INFO    rave_agent.rave.client: rws call ok
+13:33:18 INFO    rave_agent.submission.submitter: submission accepted
+13:33:19 INFO    rave_agent.rave.client: rws call ok
+13:33:19 INFO    rave_agent.submission.submitter: submission accepted
+13:33:20 INFO    rave_agent.rave.client: rws call ok
+13:33:20 INFO    rave_agent.submission.submitter: submission accepted
+13:33:20 WARNING rave_agent.rave.client: rws call failed
+13:33:20 ERROR   rave_agent.submission.submitter: submission failed
+13:33:22 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:23 INFO    rave_agent.generation.llm_client: llm call
+13:33:24 WARNING rave_agent.rave.client: rws call failed
+13:33:24 ERROR   rave_agent.submission.submitter: submission failed
+13:33:25 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:25 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:25 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:25 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:26 INFO    rave_agent.generation.llm_client: llm call
+13:33:26 INFO    rave_agent.generation.llm_client: llm call
+13:33:27 INFO    rave_agent.generation.llm_client: llm call
+13:33:27 INFO    rave_agent.generation.llm_client: llm call
+13:33:27 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:28 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:28 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:28 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:28 INFO    rave_agent.generation.llm_client: llm call
+13:33:29 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:30 INFO    rave_agent.generation.llm_client: llm call
+13:33:32 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:32 INFO    rave_agent.generation.llm_client: llm call
+13:33:33 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:39 INFO    rave_agent.generation.llm_client: llm call
+13:33:40 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:41 INFO    rave_agent.generation.llm_client: llm call
+13:33:44 INFO    rave_agent.generation.llm_client: llm call
+13:33:44 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:45 INFO    rave_agent.generation.llm_client: llm call
+13:33:45 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:46 INFO    rave_agent.generation.llm_client: llm call
+13:33:47 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:47 INFO    rave_agent.generation.llm_client: llm call
+13:33:47 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:33:48 INFO    rave_agent.generation.llm_client: llm call
+13:33:50 INFO    rave_agent.generation.llm_client: llm call
+13:33:54 INFO    rave_agent.generation.llm_client: llm call
+13:33:55 WARNING rave_agent.rave.client: rws call failed
+13:33:55 ERROR   rave_agent.submission.submitter: submission failed
+13:33:56 INFO    rave_agent.rave.client: rws call ok
+13:33:56 INFO    rave_agent.submission.submitter: submission accepted
+13:33:56 INFO    rave_agent.rave.client: rws call ok
+13:33:56 INFO    rave_agent.submission.submitter: submission accepted
+13:33:57 INFO    rave_agent.rave.client: rws call ok
+13:33:57 INFO    rave_agent.submission.submitter: submission accepted
+13:33:57 INFO    rave_agent.rave.client: rws call ok
+13:33:57 INFO    rave_agent.submission.submitter: submission accepted
+13:33:58 INFO    rave_agent.rave.client: rws call ok
+13:33:58 INFO    rave_agent.submission.submitter: submission accepted
+13:33:59 INFO    rave_agent.rave.client: rws call ok
+13:33:59 INFO    rave_agent.submission.submitter: submission accepted
+13:33:59 WARNING rave_agent.rave.client: rws call failed
+13:33:59 ERROR   rave_agent.submission.submitter: submission failed
+13:34:00 INFO    rave_agent.rave.client: rws call ok
+13:34:00 INFO    rave_agent.submission.submitter: submission accepted
+13:34:00 INFO    rave_agent.rave.client: rws call ok
+13:34:00 INFO    rave_agent.submission.submitter: submission accepted
+13:34:01 INFO    rave_agent.rave.client: rws call ok
+13:34:01 INFO    rave_agent.submission.submitter: submission accepted
+13:34:02 WARNING rave_agent.rave.client: rws call failed
+13:34:02 ERROR   rave_agent.submission.submitter: submission failed
+13:34:02 INFO    rave_agent.rave.client: rws call ok
+13:34:02 INFO    rave_agent.submission.submitter: submission accepted
+13:34:03 INFO    rave_agent.rave.client: rws call ok
+13:34:03 INFO    rave_agent.submission.submitter: submission accepted
+13:34:03 INFO    rave_agent.rave.client: rws call ok
+13:34:03 INFO    rave_agent.submission.submitter: submission accepted
+13:34:03 WARNING rave_agent.rave.client: rws call failed
+13:34:03 ERROR   rave_agent.submission.submitter: submission failed
+13:34:04 WARNING rave_agent.rave.client: rws call failed
+13:34:04 ERROR   rave_agent.submission.submitter: submission failed
+13:34:05 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:05 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:05 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:05 INFO    rave_agent.generation.llm_client: llm call
+13:34:06 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:06 INFO    rave_agent.generation.llm_client: llm call
+13:34:07 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:07 INFO    rave_agent.generation.llm_client: llm call
+13:34:08 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:08 INFO    rave_agent.generation.llm_client: llm call
+13:34:09 INFO    rave_agent.generation.llm_client: llm call
+13:34:09 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:09 INFO    rave_agent.generation.llm_client: llm call
+13:34:10 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:10 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:11 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:11 INFO    rave_agent.generation.llm_client: llm call
+13:34:12 INFO    rave_agent.generation.llm_client: llm call
+13:34:13 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:13 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:19 INFO    rave_agent.generation.llm_client: llm call
+13:34:20 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:27 INFO    rave_agent.generation.llm_client: llm call
+13:34:29 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:29 INFO    rave_agent.generation.llm_client: llm call
+13:34:29 INFO    rave_agent.generation.llm_client: llm call
+13:34:30 INFO    rave_agent.generation.llm_client: llm call
+13:34:31 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:31 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:32 INFO    rave_agent.generation.llm_client: llm call
+13:34:33 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:33 INFO    rave_agent.generation.llm_client: llm call
+13:34:35 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:35 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:34:35 INFO    rave_agent.generation.llm_client: llm call
+13:34:39 INFO    rave_agent.generation.llm_client: llm call
+13:34:41 INFO    rave_agent.generation.llm_client: llm call
+13:35:15 INFO    rave_agent.generation.llm_client: llm call
+13:35:16 WARNING rave_agent.rave.client: rws call failed
+13:35:16 ERROR   rave_agent.submission.submitter: submission failed
+13:35:17 INFO    rave_agent.rave.client: rws call ok
+13:35:17 INFO    rave_agent.submission.submitter: submission accepted
+13:35:18 INFO    rave_agent.rave.client: rws call ok
+13:35:18 INFO    rave_agent.submission.submitter: submission accepted
+13:35:19 INFO    rave_agent.rave.client: rws call ok
+13:35:19 INFO    rave_agent.submission.submitter: submission accepted
+13:35:19 INFO    rave_agent.rave.client: rws call ok
+13:35:19 INFO    rave_agent.submission.submitter: submission accepted
+13:35:20 INFO    rave_agent.rave.client: rws call ok
+13:35:20 INFO    rave_agent.submission.submitter: submission accepted
+13:35:22 INFO    rave_agent.rave.client: rws call ok
+13:35:22 INFO    rave_agent.submission.submitter: submission accepted
+13:35:23 INFO    rave_agent.rave.client: rws call ok
+13:35:23 INFO    rave_agent.submission.submitter: submission accepted
+13:35:24 WARNING rave_agent.rave.client: rws call failed
+13:35:24 ERROR   rave_agent.submission.submitter: submission failed
+13:35:24 WARNING rave_agent.rave.client: rws call failed
+13:35:24 ERROR   rave_agent.submission.submitter: submission failed
+13:35:25 INFO    rave_agent.rave.client: rws call ok
+13:35:25 INFO    rave_agent.submission.submitter: submission accepted
+13:35:26 INFO    rave_agent.rave.client: rws call ok
+13:35:26 INFO    rave_agent.submission.submitter: submission accepted
+13:35:26 INFO    rave_agent.rave.client: rws call ok
+13:35:26 INFO    rave_agent.submission.submitter: submission accepted
+13:35:27 INFO    rave_agent.rave.client: rws call ok
+13:35:27 INFO    rave_agent.submission.submitter: submission accepted
+13:35:27 WARNING rave_agent.rave.client: rws call failed
+13:35:27 ERROR   rave_agent.submission.submitter: submission failed
+13:35:28 INFO    rave_agent.rave.client: rws call ok
+13:35:28 INFO    rave_agent.submission.submitter: submission accepted
+13:35:28 INFO    rave_agent.rave.client: rws call ok
+13:35:28 INFO    rave_agent.submission.submitter: submission accepted
+13:35:29 WARNING rave_agent.rave.client: rws call failed
+13:35:29 ERROR   rave_agent.submission.submitter: submission failed
+13:35:29 WARNING rave_agent.rave.client: rws call failed
+13:35:29 ERROR   rave_agent.submission.submitter: submission failed
+13:35:30 INFO    rave_agent.rave.client: rws call ok
+13:35:30 INFO    rave_agent.submission.submitter: submission accepted
+13:35:30 INFO    rave_agent.rave.client: rws call ok
+13:35:30 INFO    rave_agent.submission.submitter: submission accepted
+13:35:31 WARNING rave_agent.rave.client: rws call failed
+13:35:31 ERROR   rave_agent.submission.submitter: submission failed
+13:35:31 WARNING rave_agent.rave.client: rws call failed
+13:35:31 ERROR   rave_agent.submission.submitter: submission failed
+13:35:31 WARNING rave_agent.rave.client: rws call failed
+13:35:31 ERROR   rave_agent.submission.submitter: submission failed
+13:35:32 WARNING rave_agent.rave.client: rws call failed
+13:35:32 ERROR   rave_agent.submission.submitter: submission failed
+13:35:32 WARNING rave_agent.rave.client: rws call failed
+13:35:32 ERROR   rave_agent.submission.submitter: submission failed
+13:35:33 WARNING rave_agent.rave.client: rws call failed
+13:35:33 ERROR   rave_agent.submission.submitter: submission failed
+13:35:33 WARNING rave_agent.rave.client: rws call failed
+13:35:33 ERROR   rave_agent.submission.submitter: submission failed
+13:35:35 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:35:37 INFO    rave_agent.generation.llm_client: llm call
+13:35:38 WARNING rave_agent.rave.client: rws call failed
+13:35:38 ERROR   rave_agent.submission.submitter: submission failed
+13:35:39 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:35:40 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:35:40 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:35:40 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:35:41 INFO    rave_agent.generation.llm_client: llm call
+13:35:41 INFO    rave_agent.generation.llm_client: llm call
+13:35:43 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:35:43 INFO    rave_agent.generation.llm_client: llm call
+13:35:44 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:35:44 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:35:50 INFO    rave_agent.generation.llm_client: llm call
+13:35:51 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:35:53 INFO    rave_agent.generation.llm_client: llm call
+13:35:54 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:35:55 INFO    rave_agent.generation.llm_client: llm call
+13:35:55 INFO    rave_agent.generation.llm_client: llm call
+13:35:57 INFO    rave_agent.generation.llm_client: llm call
+13:36:03 INFO    rave_agent.generation.llm_client: llm call
+13:36:04 INFO    rave_agent.rave.client: rws call ok
+13:36:04 INFO    rave_agent.submission.submitter: submission accepted
+13:36:05 INFO    rave_agent.rave.client: rws call ok
+13:36:05 INFO    rave_agent.submission.submitter: submission accepted
+13:36:05 INFO    rave_agent.rave.client: rws call ok
+13:36:05 INFO    rave_agent.submission.submitter: submission accepted
+13:36:06 WARNING rave_agent.rave.client: rws call failed
+13:36:06 ERROR   rave_agent.submission.submitter: submission failed
+13:36:07 INFO    rave_agent.rave.client: rws call ok
+13:36:07 INFO    rave_agent.submission.submitter: submission accepted
+13:36:07 INFO    rave_agent.rave.client: rws call ok
+13:36:07 INFO    rave_agent.submission.submitter: submission accepted
+13:36:08 INFO    rave_agent.rave.client: rws call ok
+13:36:08 INFO    rave_agent.submission.submitter: submission accepted
+13:36:08 WARNING rave_agent.rave.client: rws call failed
+13:36:08 ERROR   rave_agent.submission.submitter: submission failed
+13:36:09 INFO    rave_agent.rave.client: rws call ok
+13:36:09 INFO    rave_agent.submission.submitter: submission accepted
+13:36:10 INFO    rave_agent.rave.client: rws call ok
+13:36:10 INFO    rave_agent.submission.submitter: submission accepted
+13:36:11 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:12 INFO    rave_agent.generation.llm_client: llm call
+13:36:13 INFO    rave_agent.rave.client: rws call ok
+13:36:13 INFO    rave_agent.submission.submitter: submission accepted
+13:36:14 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:16 INFO    rave_agent.generation.llm_client: llm call
+13:36:16 WARNING rave_agent.rave.client: rws call failed
+13:36:16 ERROR   rave_agent.submission.submitter: submission failed
+13:36:18 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:18 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:18 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:18 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:19 INFO    rave_agent.generation.llm_client: llm call
+13:36:20 INFO    rave_agent.generation.llm_client: llm call
+13:36:20 INFO    rave_agent.generation.llm_client: llm call
+13:36:21 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:22 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:22 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:22 INFO    rave_agent.generation.llm_client: llm call
+13:36:23 INFO    rave_agent.generation.llm_client: llm call
+13:36:24 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:26 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:30 INFO    rave_agent.generation.llm_client: llm call
+13:36:32 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:36 INFO    rave_agent.generation.llm_client: llm call
+13:36:37 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:38 INFO    rave_agent.generation.llm_client: llm call
+13:36:40 INFO    rave_agent.generation.llm_client: llm call
+13:36:40 INFO    rave_agent.generation.llm_client: llm call
+13:36:41 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:41 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:42 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:42 INFO    rave_agent.generation.llm_client: llm call
+13:36:44 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:45 INFO    rave_agent.generation.llm_client: llm call
+13:36:46 INFO    rave_agent.generation.llm_client: llm call
+13:36:47 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:47 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:47 INFO    rave_agent.generation.llm_client: llm call
+13:36:48 INFO    rave_agent.generation.llm_client: llm call
+13:36:48 INFO    rave_agent.generation.llm_client: llm call
+13:36:49 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:36:58 INFO    rave_agent.generation.llm_client: llm call
+13:37:13 INFO    rave_agent.generation.llm_client: llm call
+13:37:14 WARNING rave_agent.rave.client: rws call failed
+13:37:14 ERROR   rave_agent.submission.submitter: submission failed
+13:37:15 INFO    rave_agent.rave.client: rws call ok
+13:37:15 INFO    rave_agent.submission.submitter: submission accepted
+13:37:15 INFO    rave_agent.rave.client: rws call ok
+13:37:15 INFO    rave_agent.submission.submitter: submission accepted
+13:37:16 INFO    rave_agent.rave.client: rws call ok
+13:37:16 INFO    rave_agent.submission.submitter: submission accepted
+13:37:17 INFO    rave_agent.rave.client: rws call ok
+13:37:17 INFO    rave_agent.submission.submitter: submission accepted
+13:37:17 WARNING rave_agent.rave.client: rws call failed
+13:37:17 ERROR   rave_agent.submission.submitter: submission failed
+13:37:18 WARNING rave_agent.rave.client: rws call failed
+13:37:18 ERROR   rave_agent.submission.submitter: submission failed
+13:37:19 INFO    rave_agent.rave.client: rws call ok
+13:37:19 INFO    rave_agent.submission.submitter: submission accepted
+13:37:19 INFO    rave_agent.rave.client: rws call ok
+13:37:19 INFO    rave_agent.submission.submitter: submission accepted
+13:37:20 INFO    rave_agent.rave.client: rws call ok
+13:37:20 INFO    rave_agent.submission.submitter: submission accepted
+13:37:21 INFO    rave_agent.rave.client: rws call ok
+13:37:21 INFO    rave_agent.submission.submitter: submission accepted
+13:37:21 WARNING rave_agent.rave.client: rws call failed
+13:37:21 ERROR   rave_agent.submission.submitter: submission failed
+13:37:21 INFO    rave_agent.rave.client: rws call ok
+13:37:21 INFO    rave_agent.submission.submitter: submission accepted
+13:37:22 INFO    rave_agent.rave.client: rws call ok
+13:37:22 INFO    rave_agent.submission.submitter: submission accepted
+13:37:23 INFO    rave_agent.rave.client: rws call ok
+13:37:23 INFO    rave_agent.submission.submitter: submission accepted
+13:37:23 INFO    rave_agent.rave.client: rws call ok
+13:37:23 INFO    rave_agent.submission.submitter: submission accepted
+13:37:24 WARNING rave_agent.rave.client: rws call failed
+13:37:24 ERROR   rave_agent.submission.submitter: submission failed
+13:37:24 WARNING rave_agent.rave.client: rws call failed
+13:37:24 ERROR   rave_agent.submission.submitter: submission failed
+13:37:25 INFO    rave_agent.rave.client: rws call ok
+13:37:25 INFO    rave_agent.submission.submitter: submission accepted
+13:37:26 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:37:27 INFO    rave_agent.generation.llm_client: llm call
+13:37:28 INFO    rave_agent.rave.client: rws call ok
+13:37:28 INFO    rave_agent.submission.submitter: submission accepted
+13:37:29 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:37:31 INFO    rave_agent.generation.llm_client: llm call
+13:37:31 WARNING rave_agent.rave.client: rws call failed
+13:37:31 ERROR   rave_agent.submission.submitter: submission failed
+13:37:33 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:37:33 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:37:33 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:37:34 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:37:34 INFO    rave_agent.generation.llm_client: llm call
+13:37:35 INFO    rave_agent.generation.llm_client: llm call
+13:37:36 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:37:36 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:37:36 INFO    rave_agent.generation.llm_client: llm call
+13:37:38 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:37:43 INFO    rave_agent.generation.llm_client: llm call
+13:37:45 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:37:45 INFO    rave_agent.generation.llm_client: llm call
+13:37:47 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:37:47 INFO    rave_agent.generation.llm_client: llm call
+13:37:47 INFO    rave_agent.generation.llm_client: llm call
+13:37:49 INFO    rave_agent.generation.llm_client: llm call
+13:37:54 INFO    rave_agent.generation.llm_client: llm call
+13:37:55 INFO    rave_agent.rave.client: rws call ok
+13:37:55 INFO    rave_agent.submission.submitter: submission accepted
+13:37:56 INFO    rave_agent.rave.client: rws call ok
+13:37:56 INFO    rave_agent.submission.submitter: submission accepted
+13:37:56 INFO    rave_agent.rave.client: rws call ok
+13:37:56 INFO    rave_agent.submission.submitter: submission accepted
+13:37:57 WARNING rave_agent.rave.client: rws call failed
+13:37:57 ERROR   rave_agent.submission.submitter: submission failed
+13:37:57 INFO    rave_agent.rave.client: rws call ok
+13:37:57 INFO    rave_agent.submission.submitter: submission accepted
+13:37:58 INFO    rave_agent.rave.client: rws call ok
+13:37:58 INFO    rave_agent.submission.submitter: submission accepted
+13:37:59 INFO    rave_agent.rave.client: rws call ok
+13:37:59 INFO    rave_agent.submission.submitter: submission accepted
+13:38:00 WARNING rave_agent.rave.client: rws call failed
+13:38:00 ERROR   rave_agent.submission.submitter: submission failed
+13:38:00 INFO    rave_agent.rave.client: rws call ok
+13:38:00 INFO    rave_agent.submission.submitter: submission accepted
+13:38:02 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:04 INFO    rave_agent.generation.llm_client: llm call
+13:38:04 WARNING rave_agent.rave.client: rws call failed
+13:38:04 ERROR   rave_agent.submission.submitter: submission failed
+13:38:06 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:06 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:06 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:06 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:07 INFO    rave_agent.generation.llm_client: llm call
+13:38:08 INFO    rave_agent.generation.llm_client: llm call
+13:38:09 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:09 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:10 INFO    rave_agent.generation.llm_client: llm call
+13:38:11 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:12 INFO    rave_agent.generation.llm_client: llm call
+13:38:12 INFO    rave_agent.generation.llm_client: llm call
+13:38:13 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:14 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:19 INFO    rave_agent.generation.llm_client: llm call
+13:38:21 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:23 INFO    rave_agent.generation.llm_client: llm call
+13:38:25 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:26 INFO    rave_agent.generation.llm_client: llm call
+13:38:27 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:31 INFO    rave_agent.generation.llm_client: llm call
+13:38:32 INFO    rave_agent.generation.llm_client: llm call
+13:38:33 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:33 INFO    rave_agent.generation.llm_client: llm call
+13:38:33 INFO    rave_agent.generation.llm_client: llm call
+13:38:34 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:34 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:34 INFO    rave_agent.generation.llm_client: llm call
+13:38:35 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:36 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:36 INFO    rave_agent.generation.llm_client: llm call
+13:38:37 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:38:39 INFO    rave_agent.generation.llm_client: llm call
+13:38:40 INFO    rave_agent.generation.llm_client: llm call
+13:38:46 INFO    rave_agent.generation.llm_client: llm call
+13:39:09 INFO    rave_agent.generation.llm_client: llm call
+13:39:10 WARNING rave_agent.rave.client: rws call failed
+13:39:10 ERROR   rave_agent.submission.submitter: submission failed
+13:39:11 INFO    rave_agent.rave.client: rws call ok
+13:39:11 INFO    rave_agent.submission.submitter: submission accepted
+13:39:12 INFO    rave_agent.rave.client: rws call ok
+13:39:12 INFO    rave_agent.submission.submitter: submission accepted
+13:39:12 INFO    rave_agent.rave.client: rws call ok
+13:39:12 INFO    rave_agent.submission.submitter: submission accepted
+13:39:13 INFO    rave_agent.rave.client: rws call ok
+13:39:13 INFO    rave_agent.submission.submitter: submission accepted
+13:39:13 WARNING rave_agent.rave.client: rws call failed
+13:39:13 ERROR   rave_agent.submission.submitter: submission failed
+13:39:14 WARNING rave_agent.rave.client: rws call failed
+13:39:14 ERROR   rave_agent.submission.submitter: submission failed
+13:39:15 INFO    rave_agent.rave.client: rws call ok
+13:39:15 INFO    rave_agent.submission.submitter: submission accepted
+13:39:15 INFO    rave_agent.rave.client: rws call ok
+13:39:15 INFO    rave_agent.submission.submitter: submission accepted
+13:39:16 INFO    rave_agent.rave.client: rws call ok
+13:39:16 INFO    rave_agent.submission.submitter: submission accepted
+13:39:17 INFO    rave_agent.rave.client: rws call ok
+13:39:17 INFO    rave_agent.submission.submitter: submission accepted
+13:39:17 WARNING rave_agent.rave.client: rws call failed
+13:39:17 ERROR   rave_agent.submission.submitter: submission failed
+13:39:18 INFO    rave_agent.rave.client: rws call ok
+13:39:18 INFO    rave_agent.submission.submitter: submission accepted
+13:39:18 INFO    rave_agent.rave.client: rws call ok
+13:39:18 INFO    rave_agent.submission.submitter: submission accepted
+13:39:19 INFO    rave_agent.rave.client: rws call ok
+13:39:19 INFO    rave_agent.submission.submitter: submission accepted
+13:39:19 INFO    rave_agent.rave.client: rws call ok
+13:39:19 INFO    rave_agent.submission.submitter: submission accepted
+13:39:20 WARNING rave_agent.rave.client: rws call failed
+13:39:20 ERROR   rave_agent.submission.submitter: submission failed
+13:39:20 WARNING rave_agent.rave.client: rws call failed
+13:39:20 ERROR   rave_agent.submission.submitter: submission failed
+13:39:22 INFO    rave_agent.rave.client: rws call ok
+13:39:22 INFO    rave_agent.submission.submitter: submission accepted
+13:39:23 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:39:23 INFO    rave_agent.generation.llm_client: llm call
+13:39:24 INFO    rave_agent.rave.client: rws call ok
+13:39:24 INFO    rave_agent.submission.submitter: submission accepted
+13:39:26 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:39:27 INFO    rave_agent.generation.llm_client: llm call
+13:39:28 WARNING rave_agent.rave.client: rws call failed
+13:39:28 ERROR   rave_agent.submission.submitter: submission failed
+13:39:29 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:39:29 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:39:30 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:39:30 INFO    rave_agent.generation.llm_client: llm call
+13:39:30 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:39:31 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:39:32 INFO    rave_agent.generation.llm_client: llm call
+13:39:33 INFO    rave_agent.generation.llm_client: llm call
+13:39:34 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:39:34 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:39:42 INFO    rave_agent.generation.llm_client: llm call
+13:39:43 INFO    rave_agent.generation.llm_client: llm call
+13:39:44 INFO    rave_agent.generation.llm_client: llm call
+13:39:44 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:39:44 INFO    httpx2: HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+13:39:44 INFO    rave_agent.generation.llm_client: llm call
+13:39:47 INFO    rave_agent.generation.llm_client: llm call
+13:39:52 INFO    rave_agent.generation.llm_client: llm call
+13:39:53 INFO    rave_agent.rave.client: rws call ok
+13:39:53 INFO    rave_agent.submission.submitter: submission accepted
+13:39:54 INFO    rave_agent.rave.client: rws call ok
+13:39:54 INFO    rave_agent.submission.submitter: submission accepted
+13:39:55 INFO    rave_agent.rave.client: rws call ok
+13:39:55 INFO    rave_agent.submission.submitter: submission accepted
+13:39:55 WARNING rave_agent.rave.client: rws call failed
+13:39:55 ERROR   rave_agent.submission.submitter: submission failed
+13:39:56 INFO    rave_agent.rave.client: rws call ok
+13:39:56 INFO    rave_agent.submission.submitter: submission accepted
+13:39:56 INFO    rave_agent.rave.client: rws call ok
+13:39:56 INFO    rave_agent.submission.submitter: submission accepted
+13:39:57 INFO    rave_agent.rave.client: rws call ok
+13:39:57 INFO    rave_agent.submission.submitter: submission accepted
+13:39:58 WARNING rave_agent.rave.client: rws call failed
+13:39:58 ERROR   rave_agent.submission.submitter: submission failed
+13:39:58 INFO    rave_agent.rave.client: rws call ok
+13:39:58 INFO    rave_agent.submission.submitter: submission accepted
+13:39:58 INFO    rave_agent.dynamics.resolver: pass complete
+13:39:59 WARNING rave_agent.rave.client: rws call failed
+13:39:59 ERROR   rave_agent.submission.submitter: submission failed
+13:39:59 WARNING rave_agent.rave.client: rws call failed
+13:39:59 ERROR   rave_agent.submission.submitter: submission failed
+13:40:00 WARNING rave_agent.rave.client: rws call failed
+13:40:00 ERROR   rave_agent.submission.submitter: submission failed
+13:40:01 WARNING rave_agent.rave.client: rws call failed
+13:40:01 ERROR   rave_agent.submission.submitter: submission failed
+13:40:02 WARNING rave_agent.rave.client: rws call failed
+13:40:02 ERROR   rave_agent.submission.submitter: submission failed
+13:40:02 WARNING rave_agent.rave.client: rws call failed
+13:40:02 ERROR   rave_agent.submission.submitter: submission failed
+13:40:03 WARNING rave_agent.rave.client: rws call failed
+13:40:03 ERROR   rave_agent.submission.submitter: submission failed
+13:40:03 WARNING rave_agent.rave.client: rws call failed
+13:40:03 ERROR   rave_agent.submission.submitter: submission failed
+13:40:04 WARNING rave_agent.rave.client: rws call failed
+13:40:04 ERROR   rave_agent.submission.submitter: submission failed
+13:40:04 WARNING rave_agent.rave.client: rws call failed
+13:40:04 ERROR   rave_agent.submission.submitter: submission failed
+13:40:04 WARNING rave_agent.rave.client: rws call failed
+13:40:04 ERROR   rave_agent.submission.submitter: submission failed
+13:40:05 WARNING rave_agent.rave.client: rws call failed
+13:40:05 ERROR   rave_agent.submission.submitter: submission failed
+13:40:05 WARNING rave_agent.rave.client: rws call failed
+13:40:05 ERROR   rave_agent.submission.submitter: submission failed
+13:40:06 WARNING rave_agent.rave.client: rws call failed
+13:40:06 ERROR   rave_agent.submission.submitter: submission failed
+13:40:06 WARNING rave_agent.rave.client: rws call failed
+13:40:06 ERROR   rave_agent.submission.submitter: submission failed
+13:40:07 WARNING rave_agent.rave.client: rws call failed
+13:40:07 ERROR   rave_agent.submission.submitter: submission failed
+13:40:07 WARNING rave_agent.rave.client: rws call failed
+13:40:07 ERROR   rave_agent.submission.submitter: submission failed
+13:40:07 WARNING rave_agent.rave.client: rws call failed
+13:40:07 ERROR   rave_agent.submission.submitter: submission failed
+13:40:08 WARNING rave_agent.rave.client: rws call failed
+13:40:08 ERROR   rave_agent.submission.submitter: submission failed
+13:40:08 WARNING rave_agent.rave.client: rws call failed
+13:40:08 ERROR   rave_agent.submission.submitter: submission failed
+13:40:09 WARNING rave_agent.rave.client: rws call failed
+13:40:09 ERROR   rave_agent.submission.submitter: submission failed
+13:40:09 WARNING rave_agent.rave.client: rws call failed
+13:40:09 ERROR   rave_agent.submission.submitter: submission failed
+13:40:10 WARNING rave_agent.rave.client: rws call failed
+13:40:10 ERROR   rave_agent.submission.submitter: submission failed
+13:40:10 WARNING rave_agent.rave.client: rws call failed
+13:40:10 ERROR   rave_agent.submission.submitter: submission failed
+13:40:10 WARNING rave_agent.rave.client: rws call failed
+13:40:10 ERROR   rave_agent.submission.submitter: submission failed
+13:40:11 WARNING rave_agent.rave.client: rws call failed
+13:40:11 ERROR   rave_agent.submission.submitter: submission failed
+13:40:11 WARNING rave_agent.rave.client: rws call failed
+13:40:11 ERROR   rave_agent.submission.submitter: submission failed
+13:40:12 WARNING rave_agent.rave.client: rws call failed
+13:40:12 ERROR   rave_agent.submission.submitter: submission failed
+13:40:12 WARNING rave_agent.rave.client: rws call failed
+13:40:12 ERROR   rave_agent.submission.submitter: submission failed
+13:40:12 WARNING rave_agent.rave.client: rws call failed
+13:40:12 ERROR   rave_agent.submission.submitter: submission failed
+13:40:13 WARNING rave_agent.rave.client: rws call failed
+13:40:13 ERROR   rave_agent.submission.submitter: submission failed
+13:40:13 WARNING rave_agent.rave.client: rws call failed
+13:40:13 ERROR   rave_agent.submission.submitter: submission failed
+13:40:14 WARNING rave_agent.rave.client: rws call failed
+13:40:14 ERROR   rave_agent.submission.submitter: submission failed
+13:40:14 WARNING rave_agent.rave.client: rws call failed
+13:40:14 ERROR   rave_agent.submission.submitter: submission failed
+13:40:15 WARNING rave_agent.rave.client: rws call failed
+13:40:15 ERROR   rave_agent.submission.submitter: submission failed
+13:40:15 WARNING rave_agent.rave.client: rws call failed
+13:40:15 ERROR   rave_agent.submission.submitter: submission failed
+13:40:15 WARNING rave_agent.rave.client: rws call failed
+13:40:15 ERROR   rave_agent.submission.submitter: submission failed
+13:40:16 WARNING rave_agent.rave.client: rws call failed
+13:40:16 ERROR   rave_agent.submission.submitter: submission failed
+13:40:16 WARNING rave_agent.rave.client: rws call failed
+13:40:16 ERROR   rave_agent.submission.submitter: submission failed
+13:40:17 WARNING rave_agent.rave.client: rws call failed
+13:40:17 ERROR   rave_agent.submission.submitter: submission failed
+13:40:17 WARNING rave_agent.rave.client: rws call failed
+13:40:17 ERROR   rave_agent.submission.submitter: submission failed
+13:40:18 WARNING rave_agent.rave.client: rws call failed
+13:40:18 ERROR   rave_agent.submission.submitter: submission failed
+13:40:18 WARNING rave_agent.rave.client: rws call failed
+13:40:18 ERROR   rave_agent.submission.submitter: submission failed
+13:40:18 WARNING rave_agent.rave.client: rws call failed
+13:40:18 ERROR   rave_agent.submission.submitter: submission failed
+13:40:19 WARNING rave_agent.rave.client: rws call failed
+13:40:19 ERROR   rave_agent.submission.submitter: submission failed
+13:40:19 WARNING rave_agent.rave.client: rws call failed
+13:40:19 ERROR   rave_agent.submission.submitter: submission failed
+13:40:20 WARNING rave_agent.rave.client: rws call failed
+13:40:20 ERROR   rave_agent.submission.submitter: submission failed
+13:40:20 WARNING rave_agent.rave.client: rws call failed
+13:40:20 ERROR   rave_agent.submission.submitter: submission failed
+13:40:21 WARNING rave_agent.rave.client: rws call failed
+13:40:21 ERROR   rave_agent.submission.submitter: submission failed
+13:40:21 WARNING rave_agent.rave.client: rws call failed
+13:40:21 ERROR   rave_agent.submission.submitter: submission failed
+13:40:21 WARNING rave_agent.rave.client: rws call failed
+13:40:21 ERROR   rave_agent.submission.submitter: submission failed
+13:40:22 WARNING rave_agent.rave.client: rws call failed
+13:40:22 ERROR   rave_agent.submission.submitter: submission failed
+13:40:22 WARNING rave_agent.rave.client: rws call failed
+13:40:22 ERROR   rave_agent.submission.submitter: submission failed
+13:40:23 WARNING rave_agent.rave.client: rws call failed
+13:40:23 ERROR   rave_agent.submission.submitter: submission failed
+13:40:23 WARNING rave_agent.rave.client: rws call failed
+13:40:23 ERROR   rave_agent.submission.submitter: submission failed
+13:40:24 WARNING rave_agent.rave.client: rws call failed
+13:40:24 ERROR   rave_agent.submission.submitter: submission failed
+13:40:24 WARNING rave_agent.rave.client: rws call failed
+13:40:24 ERROR   rave_agent.submission.submitter: submission failed
+13:40:25 WARNING rave_agent.rave.client: rws call failed
+13:40:25 ERROR   rave_agent.submission.submitter: submission failed
+13:40:25 WARNING rave_agent.rave.client: rws call failed
+13:40:25 ERROR   rave_agent.submission.submitter: submission failed
+13:40:26 WARNING rave_agent.rave.client: rws call failed
+13:40:26 ERROR   rave_agent.submission.submitter: submission failed
+13:40:26 WARNING rave_agent.rave.client: rws call failed
+13:40:26 ERROR   rave_agent.submission.submitter: submission failed
+13:40:26 WARNING rave_agent.rave.client: rws call failed
+13:40:26 ERROR   rave_agent.submission.submitter: submission failed
+13:40:27 WARNING rave_agent.rave.client: rws call failed
+13:40:27 ERROR   rave_agent.submission.submitter: submission failed
+13:40:27 WARNING rave_agent.rave.client: rws call failed
+13:40:27 ERROR   rave_agent.submission.submitter: submission failed
+13:40:28 WARNING rave_agent.rave.client: rws call failed
+13:40:28 ERROR   rave_agent.submission.submitter: submission failed
+13:40:28 WARNING rave_agent.rave.client: rws call failed
+13:40:28 ERROR   rave_agent.submission.submitter: submission failed
+13:40:29 WARNING rave_agent.rave.client: rws call failed
+13:40:29 ERROR   rave_agent.submission.submitter: submission failed
+13:40:29 WARNING rave_agent.rave.client: rws call failed
+13:40:29 ERROR   rave_agent.submission.submitter: submission failed
+13:40:30 WARNING rave_agent.rave.client: rws call failed
+13:40:30 ERROR   rave_agent.submission.submitter: submission failed
+13:40:30 INFO    rave_agent.dynamics.resolver: pass complete
+
+Study      : AES-001(DEV)
+Subject    : TST-004 at site 001234
+Seed set   : 19 folder(s)
+Max passes : 5
+Mode       : LIVE
+
+PASS  ATTEMPTED  SUBMITTED  REJECTED  NEW FOLDERS
+----- ---------- ---------- --------- ------------------------------
+0     19         22         20        SCREEN, SCREEN_15, SCREEN_27
+1     20         148        69        ABBV, COMP, D420, FU_D151, FU_D181, FU_D
+2     17         0          69        -
+
+Active folders   : 21 / 39
+  ABBV, COMP, D420, FU_D151, FU_D181, FU_D241, FU_D331, FU_D91, PD, RAND, SCREEN, SCREEN_15, SCREEN_27, TX1_D15, TX1_D4, TX2_D31, TX2_D34, TX2_D45, TX3_D61, TX3_D64, TX3_D75
+Predicted by ALS : 20
+
+Forms populated  : 170
+
+Triggers the CRF version cannot satisfy:
+  DS_IC_F.DSSCAT - the ALS wants ['120'], not in its codelist
+  (the edit check predates this CRF version; those targets stay unreachable)
+Tokens           : {'calls': 246, 'input_tokens': 647184, 'output_tokens': 164748}
+State            : D:\OneDrive\My Documents\Learning\Claude\Medidata_Rave\rave-testdata-agent\output\AES-001\state\TST-004\activation_state.json

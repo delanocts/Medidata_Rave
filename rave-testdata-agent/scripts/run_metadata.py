@@ -66,7 +66,12 @@ def main(argv: list[str] | None = None) -> int:
     summary = agent.run(force=args.force_download)
 
     version = summary["crf_version"]
-    print(f"CRF version : {version['oid']} ({version['name']})\n")
+    print(f"CRF version : {version['oid']} ({version['name']})")
+    print(f"              chosen because it is {version.get('source') or 'unknown'}")
+    print()
+    for note in summary.get("version_notes") or []:
+        print(f"  NOTE: {note}")
+        print()
 
     width = max(len(a["name"]) for a in summary["artifacts"])
     print(f"{'ARTIFACT'.ljust(width)}  STATUS      SIZE       FILE")

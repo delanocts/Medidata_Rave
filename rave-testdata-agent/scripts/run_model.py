@@ -18,11 +18,13 @@ from _bootstrap import REPO_ROOT, check_dependencies  # noqa: E402
 check_dependencies(include_optional=False)
 
 from rave_agent.config.loader import ConfigError, load_config  # noqa: E402
+from rave_agent.generation.validators import untranslatable_formats  # noqa: E402
 from rave_agent.metadata.manifest import MetadataManifest  # noqa: E402
 from rave_agent.model.dynamics_graph import build_graph  # noqa: E402
 from rave_agent.metadata.observed_structure import ObservedStructure  # noqa: E402
 from rave_agent.model.matrix_resolver import (  # noqa: E402
     apply_als_derivations,
+    apply_als_dictionaries,
     apply_als_matrices,
     apply_observed_structure,
     apply_version_folders,
@@ -102,6 +104,7 @@ def main(argv: list[str] | None = None) -> int:
         als = parse_als(metadata_dir / als_record.filename)
         apply_als_matrices(model, als)
         apply_als_derivations(model, als)
+        apply_als_dictionaries(model, als)
         print(f"ALS      : {als_record.filename} - "
               f"{als.counts.get('activating_actions', 0)} activating action(s), "
               f"{als.counts.get('matrices', 0)} matrix grid(s), "
@@ -114,6 +117,15 @@ def main(argv: list[str] | None = None) -> int:
     finalise_assignments(model)
 
     graph = build_graph(model, config.get("dynamics") or {}, als)
+
+    # Every date format must translate before a live run. An unknown token is
+    # emitted literally and Rave answers with a non-conformance query that no
+    # load response mentions, so it would otherwise surface only in the CRF.
+    for fmt, oids in untranslatable_formats(model).items():
+        model.warnings.append(
+            f"date format {fmt!r} cannot be translated - {len(oids)} field(s) "
+            f"including {oids[0]} would be written with the token left literal"
+        )
 
     model_dir = model_dir_for(config)
     model_path = model.save(model_dir / "study_model.json")

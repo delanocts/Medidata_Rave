@@ -338,3 +338,71 @@ def apply_als_derivations(model: StudyModel, als) -> StudyModel:
             f"{len(unknown)} derivation target(s) have no ItemDef in this CRF version: "
             f"{sorted(unknown)[:10]}")
     return model
+
+
+def apply_als_dictionaries(model: StudyModel, als) -> StudyModel:
+    """Point each field at the data dictionary Rave actually enforces.
+
+    A submission is judged against the field's Rave data dictionary, not against
+    the ODM `CodeListRef`. Those two can disagree, and the ODM export is the one
+    that is wrong:
+
+      * a field can reference the wrong codelist entirely, so the generator
+        offers values from another field's list;
+      * an export can put the *decode* in `CodedValue`, so the generator sends
+        "MAIN STUDY" where Rave wants "6".
+
+    Either way Rave answers `Data not in dictionary` and the form is lost - and
+    if that form carried a trigger, everything downstream of it stays unreachable.
+
+    A corrected list is stored as its own codelist rather than by editing the ODM
+    one, because that list may be shared with fields the export got right.
+    """
+    from .study_model import CodeList, CodeListEntry
+
+    corrected: list[tuple[str, str]] = []
+    unknown_dictionary = 0
+
+    for item_oid, dictionary_name in (als.field_dictionaries or {}).items():
+        item = model.items.get(item_oid)
+        if item is None:
+            continue
+
+        entries = (als.data_dictionaries or {}).get(dictionary_name)
+        if not entries:
+            unknown_dictionary += 1
+            continue
+
+        wanted = [e["coded_value"] for e in entries]
+        existing = model.codelists.get(item.codelist_oid)
+        if existing is not None and existing.coded_values == wanted:
+            continue  # the export agrees; leave it alone
+
+        oid = f"ALS:{dictionary_name}"
+        if oid not in model.codelists:
+            model.codelists[oid] = CodeList(
+                oid=oid, name=dictionary_name, data_type=item.data_type,
+                entries=[
+                    CodeListEntry(
+                        coded_value=e["coded_value"], decode=e["decode"],
+                        order=e["order"], specify=e["specify"],
+                    )
+                    for e in entries
+                ],
+            )
+        corrected.append((item_oid, dictionary_name))
+        item.codelist_oid = oid
+
+    if corrected:
+        model.warnings.append(
+            f"{len(corrected)} field(s) had an ODM codelist that disagreed with the Rave "
+            f"data dictionary the ALS declares; the dictionary wins, since that is what a "
+            f"submission is judged against. Examples: "
+            f"{[oid for oid, _ in corrected[:5]]}"
+        )
+    if unknown_dictionary:
+        model.warnings.append(
+            f"{unknown_dictionary} field(s) name a data dictionary the ALS does not define; "
+            "their ODM codelist was left in place."
+        )
+    return model

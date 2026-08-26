@@ -21,6 +21,8 @@ from rave_agent.generation.prompt_builder import (  # noqa: E402
 )
 from rave_agent.generation.validators import (  # noqa: E402
     format_for_rave,
+    strftime_pattern,
+    untranslatable_formats,
     validate_form,
     validate_value,
 )
@@ -34,6 +36,7 @@ from rave_agent.model.matrix_resolver import (  # noqa: E402
     resolve_primary_form_placement,
 )
 from rave_agent.model.odm_parser import parse_odm  # noqa: E402
+from rave_agent.model.study_model import Item  # noqa: E402
 
 FIXTURES = REPO_ROOT / "tests" / "fixtures"
 
@@ -172,6 +175,59 @@ def test_each_study_renders_dates_in_its_own_format(study_a, study_b):
     assert format_for_rave(model_b.items["scr_entry.scr_dt"], "2026-03-14") == "2026-03-14"
 
 
+def test_unknown_allowed_marker_is_not_written_into_the_value():
+    """`dd- MMM- yyyy` is a full date whose parts may be unknown.
+
+    The trailing hyphen is a property of the field, not a separator. Writing it
+    out produced `01- SEP- 2012`, which Rave stored but flagged with "Clinical
+    Data entered in incorrect format"; the day and year still parsed, the month
+    did not, so the field looked half-entered in the CRF.
+    """
+    assert strftime_pattern("dd- MMM- yyyy") == "%d %b %Y"
+    assert strftime_pattern("dd- MMM yyyy") == "%d %b %Y"
+    assert strftime_pattern("MMM- yyyy") == "%b %Y"
+    item = Item(oid="MH.END", name="END", form_oid="MH", data_type="date",
+                datetime_format="dd- MMM- yyyy")
+    assert format_for_rave(item, "2012-09-01") == "01 SEP 2012"
+
+
+def test_hyphen_separator_survives():
+    """Only a hyphen that ends a part is a marker; `yyyy-MM-dd` is a real format."""
+    assert strftime_pattern("yyyy-MM-dd") == "%Y-%m-%d"
+
+
+def test_lowercase_month_is_a_month_not_minutes():
+    """`nn` is minutes in Rave, so `mm` is free to mean month - and does.
+
+    Mapping `mm` to minutes rendered every `dd mm yyyy` field as `15 00 2024`,
+    which Rave dropped on the floor.
+    """
+    assert strftime_pattern("dd mm yyyy") == "%d %m %Y"
+    item = Item(oid="D.DATE", name="DATE", form_oid="D", data_type="date",
+                datetime_format="dd mm yyyy")
+    assert format_for_rave(item, "2024-01-15") == "15 01 2024"
+
+
+def test_twelve_hour_clock_with_meridiem():
+    """`hh:nn rr` left `hh` and `rr` untranslated, emitting the literal `hh:30 rr`."""
+    assert strftime_pattern("hh:nn rr") == "%I:%M %p"
+    item = Item(oid="D.TIME", name="TIME", form_oid="D", data_type="time",
+                datetime_format="hh:nn rr")
+    assert format_for_rave(item, "14:30") == "02:30 PM"
+
+
+def test_unknown_format_token_is_reported_not_emitted(study_a):
+    """The guard that would have caught `hh:nn rr` before it reached a study."""
+    assert untranslatable_formats(study_a) == {}
+    item = study_a.items["OBS.WHEN"]
+    original = item.datetime_format
+    try:
+        item.datetime_format = "dd MMM yyyy zz"
+        assert untranslatable_formats(study_a) == {"dd MMM yyyy zz": ["OBS.WHEN"]}
+    finally:
+        item.datetime_format = original
+
+
 def test_time_field_is_not_treated_as_a_date(study_b):
     """A date in a HH:nn field stores garbage; the validator must refuse it."""
     model, _, _ = study_b
@@ -280,3 +336,391 @@ def test_rave_padding_a_decimal_is_not_a_mismatch():
     assert _compare(model, item.oid, "10.0", "10.00") == "normalised"
     # A genuinely different number is still a mismatch.
     assert _compare(model, item.oid, "2", "1") == "mismatch"
+
+
+# ------------------------------------------------- ALS data dictionaries win
+def _dict_model():
+    """A field whose ODM CodeListRef disagrees with its Rave data dictionary."""
+    from rave_agent.model.study_model import CodeList, CodeListEntry, Item, StudyModel
+
+    model = StudyModel(study_name="S", environment="D",
+                       crf_version_oid="1", crf_version_name="v")
+    model.codelists["NY"] = CodeList(
+        oid="NY", name="NY", data_type="text",
+        entries=[CodeListEntry(coded_value="N"), CodeListEntry(coded_value="Y")],
+    )
+    # The export points this field at NY; Rave actually enforces 1/2.
+    model.items["F.RATE"] = Item(oid="F.RATE", name="RATE", form_oid="F",
+                                 data_type="text", codelist_oid="NY")
+    # This one the export got right.
+    model.items["F.YN"] = Item(oid="F.YN", name="YN", form_oid="F",
+                               data_type="text", codelist_oid="NY")
+    return model
+
+
+class _StubAls:
+    data_dictionaries = {
+        "COMPRATE": [
+            {"coded_value": "1", "decode": "Complete", "order": 1, "specify": False},
+            {"coded_value": "2", "decode": "Partial", "order": 2, "specify": False},
+        ],
+        "NY": [
+            {"coded_value": "N", "decode": "No", "order": 1, "specify": False},
+            {"coded_value": "Y", "decode": "Yes", "order": 2, "specify": False},
+        ],
+    }
+    field_dictionaries = {"F.RATE": "COMPRATE", "F.YN": "NY"}
+
+
+def test_als_dictionary_overrides_a_wrong_odm_codelist():
+    """Rave judges a submission against the dictionary, not the ODM codelist."""
+    from rave_agent.model.matrix_resolver import apply_als_dictionaries
+
+    model = _dict_model()
+    apply_als_dictionaries(model, _StubAls())
+
+    corrected = model.codelists[model.items["F.RATE"].codelist_oid]
+    assert corrected.coded_values == ["1", "2"]
+    assert any("data dictionary" in w for w in model.warnings)
+
+
+def test_a_correct_odm_codelist_is_left_alone():
+    """Only disagreements are rewritten - agreement must not churn the model."""
+    from rave_agent.model.matrix_resolver import apply_als_dictionaries
+
+    model = _dict_model()
+    apply_als_dictionaries(model, _StubAls())
+    assert model.items["F.YN"].codelist_oid == "NY"
+
+
+def test_the_shared_codelist_is_not_mutated():
+    """NY is shared; correcting one field must not corrupt the other's list."""
+    from rave_agent.model.matrix_resolver import apply_als_dictionaries
+
+    model = _dict_model()
+    apply_als_dictionaries(model, _StubAls())
+    assert model.codelists["NY"].coded_values == ["N", "Y"]
+
+
+def test_validation_then_rejects_the_value_rave_would_reject():
+    """The whole point: the generator must stop offering the ODM's wrong value."""
+    from rave_agent.generation.validators import validate_value
+    from rave_agent.model.matrix_resolver import apply_als_dictionaries
+
+    model = _dict_model()
+    item = model.items["F.RATE"]
+    assert validate_value(model, item, "N") == []      # before: wrongly allowed
+
+    apply_als_dictionaries(model, _StubAls())
+    assert validate_value(model, item, "N") != []      # after: correctly refused
+    assert validate_value(model, item, "1") == []
+
+
+# --------------------------------------------------------- parallel generation
+class _CountingGenerator:
+    """Stands in for the real generator to check ordering and call counts."""
+
+    def __init__(self, model, max_parallel_forms=4):
+        import threading
+        from concurrent.futures import ThreadPoolExecutor
+        self.model = model
+        self.max_parallel_forms = max_parallel_forms
+        self.calls = []
+        self._lock = threading.Lock()
+        self._pool = ThreadPoolExecutor
+        self.unsatisfiable_triggers = {}
+
+    def generate_form(self, subject_id, folder_oid, form_oid, context):
+        from rave_agent.generation.generator import FormOutcome
+        with self._lock:
+            self.calls.append(form_oid)
+        return FormOutcome(subject_id, folder_oid, form_oid, "generated",
+                           values={f"{form_oid}.A": "1"})
+
+    def generate_forms(self, subject_id, folder_oid, form_oids, context):
+        from rave_agent.generation.generator import Generator
+        return Generator.generate_forms(self, subject_id, folder_oid, form_oids, context)
+
+    def _update_context(self, context, outcome):
+        pass
+
+
+def test_generate_forms_preserves_request_order():
+    """Submissions stay serialised per subject, so results must not be reordered."""
+    from rave_agent.model.study_model import StudyModel
+
+    gen = _CountingGenerator(StudyModel(study_name="S", environment="D",
+                                        crf_version_oid="1", crf_version_name="v"))
+    wanted = [f"F{i}" for i in range(10)]
+    out = gen.generate_forms("SUBJ", "FOLDER", wanted, {})
+    assert [o.form_oid for o in out] == wanted
+    assert sorted(gen.calls) == sorted(wanted)
+
+
+def test_generate_forms_runs_concurrently():
+    """With parallelism enabled the calls must actually overlap."""
+    import threading
+    import time
+    from rave_agent.generation.generator import FormOutcome, Generator
+    from rave_agent.model.study_model import StudyModel
+
+    class Slow(_CountingGenerator):
+        def __init__(self):
+            super().__init__(StudyModel(study_name="S", environment="D",
+                                        crf_version_oid="1", crf_version_name="v"),
+                             max_parallel_forms=4)
+            self.live = 0
+            self.peak = 0
+
+        def generate_form(self, subject_id, folder_oid, form_oid, context):
+            with self._lock:
+                self.live += 1
+                self.peak = max(self.peak, self.live)
+            time.sleep(0.05)
+            with self._lock:
+                self.live -= 1
+            return FormOutcome(subject_id, folder_oid, form_oid, "generated")
+
+    slow = Slow()
+    slow.generate_forms("SUBJ", "FOLDER", [f"F{i}" for i in range(8)], {})
+    assert slow.peak > 1, "forms were generated one at a time"
+    assert slow.peak <= 4, f"exceeded max_parallel_forms: {slow.peak}"
+
+
+def test_max_parallel_forms_one_stays_sequential():
+    """The setting must be able to turn concurrency off entirely."""
+    import time
+    from rave_agent.generation.generator import FormOutcome
+    from rave_agent.model.study_model import StudyModel
+
+    class Serial(_CountingGenerator):
+        def __init__(self):
+            super().__init__(StudyModel(study_name="S", environment="D",
+                                        crf_version_oid="1", crf_version_name="v"),
+                             max_parallel_forms=1)
+            self.live = 0
+            self.peak = 0
+
+        def generate_form(self, subject_id, folder_oid, form_oid, context):
+            self.live += 1
+            self.peak = max(self.peak, self.live)
+            time.sleep(0.01)
+            self.live -= 1
+            return FormOutcome(subject_id, folder_oid, form_oid, "generated")
+
+    s = Serial()
+    s.generate_forms("SUBJ", "FOLDER", [f"F{i}" for i in range(5)], {})
+    assert s.peak == 1
+
+
+def test_token_usage_survives_concurrent_updates():
+    """Counts are shared across generation threads."""
+    import threading
+    from rave_agent.generation.llm_client import TokenUsage
+
+    usage = TokenUsage()
+    def bump():
+        for _ in range(500):
+            usage.add(1, 2)
+    threads = [threading.Thread(target=bump) for _ in range(8)]
+    for t in threads: t.start()
+    for t in threads: t.join()
+    assert usage.calls == 4000
+    assert usage.input_tokens == 4000
+    assert usage.output_tokens == 8000
+
+
+# ------------------------------------------- CRF version follows the site
+SITES_ODM = """<?xml version="1.0" encoding="utf-8"?>
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:mdsol="http://www.mdsol.com/ns/odm/metadata" ODMVersion="1.3">
+  <AdminData>
+    <Location OID="001234" Name="DEV-SITE-A" LocationType="Site">
+      <MetaDataVersionRef StudyOID="S(DEV)" MetaDataVersionOID="17199" EffectiveDate="2026-03-27"/>
+      <MetaDataVersionRef StudyOID="S(DEV)" MetaDataVersionOID="17001" EffectiveDate="2026-03-23"/>
+    </Location>
+    <Location OID="999" Name="OTHER" LocationType="Site">
+      <MetaDataVersionRef StudyOID="S(DEV)" MetaDataVersionOID="17481" EffectiveDate="2026-06-01"/>
+    </Location>
+  </AdminData>
+</ODM>"""
+
+
+class _Version:
+    def __init__(self, oid, name): self.oid, self.name = oid, name
+
+
+class _StubClient:
+    """Returns the study's published versions, newest first."""
+    base_url = "https://example.invalid/RaveWebServices"
+
+    def send(self, request, label=None):
+        class R:
+            value = [_Version("17481", "3.0"), _Version("17199", "2.0"),
+                     _Version("17001", "0.1")]
+            correlation_id = "x"
+        return R()
+
+
+def _acquisition(tmp_path, site_number, pinned=None):
+    from rave_agent.config.loader import load_config
+    from rave_agent.metadata.downloader import MetadataAcquisition
+
+    overrides = {"site.number": site_number,
+                 "execution.output_root": str(tmp_path)}
+    if pinned is not None:
+        overrides["study.crf_version"] = pinned
+    config = load_config("aes-002", config_dir=REPO_ROOT / "config",
+                         cli_overrides=overrides)
+    return MetadataAcquisition(_StubClient(), config)
+
+
+def test_version_follows_the_site_not_the_study_newest(tmp_path):
+    """A site on an earlier amendment must not be sent the newest version.
+
+    Using the study's newest against such a site makes Rave reject fields and
+    forms that genuinely do not exist there.
+    """
+    acq = _acquisition(tmp_path, "001234")
+    sites = tmp_path / "sites.xml"
+    sites.write_text(SITES_ODM, encoding="utf-8")
+
+    oid, name = acq.resolve_version(sites)
+    assert (oid, name) == ("17199", "2.0")
+    assert "site" in acq.version_source
+    assert any("newest is 17481" in n for n in acq.version_notes)
+
+
+def test_latest_effective_date_wins_when_a_site_has_several(tmp_path):
+    acq = _acquisition(tmp_path, "001234")
+    sites = tmp_path / "sites.xml"
+    sites.write_text(SITES_ODM, encoding="utf-8")
+    assert acq.site_versions(sites)[0] == ("17199", "2026-03-27")
+
+
+def test_a_site_already_on_the_newest_version_raises_no_note(tmp_path):
+    acq = _acquisition(tmp_path, "999")
+    sites = tmp_path / "sites.xml"
+    sites.write_text(SITES_ODM, encoding="utf-8")
+    oid, _ = acq.resolve_version(sites)
+    assert oid == "17481"
+    assert acq.version_notes == []
+
+
+def test_config_pin_beats_the_site_assignment(tmp_path):
+    acq = _acquisition(tmp_path, "001234", pinned="17481")
+    sites = tmp_path / "sites.xml"
+    sites.write_text(SITES_ODM, encoding="utf-8")
+    oid, _ = acq.resolve_version(sites)
+    assert oid == "17481"
+    assert acq.version_source == "config pin"
+
+
+def test_unknown_site_falls_back_to_newest_and_says_so(tmp_path):
+    """Falling back silently is what produced a whole run against the wrong version."""
+    acq = _acquisition(tmp_path, "not-a-site")
+    sites = tmp_path / "sites.xml"
+    sites.write_text(SITES_ODM, encoding="utf-8")
+    oid, _ = acq.resolve_version(sites)
+    assert oid == "17481"
+    assert "site version unknown" in acq.version_source
+    assert acq.version_notes, "a silent fallback must not be possible"
+
+
+# ------------------------------------------------------- generation lookahead
+def _resolver_fixture(lookahead, absent_folders=()):
+    """A resolver whose posting is stubbed, to observe scheduling only."""
+    import threading
+    import time
+    from rave_agent.config.loader import Config
+    from rave_agent.dynamics.resolver import DynamicsResolver
+    from rave_agent.generation.generator import FormOutcome
+    from rave_agent.model.dynamics_graph import DynamicsGraph
+    from rave_agent.model.study_model import FormAssignment, Folder, StudyModel
+
+    model = StudyModel(study_name="S", environment="D",
+                       crf_version_oid="1", crf_version_name="v")
+    for folder in ("V1", "V2", "V3"):
+        model.folders[folder] = Folder(
+            oid=folder, name=folder,
+            forms=[FormAssignment(form_oid=f"{folder}_F{i}") for i in range(3)])
+
+    events: list[str] = []
+    lock = threading.Lock()
+
+    class Gen:
+        max_parallel_forms = 1
+        unsatisfiable_triggers: dict = {}
+
+        def generate_form(self, subject_id, folder_oid, form_oid, context):
+            with lock:
+                events.append(f"gen {folder_oid}")
+            time.sleep(0.01)
+            return FormOutcome(subject_id, folder_oid, form_oid, "generated",
+                               values={f"{form_oid}.A": "1"})
+
+        def generate_forms(self, subject_id, folder_oid, form_oids, context):
+            return [self.generate_form(subject_id, folder_oid, o, context)
+                    for o in form_oids]
+
+        def _update_context(self, context, outcome):
+            pass
+
+    class Res(DynamicsResolver):
+        def _submit_one(self, subject_id, folder_oid, outcome, pass_number):
+            with lock:
+                events.append(f"post {folder_oid}")
+            time.sleep(0.03)
+            if folder_oid in absent_folders:
+                return None, "RWSException: Folder not found."
+
+            class Ok:
+                ok = True
+                status = "SUCCESS"
+            return Ok(), ""
+
+    config = Config(
+        data={"study": {"name": "S"}, "rave": {"environment": "DEV"},
+              "execution": {"output_root": "./output"},
+              "generation": {"lookahead_folders": lookahead},
+              "dynamics": {"max_iterations": 5}},
+        study_file=Path("x"), defaults_file=Path("y"), config_hash="h")
+    return Res(model, DynamicsGraph(study_name="S", crf_version_oid="1"), config,
+               Gen(), object(), "SITE"), events
+
+
+def test_lookahead_overlaps_generation_with_posting():
+    """The next visit must be generated while this one is still being posted."""
+    from rave_agent.dynamics.activation_state import ActivationState
+
+    resolver, events = _resolver_fixture(lookahead=1)
+    resolver.run_pass("SUBJ", ["V1", "V2", "V3"], ActivationState("SUBJ", "S", "DEV"), 0)
+
+    # V2 has to start generating before V1 has finished posting, or nothing
+    # was overlapped and the pass still costs generation + posting.
+    first_v2_gen = events.index("gen V2")
+    last_v1_post = len(events) - 1 - events[::-1].index("post V1")
+    assert first_v2_gen < last_v1_post, f"no overlap: {events}"
+
+
+def test_lookahead_zero_keeps_the_probe():
+    """Without a lookahead an absent visit must cost exactly one generation."""
+    from rave_agent.dynamics.activation_state import ActivationState
+
+    resolver, events = _resolver_fixture(lookahead=0, absent_folders={"V2"})
+    result = resolver.run_pass("SUBJ", ["V1", "V2", "V3"], ActivationState("SUBJ", "S", "DEV"), 0)
+
+    assert events.count("gen V2") == 1, f"generated past the probe: {events}"
+    assert result.forms_discarded == 0
+
+
+def test_lookahead_counts_what_an_absent_visit_wasted():
+    """Speculating has a price; it must be reported, not swallowed."""
+    from rave_agent.dynamics.activation_state import ActivationState
+
+    resolver, events = _resolver_fixture(lookahead=1, absent_folders={"V2"})
+    result = resolver.run_pass("SUBJ", ["V1", "V2", "V3"], ActivationState("SUBJ", "S", "DEV"), 0)
+
+    assert events.count("gen V2") == 3        # generated before the probe answered
+    assert result.forms_discarded == 2        # two of them never posted
+    assert events.count("post V2") == 1       # and posting stopped at the probe

@@ -8,7 +8,9 @@ rave:
   timeout_seconds: 60
   max_retries: 3
   retry_backoff_seconds: 2
-  requests_per_minute: 30
+  # Rave answers in well under a second; 30/min throttled a real run by ~9
+  # minutes of pure waiting. Lower it if an instance pushes back with 429s.
+  requests_per_minute: 120
   verify_tls: true          # SEC-2: there is no supported way to turn this off
 
 metadata:
@@ -50,6 +52,17 @@ generation:
   # Cap fields x log records per form. A wide log form otherwise asks the model
   # for hundreds of values in one reply and the answer is truncated.
   max_values_per_form: 150
+  # Forms within one visit are generated concurrently. Folders stay sequential,
+  # so demographics carried forward and advancing visit dates are unaffected.
+  # 1 restores fully sequential generation.
+  max_parallel_forms: 4
+  # Generate this many visits ahead of the one being posted. Posting dominates a
+  # pass - Rave charges per message, not per value - so without a lookahead the
+  # two phases alternate and the pass costs their sum. The price is that a visit
+  # is prepared before the probe proves it exists; an absent one wastes what was
+  # generated for it, counted as `forms_discarded`. 0 restores the strict
+  # probe-then-generate order.
+  lookahead_folders: 1
   therapeutic_area: null
   visits:
     mode: "all"              # all | subset  (OQ-6)

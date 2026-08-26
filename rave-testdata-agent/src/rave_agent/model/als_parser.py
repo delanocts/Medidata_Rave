@@ -106,6 +106,10 @@ class AlsModel:
     folder_names: dict[str, str] = field(default_factory=dict)
     custom_functions: dict[str, str] = field(default_factory=dict)
     derivations: list[dict[str, Any]] = field(default_factory=list)
+    # dictionary name -> ordered [{coded_value, decode, order, specify}]
+    data_dictionaries: dict[str, list[dict[str, Any]]] = field(default_factory=dict)
+    # "FORM.FIELD" -> dictionary name
+    field_dictionaries: dict[str, str] = field(default_factory=dict)
     counts: dict[str, int] = field(default_factory=dict)
     warnings: list[str] = field(default_factory=list)
 
@@ -117,6 +121,8 @@ class AlsModel:
             "matrix_names": self.matrix_names,
             "folder_names": self.folder_names,
             "matrices": self.matrices,
+            "data_dictionaries": self.data_dictionaries,
+            "field_dictionaries": self.field_dictionaries,
             "activations": [asdict(a) for a in self.activations],
             "derivations": self.derivations,
             "custom_functions": {
@@ -291,6 +297,13 @@ def _parse_matrix_sheet(workbook: Workbook, sheet: str) -> dict[str, list[str]]:
 # Entry point
 # ---------------------------------------------------------------------------
 
+def _as_int(value: Any) -> int | None:
+    try:
+        return int(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+
+
 def parse_als(path: Path) -> AlsModel:
     """Parse an ALS workbook into the activation and structure model."""
     workbook = Workbook(path)
@@ -334,6 +347,33 @@ def parse_als(path: Path) -> AlsModel:
         grid = _parse_matrix_sheet(workbook, sheet)
         if grid:
             model.matrices[resolved] = grid
+
+    # -- data dictionaries ------------------------------------------------
+    # Rave enforces these at data entry. Where the ODM export disagrees with
+    # them - a wrong CodeListRef, or decodes exported as coded values - the
+    # dictionary is what a submission is actually judged against.
+    if workbook.has_sheet("DataDictionaryEntries"):
+        for record in workbook.records("DataDictionaryEntries"):
+            name = (record.get("datadictionaryname") or "").strip()
+            coded = (record.get("codeddata") or "").strip()
+            if not name or coded == "":
+                continue
+            model.data_dictionaries.setdefault(name, []).append({
+                "coded_value": coded,
+                "decode": (record.get("userdatastring") or "").strip(),
+                "order": _as_int(record.get("ordinal")),
+                "specify": (record.get("specify") or "").upper() == "TRUE",
+            })
+        for entries in model.data_dictionaries.values():
+            entries.sort(key=lambda e: (e["order"] is None, e["order"]))
+
+    if workbook.has_sheet("Fields"):
+        for record in workbook.records("Fields"):
+            form = (record.get("formoid") or "").strip()
+            field_oid = (record.get("fieldoid") or "").strip()
+            dictionary = (record.get("datadictionaryname") or "").strip()
+            if form and field_oid and dictionary:
+                model.field_dictionaries[f"{form}.{field_oid}"] = dictionary
 
     # -- folders ----------------------------------------------------------
     for record in workbook.records("Folders") if workbook.has_sheet("Folders") else []:
@@ -416,6 +456,8 @@ def parse_als(path: Path) -> AlsModel:
         "matrices": len(model.matrices),
         "custom_functions": len(model.custom_functions),
         "derivations": len(model.derivations),
+        "data_dictionaries": len(model.data_dictionaries),
+        "fields_with_dictionary": len(model.field_dictionaries),
         "fully_resolved_conditions": sum(
             1 for a in model.activations if a.condition_complete and a.assignments),
         "partial_conditions": sum(1 for a in model.activations if not a.condition_complete),

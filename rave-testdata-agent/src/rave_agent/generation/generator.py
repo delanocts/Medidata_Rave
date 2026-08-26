@@ -11,6 +11,8 @@ from __future__ import annotations
 
 import json
 import random
+import threading
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -95,6 +97,11 @@ class Generator:
         self.discovered_limits = self._load_discovered_limits()
         # trigger field -> values the ALS wants but the codelist will not accept
         self.unsatisfiable_triggers: dict[str, set[str]] = {}
+        # Forms within a folder are generated concurrently, so the shared
+        # bookkeeping below needs guarding.
+        self._lock = threading.Lock()
+        self.max_parallel_forms = max(
+            1, int(config.get("generation.max_parallel_forms") or 1))
         self._required_values = graph.required_values() if graph else {}
 
     def _load_discovered_limits(self) -> dict:
@@ -172,7 +179,8 @@ class Generator:
             return True
         if value in codelist.coded_values:
             return True
-        self.unsatisfiable_triggers.setdefault(item.oid, set()).add(value)
+        with self._lock:
+            self.unsatisfiable_triggers.setdefault(item.oid, set()).add(value)
         return False
 
     def _targets_for(self, field_oid: str, value: str) -> set[str]:
@@ -393,6 +401,42 @@ class Generator:
         }, indent=2, ensure_ascii=False), encoding="utf-8")
 
     # ------------------------------------------------------------------
+    def generate_forms(
+        self,
+        subject_id: str,
+        folder_oid: str,
+        form_oids: list[str],
+        subject_context: dict[str, Any],
+    ) -> list[FormOutcome]:
+        """Generate several forms of one folder at once.
+
+        Concurrency is deliberately scoped to a single folder. Cross-visit
+        consistency (demographics carried forward, visit dates advancing) is
+        preserved by keeping folders sequential; within one visit the forms
+        share a date and a patient, so generating them against the same context
+        snapshot loses nothing.
+
+        Results come back in the order requested, so submission order - which
+        must stay serialised per subject - is unaffected.
+        """
+        if not form_oids:
+            return []
+        if self.max_parallel_forms == 1 or len(form_oids) == 1:
+            return [
+                self.generate_form(subject_id, folder_oid, oid, subject_context)
+                for oid in form_oids
+            ]
+
+        snapshot = dict(subject_context)
+        workers = min(self.max_parallel_forms, len(form_oids))
+        with ThreadPoolExecutor(max_workers=workers,
+                                thread_name_prefix="generate") as pool:
+            return list(pool.map(
+                lambda oid: self.generate_form(subject_id, folder_oid, oid, snapshot),
+                form_oids,
+            ))
+
+    # ------------------------------------------------------------------
     def _update_context(self, context: dict[str, Any], outcome: FormOutcome) -> None:
         """Carry stable subject facts forward so later forms agree (FR-6.5)."""
         for oid, value in (outcome.values or {}).items():
@@ -425,18 +469,20 @@ class Generator:
         )
 
         for folder_oid in ordered:
-            for assignment in self.model.folders[folder_oid].forms:
-                if max_forms is not None and produced >= max_forms:
+            pending = [a.form_oid for a in self.model.folders[folder_oid].forms]
+            if max_forms is not None:
+                room = max_forms - produced
+                if room <= 0:
                     result.warnings.append(
                         f"stopped after {max_forms} form(s) because of --max-forms")
                     result.token_usage = self.llm.usage.to_dict()
                     return result
+                pending = pending[:room]
 
-                outcome = self.generate_form(
-                    subject_id, folder_oid, assignment.form_oid, context)
+            for outcome in self.generate_forms(
+                    subject_id, folder_oid, pending, context):
                 result.outcomes.append(outcome)
                 produced += 1
-
                 if outcome.ok:
                     self._update_context(context, outcome)
 

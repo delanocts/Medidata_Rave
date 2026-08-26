@@ -115,12 +115,20 @@ def main(argv: list[str] | None = None) -> int:
 
     state = resolver.resolve(args.subject)
 
-    print(f"{'PASS':<6}{'ATTEMPTED':<11}{'SUBMITTED':<11}{'REJECTED':<10}NEW FOLDERS")
-    print(f"{'-' * 5} {'-' * 10} {'-' * 10} {'-' * 9} {'-' * 30}")
+    print(f"{'PASS':<6}{'ATTEMPTED':<11}{'SUBMITTED':<11}{'REJECTED':<10}"
+          f"{'DISCARDED':<11}NEW FOLDERS")
+    print(f"{'-' * 5} {'-' * 10} {'-' * 10} {'-' * 9} {'-' * 10} {'-' * 30}")
     for entry in state.history:
         new = ", ".join(entry.get("newly_activated") or []) or "-"
         print(f"{entry['pass']:<6}{len(entry.get('folders_attempted') or []):<11}"
-              f"{entry.get('forms_submitted', 0):<11}{entry.get('forms_rejected', 0):<10}{new[:40]}")
+              f"{entry.get('forms_submitted', 0):<11}{entry.get('forms_rejected', 0):<10}"
+              f"{entry.get('forms_discarded', 0):<11}{new[:40]}")
+
+    discarded = sum(e.get("forms_discarded", 0) for e in state.history)
+    if discarded:
+        print()
+        print(f"{discarded} form(s) were generated for a visit that turned "
+              f"out absent - the cost of generation.lookahead_folders.")
 
     values = submitted_values(config.study_output_dir / "generated", args.subject)
     predicted = predicted_folders(graph, values)

@@ -162,6 +162,26 @@ class StudyModel:
             return list(default.folder_oids)
         return list(self.folders.keys())
 
+    def in_schedule_order(self, folder_oids: list[str]) -> list[str]:
+        """Folder OIDs in visit order rather than alphabetical order.
+
+        `Folder.order` is the StudyEventRef ordinal - the sequence the study
+        runs in. Sorting by OID instead puts `D420` (the final visit) before
+        `RAND` (Day 1) and `FU_D91` after `FU_D331`, because those are string
+        comparisons. Generation carries each visit's date forward into the next
+        visit's prompt, so out-of-sequence generation asks for a date with no
+        earlier visit to measure from.
+
+        Folders without an ordinal keep a deterministic alphabetical tail, so
+        the order is stable whether or not the study publishes one.
+        """
+        def key(oid: str) -> tuple:
+            folder = self.folders.get(oid)
+            order = folder.order if folder else None
+            return (order is None, order if order is not None else 0, oid)
+
+        return sorted(folder_oids, key=key)
+
     @property
     def non_default_matrices(self) -> list[Matrix]:
         return [m for m in self.matrices.values() if not m.is_default]

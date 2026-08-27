@@ -1004,3 +1004,153 @@ def test_the_two_stages_read_the_site_the_same_way(tmp_path):
         parse_xml(path.read_text(encoding="utf-8")), "001234", "DEV-SITE-ONE")
     from_live = _sites_via_client()[0]["versions"]
     assert from_file == from_live == [("17199", "2026-03-27"), ("17001", "2026-03-23")]
+
+
+# ------------------------------------------------ visits run in schedule order
+def _scheduled_model():
+    from rave_agent.model.study_model import Folder, StudyModel
+
+    model = StudyModel(study_name="S", environment="D",
+                       crf_version_oid="1", crf_version_name="v")
+    # OIDs deliberately chosen so that sorting them as strings gets it wrong:
+    # "D420" < "RAND", and "FU_D91" > "FU_D331" because '9' > '3'.
+    for oid, order in (("RAND", 9), ("FU_D91", 18), ("FU_D331", 22), ("D420", 23)):
+        model.folders[oid] = Folder(oid=oid, name=oid, order=order)
+    return model
+
+
+def test_schedule_order_beats_oid_order():
+    """Day 1 must be written before Day 420, whatever the OIDs sort like."""
+    model = _scheduled_model()
+    jumbled = ["D420", "FU_D331", "FU_D91", "RAND"]
+
+    assert sorted(jumbled) == ["D420", "FU_D331", "FU_D91", "RAND"]   # the old order
+    assert model.in_schedule_order(jumbled) == ["RAND", "FU_D91", "FU_D331", "D420"]
+
+
+def test_folders_without_an_ordinal_keep_a_stable_tail():
+    """A study that publishes no ordinal must still order deterministically."""
+    from rave_agent.model.study_model import Folder
+
+    model = _scheduled_model()
+    model.folders["ZZ_EXTRA"] = Folder(oid="ZZ_EXTRA", name="ZZ_EXTRA")
+    model.folders["AA_EXTRA"] = Folder(oid="AA_EXTRA", name="AA_EXTRA")
+
+    out = model.in_schedule_order(["ZZ_EXTRA", "D420", "AA_EXTRA", "RAND"])
+    assert out == ["RAND", "D420", "AA_EXTRA", "ZZ_EXTRA"]
+
+
+def test_a_pass_generates_visits_in_schedule_order():
+    """The ordering has to bite where the work is planned, not just in a helper.
+
+    Generation carries each visit's date into the next visit's prompt, so a
+    visit written before the one it dates from has nothing to measure against -
+    which is how a Day 420 final visit landed eleven months before Day 1.
+    """
+    from rave_agent.dynamics.activation_state import ActivationState
+    from rave_agent.model.study_model import FormAssignment
+
+    resolver, events = _resolver_fixture(lookahead=0)
+    resolver.model = _scheduled_model()
+    for folder in resolver.model.folders.values():
+        folder.forms = [FormAssignment(form_oid=f"{folder.oid}_DOV")]
+
+    resolver.run_pass("SUBJ", ["D420", "FU_D331", "FU_D91", "RAND"],
+                      ActivationState("SUBJ", "S", "DEV"), 0)
+
+    generated = [e.split()[1] for e in events if e.startswith("gen ")]
+    assert generated == ["RAND", "FU_D91", "FU_D331", "D420"], events
+
+
+# ------------------------------------------ the date carried forward is the visit's
+def _carrier():
+    """A Generator with only the model wired up - _update_context needs no more."""
+    from rave_agent.generation.generator import Generator
+    from rave_agent.model.study_model import Item, StudyModel
+
+    model = StudyModel(study_name="S", environment="D",
+                       crf_version_oid="1", crf_version_name="v")
+
+    def add(oid, name, data_type, label=""):
+        model.items[oid] = Item(oid=oid, name=name, form_oid=oid.split(".")[0],
+                                data_type=data_type, label=label)
+
+    add("DOV.DCMDATE", "_R_DCMDATE", "date", "Date of visit")
+    add("DOV.TIME", "VISTIM", "time", "Time of visit")
+    add("DM.BRTHDAT", "BRTHDAT", "date", "Date of birth")
+    add("MH.MHSTDAT", "MHSTDAT", "date", "Onset date")
+    add("SU.SUENDAT", "SUENDAT", "date", "Date stopped")
+    add("VS.VSDAT", "VSDAT", "date", "Assessment date")
+
+    carrier = object.__new__(Generator)
+    carrier.model = model
+    return carrier
+
+
+def _feed(carrier, context, form_oid, values):
+    from rave_agent.generation.generator import FormOutcome
+    carrier._update_context(
+        context, FormOutcome("SUBJ", "SCREEN", form_oid, "generated", values=values))
+
+
+def test_a_history_date_never_becomes_the_visit_date():
+    """The bug: last form wins, earliest date on it.
+
+    A screening visit ended up dated to a smoking-cessation date five years
+    earlier, and the next two visits were generated to match it.
+    """
+    carrier, context = _carrier(), {}
+    _feed(carrier, context, "DOV", {"DOV.DCMDATE": "2024-03-01"})
+    _feed(carrier, context, "DM", {"DM.BRTHDAT": "1989-03-22"})
+    _feed(carrier, context, "MH", {"MH.MHSTDAT": "2020-07-15"})
+    _feed(carrier, context, "SU", {"SU.SUENDAT": "2019-06-15"})
+
+    assert context["SCREEN visit date"] == "2024-03-01"
+
+
+def test_a_named_visit_date_beats_an_earlier_unrelated_one():
+    """Forms are not generated in a guaranteed order, so the named field must win."""
+    carrier, context = _carrier(), {}
+    _feed(carrier, context, "MH", {"MH.MHSTDAT": "2020-07-15"})
+    assert context["SCREEN visit date"] == "2020-07-15"   # nothing better yet
+
+    _feed(carrier, context, "DOV", {"DOV.DCMDATE": "2024-03-01"})
+    assert context["SCREEN visit date"] == "2024-03-01"   # the named field takes over
+
+
+def test_the_first_named_field_holds():
+    """Two forms can both name a date; the visit still has only one."""
+    carrier, context = _carrier(), {}
+    _feed(carrier, context, "DOV", {"DOV.DCMDATE": "2024-03-01"})
+    _feed(carrier, context, "VS", {"VS.VSDAT": "2024-03-02"})
+
+    assert context["SCREEN visit date"] == "2024-03-01"
+
+
+def test_a_clock_time_is_not_a_date():
+    """`is_date_like` covers time, and "09:30" sorts before every real date.
+
+    Five of one subject's visits carried a time of day forward as the date the
+    visit happened.
+    """
+    carrier, context = _carrier(), {}
+    _feed(carrier, context, "DOV", {"DOV.TIME": "09:30", "DOV.DCMDATE": "2024-03-01"})
+    assert context["SCREEN visit date"] == "2024-03-01"
+
+    carrier, context = _carrier(), {}
+    _feed(carrier, context, "DOV", {"DOV.TIME": "09:30"})
+    assert "SCREEN visit date" not in context
+
+
+def test_bookkeeping_stays_out_of_the_prompt():
+    """How a value was decided is not a value the model should be shown."""
+    from rave_agent.generation.prompt_builder import FormRequest, build_form_prompt
+
+    carrier, context = _carrier(), {}
+    _feed(carrier, context, "DOV", {"DOV.DCMDATE": "2024-03-01"})
+    assert any(k.startswith("_") for k in context), "nothing was recorded to hide"
+
+    request = FormRequest("SUBJ", "SCREEN", "Screening", "VS", "Vitals", [])
+    prompt = build_form_prompt(carrier.model, request, subject_context=context)
+    assert "2024-03-01" in prompt
+    assert "claimed" not in prompt

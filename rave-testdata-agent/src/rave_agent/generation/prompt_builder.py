@@ -112,9 +112,12 @@ def build_form_prompt(
     lines.append(f"Form: {request.form_name} ({request.form_oid})")
     lines.append("")
 
-    if subject_context:
+    # A leading underscore marks the generator's own bookkeeping - how a value
+    # was decided, not a value the model should see or stay consistent with.
+    shown = {k: v for k, v in (subject_context or {}).items() if not k.startswith("_")}
+    if shown:
         lines.append("Data already recorded for this subject - stay consistent with it:")
-        for key, value in subject_context.items():
+        for key, value in shown.items():
             lines.append(f"  {key}: {value}")
         lines.append("")
 

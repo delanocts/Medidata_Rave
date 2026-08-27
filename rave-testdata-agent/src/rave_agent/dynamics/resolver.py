@@ -249,9 +249,15 @@ class DynamicsResolver:
         return True
 
     def _pass_plan(self, folders: list[str], state: ActivationState) -> list[tuple[str, list[str]]]:
-        """Folders still worth attempting, with the forms each one owes."""
+        """Folders still worth attempting, with the forms each one owes.
+
+        Ordered by the study schedule, which is the single place that decides
+        the sequence generation runs in. The folder lists arriving here are sets
+        that have been sorted by OID for determinism, and OID order is not visit
+        order - so a visit could be written before the visit it dates from.
+        """
         plan: list[tuple[str, list[str]]] = []
-        for folder_oid in folders:
+        for folder_oid in self.model.in_schedule_order(folders):
             folder = self.model.folders.get(folder_oid)
             if folder is None:
                 continue

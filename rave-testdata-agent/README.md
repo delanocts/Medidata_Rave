@@ -32,6 +32,30 @@ Rave host, study name, environment, and the site **number** — which is the ODM
 
 ## Running
 
+### From a browser
+
+```bash
+python web/server.py            # then open http://127.0.0.1:8765
+```
+
+A local console: edit every configurable field as a form, save it back to
+`config/studies/<name>.yaml`, and start a run with live stage status and output.
+Stdlib only — nothing to install beyond `requirements.txt`.
+
+It is a viewer, not a second way to run things: it shells out to
+`run_all.py` and reads the artifacts the stages already write, so the CLI stays
+the single execution path and `--resume` still works if you close the tab. It
+binds to `127.0.0.1` because the process holds a session that can write to Rave,
+and it never sends credentials to the browser — the page is told whether `.env`
+loads and nothing more. A configuration is validated by the real loader
+**before** the file is written, so an invalid one cannot overwrite a working one.
+
+Saving through the form rewrites the YAML, which **discards comments** and any
+key left at its default. If your study file carries notes you want to keep, edit
+it by hand.
+
+### From the command line
+
 ```bash
 python scripts/run_all.py --study <name>              # everything, in order
 python scripts/run_all.py --study <name> --dry-run    # build payloads, post nothing

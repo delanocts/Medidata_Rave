@@ -6,6 +6,30 @@ allowed-tools: Read, Grep, Glob, Bash, Edit, Write
 
 # Clinical data generation
 
+## Compute visit dates; do not ask for them
+When a visit happened is arithmetic. Asked for it, a model gives the same answer
+to the same prompt - and the first form of the first visit has no context yet,
+so its prompt is byte-identical between subjects apart from the subject ID. In
+one run 23 of 25 subjects screened on the same day. Modern models take no
+temperature parameter, so there is no sampling knob to lean on either.
+
+Derive each subject's Day 1 from its ID with a stable hash across a configured
+enrolment window: the cohort spreads out, and a subject regenerated next month
+keeps the date Rave already holds. Never `hash()`, which is salted per process,
+and never "today minus N", which is not reproducible.
+
+Take the protocol day from the visit **name** - `Screening (Day -30)`,
+`Final Visit (Day 420)` - because EDC metadata usually publishes target days for
+almost nothing; one folder in thirty-seven, in the study this was written
+against. A name can hold two day numbers (`Day 3 post Tx1 (Day 4)`): the last is
+the protocol day. A visit that names none is genuinely unscheduled and must not
+be given a date.
+
+Pin the computed date through the same path as any other pinned value - stated
+in the prompt, checked after, repaired if the model deviates - so nothing is
+substituted silently. And pin only fields that name themselves as the visit
+date, or a birth date gets fixed to the day of the visit.
+
 ## One visit, one date - and it is the visit's own field
 A CRF collects many dates and only one of them is when the visit happened: a
 demographics form carries a birth date, a history form an onset years back, a

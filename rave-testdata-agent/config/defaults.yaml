@@ -68,6 +68,15 @@ generation:
     mode: "all"              # all | subset  (OQ-6)
     include: []              # folder OIDs when mode=subset
     exclude: []
+  # When the cohort enrols. Visit dates are computed from this rather than asked
+  # of the model: with no per-subject anchor in the prompt every subject screened
+  # on the same day, and with no protocol-day scale, visits days apart shared one
+  # date. Each subject's Day 1 is derived from its ID, so it is spread across the
+  # window and stays the same on a regenerate. Fixed dates, not "today minus N",
+  # for the same reason.
+  enrolment:
+    first_date: "2024-01-08"
+    window_days: 120
   log_records:
     min: 5                   # OQ-7
     max: 10
@@ -90,6 +99,6 @@ execution:
   # within a subject and is enforced a level down, so this does not weaken it.
   # `rave.requests_per_minute` is a budget for the whole study and is divided
   # between them, so raising this does not raise the load on Rave.
-  max_parallel_subjects: 4
+  max_parallel_subjects: 10
   dry_run: false
   log_level: "INFO"

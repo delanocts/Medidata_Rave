@@ -14,13 +14,14 @@ import random
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
 from ..config.loader import Config
 from ..model.dynamics_graph import DynamicsGraph
 from ..model.study_model import Item, StudyModel
+from .schedule import day_offset, enrolment_date, visit_date
 from ..utils.logging import get_logger
 from .llm_client import LlmClient, LlmError
 from .prompt_builder import (
@@ -39,6 +40,14 @@ _CONTEXT_HINTS = ("SEX", "BRTH", "DOB", "AGE", "RACE", "ETHNIC", "HEIGHT", "WEIG
 
 # How a CRF says "this is the date the visit happened". Names are Rave and CDISC
 # conventions, not one study's; labels catch the studies that use neither.
+def _as_date(value, fallback: date) -> date:
+    """A configured ISO date, or the fallback when it is absent or unparseable."""
+    try:
+        return date.fromisoformat(str(value))
+    except (TypeError, ValueError):
+        return fallback
+
+
 _VISIT_DATE_NAMES = ("DCMDATE", "VISDAT", "VISITDAT", "SVSTDTC", "DSSTDTC")
 _VISIT_DATE_LABELS = (
     "date of visit", "visit date", "date of this visit", "date of the visit",
@@ -111,6 +120,13 @@ class Generator:
         self.max_parallel_forms = max(
             1, int(config.get("generation.max_parallel_forms") or 1))
         self._required_values = graph.required_values() if graph else {}
+        # When the first subject screens, and how wide a window the cohort
+        # enrols across. Both deliberately fixed rather than relative to today,
+        # so a subject regenerated next month keeps the dates Rave already has.
+        self._enrol_first = _as_date(config.get("generation.enrolment.first_date"),
+                                     date(2024, 1, 8))
+        self._enrol_window = max(0, int(
+            config.get("generation.enrolment.window_days") or 0))
 
     def _load_discovered_limits(self) -> dict:
         """Per-form log-record caps learned from Rave rejections (A6 writes these).
@@ -133,6 +149,32 @@ class Generator:
         out: dict[str, str] = {}
         for entry in self.config.get("dynamics.overrides") or []:
             out[str(entry["field_oid"])] = str(entry["value"])
+        return out
+
+    def _scheduled_visit(self, subject_id: str, folder) -> tuple[str, str, int | None]:
+        """This subject's Day 1 and this visit's date, both as ISO strings.
+
+        The visit date is ("", "", None) when the folder names no protocol day -
+        an unscheduled visit has no computable date and the model is left to
+        choose one from context.
+        """
+        anchor = enrolment_date(subject_id, self._enrol_first, self._enrol_window)
+        offset = day_offset(folder.name)
+        if offset is None:
+            return anchor.isoformat(), "", None
+        return anchor.isoformat(), visit_date(anchor, offset).isoformat(), offset
+
+    def _visit_date_items(self, items: list[Item]) -> list[Item]:
+        """Fields on this form that name themselves as the date of the visit."""
+        out = []
+        for item in items:
+            if item.data_type != "date":
+                continue
+            name = (item.name or "").upper()
+            label = (item.label or "").lower()
+            if (any(hint in name for hint in _VISIT_DATE_NAMES)
+                    or any(hint in label for hint in _VISIT_DATE_LABELS)):
+                out.append(item)
         return out
 
     def _forced_values(self, items: list[Item]) -> tuple[dict[str, str], list[str]]:
@@ -290,6 +332,29 @@ class Generator:
                                detail="form has no visible fields to populate")
 
         forced, notes = self._forced_values(fixed_items + log_items)
+
+        # When the visit happened is arithmetic, so it is pinned rather than
+        # asked for. Left to the model, every subject screened on the same day
+        # and visits three days apart shared one date - the prompt carried no
+        # per-subject anchor and no scale to place a protocol day against.
+        # Pinning goes through the same path as a trigger value: stated in the
+        # prompt, checked afterwards, repaired if the model deviates. Nothing is
+        # substituted silently (FR-6.4).
+        anchor, scheduled, offset = self._scheduled_visit(subject_id, folder)
+        if scheduled:
+            for item in self._visit_date_items(fixed_items):
+                forced.setdefault(item.oid, scheduled)
+            notes.append(
+                f"Day 1 for this subject is {anchor}. This visit is protocol day "
+                f"{offset}, so it takes place on {scheduled}. Every other date on "
+                f"this form must be consistent with that."
+            )
+        elif anchor:
+            notes.append(
+                f"Day 1 for this subject is {anchor}. This visit has no protocol "
+                f"day; date it plausibly relative to the visits already recorded."
+            )
+
         request = FormRequest(
             subject_id=subject_id,
             folder_oid=folder_oid, folder_name=folder.name,
@@ -495,7 +560,14 @@ class Generator:
         value, is_named = self._visit_date_candidate(outcome)
         if not value:
             return
-        key = f"{outcome.folder_oid} visit date"
+        # Keyed by the visit's *name*, because the name is where the protocol
+        # day lives - "Screening (Day -30) visit date" tells the next visit how
+        # far away it is, where "SCREEN visit date" told it nothing and it
+        # copied the date verbatim. The bookkeeping key stays on the OID, which
+        # cannot collide.
+        folder = self.model.folders.get(outcome.folder_oid)
+        label = (folder.name if folder and folder.name else outcome.folder_oid)
+        key = f"{label} visit date"
         claimed = f"_{outcome.folder_oid} visit date claimed"
         if is_named and not context.get(claimed):
             context[key] = value

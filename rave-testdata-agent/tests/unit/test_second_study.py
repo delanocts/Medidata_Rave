@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import os
 import sys
+from datetime import timedelta
 from pathlib import Path
 
 import pytest
@@ -1154,3 +1155,115 @@ def test_bookkeeping_stays_out_of_the_prompt():
     prompt = build_form_prompt(carrier.model, request, subject_context=context)
     assert "2024-03-01" in prompt
     assert "claimed" not in prompt
+
+
+# ------------------------------------------------- visit dates are arithmetic
+def test_protocol_day_comes_from_the_visit_name():
+    """Rave publishes target_days for almost nothing; the name carries it."""
+    from rave_agent.generation.schedule import day_offset
+
+    assert day_offset("Screening (Day -30)") == -30
+    assert day_offset("TX1 (Day 1)") == 1
+    assert day_offset("Final Visit (Day 420)") == 420
+    # Two day numbers: the prose one is relative, the bracketed one is the
+    # protocol day, and it comes last.
+    assert day_offset("Day 3 post Tx1 (Day 4)") == 4
+    assert day_offset("Day 14 post Tx3 (Day 75)") == 75
+
+
+def test_an_unscheduled_visit_is_not_given_a_day():
+    """A discontinuation or an AE log has no protocol day and must not get one."""
+    from rave_agent.generation.schedule import day_offset
+
+    assert day_offset("Premature Discontinuation") is None
+    assert day_offset("CM/AE/SAE") is None
+    assert day_offset("") is None
+
+
+def test_day_one_is_the_reference_and_there_is_no_day_zero():
+    from datetime import date
+    from rave_agent.generation.schedule import visit_date
+
+    anchor = date(2024, 3, 28)
+    assert visit_date(anchor, 1) == anchor
+    assert visit_date(anchor, 4) == date(2024, 3, 31)      # three days after Day 1
+    assert visit_date(anchor, -1) == date(2024, 3, 27)     # the day before Day 1
+    assert visit_date(anchor, -30) == date(2024, 2, 27)
+
+
+def test_subjects_enrol_on_different_days_but_always_the_same_ones():
+    """23 of 25 subjects screened on 2024-03-01 because nothing varied per subject.
+
+    The spread has to be reproducible: a subject regenerated tomorrow must keep
+    the date Rave already holds, so this cannot be a random draw, and `hash()`
+    is salted per process.
+    """
+    from datetime import date
+    from rave_agent.generation.schedule import enrolment_date
+
+    first, window = date(2024, 1, 8), 120
+    subjects = [f"TST-{n:03d}" for n in range(1, 21)]
+    dates = [enrolment_date(s, first, window) for s in subjects]
+
+    assert len(set(dates)) > 10, "the cohort still enrols in a clump"
+    assert all(first <= d < first + timedelta(days=window) for d in dates)
+    assert dates == [enrolment_date(s, first, window) for s in subjects]
+
+
+def test_a_zero_window_puts_everyone_on_the_first_date():
+    """Opting out must not divide by zero."""
+    from datetime import date
+    from rave_agent.generation.schedule import enrolment_date
+
+    assert enrolment_date("TST-001", date(2024, 1, 8), 0) == date(2024, 1, 8)
+
+
+def _scheduler(first="2024-01-08", window=120):
+    from datetime import date
+    from rave_agent.generation.generator import Generator
+
+    gen = object.__new__(Generator)
+    gen._enrol_first = date.fromisoformat(first)
+    gen._enrol_window = window
+    return gen
+
+
+def test_the_three_screening_visits_no_longer_share_a_date():
+    """They were identical for all 25 subjects across both studies."""
+    from rave_agent.model.study_model import Folder
+
+    gen = _scheduler()
+    seen = {}
+    for oid, name in (("SCREEN", "Screening (Day -30)"),
+                      ("SCREEN_27", "Screening (Day -27)"),
+                      ("SCREEN_15", "Screening (Day -15)")):
+        _, scheduled, _ = gen._scheduled_visit("CAN-004", Folder(oid=oid, name=name))
+        seen[oid] = scheduled
+
+    assert len(set(seen.values())) == 3, seen
+    assert seen["SCREEN"] < seen["SCREEN_27"] < seen["SCREEN_15"]
+
+
+def test_an_unscheduled_visit_gets_an_anchor_but_no_date():
+    from rave_agent.model.study_model import Folder
+
+    anchor, scheduled, offset = _scheduler()._scheduled_visit(
+        "CAN-004", Folder(oid="PD", name="Premature Discontinuation"))
+    assert anchor and scheduled == "" and offset is None
+
+
+def test_only_visit_date_fields_are_pinned():
+    """Pinning the wrong field would fix a birth date to the day of the visit."""
+    from rave_agent.model.study_model import Item
+
+    def item(oid, name, label, data_type="date"):
+        return Item(oid=oid, name=name, form_oid="F", data_type=data_type, label=label)
+
+    picked = _scheduler()._visit_date_items([
+        item("F.DCMDATE", "_R_DCMDATE", "Date of visit"),
+        item("F.BRTHDAT", "BRTHDAT", "Date of birth"),
+        item("F.MHSTDAT", "MHSTDAT", "Onset date"),
+        item("F.VSDAT", "VSDAT", "Assessment date"),
+        item("F.TIME", "VISTIM", "Time of visit", data_type="time"),
+    ])
+    assert [i.oid for i in picked] == ["F.DCMDATE", "F.VSDAT"]

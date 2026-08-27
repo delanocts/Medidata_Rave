@@ -1,0 +1,724 @@
+<title>Anatomy of a Run</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@600&display=swap">
+
+<style>
+  :root {
+    --paper:      #f6f7f8;
+    --surface:    #ffffff;
+    --surface-2:  #eef1f2;
+    --surface-3:  #e4e9eb;
+    --ink:        #141d24;
+    --ink-soft:   #4a5a66;
+    --ink-faint:  #7a8994;
+    --rule:       #dce1e4;
+    --rule-soft:  #e8ecee;
+    --petrol:     #0d6d70;
+    --petrol-bg:  #e2eff0;
+    --amber:      #9a5b12;
+    --amber-bg:   #f6ecdd;
+    --moss:       #2f6a4c;
+    --moss-bg:    #e4efe9;
+    --term-bg:    #131c21;
+    --term-ink:   #c3d2d8;
+    --shadow:     0 1px 2px rgba(20,29,36,.06), 0 8px 24px -18px rgba(20,29,36,.5);
+
+    --step--2: .7rem;
+    --step--1: .8125rem;
+    --step-0:  .9375rem;
+    --step-1:  1.125rem;
+    --step-2:  1.5rem;
+    --step-3:  2.125rem;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #101619;
+      --surface:    #161e22;
+      --surface-2:  #1c262b;
+      --surface-3:  #243139;
+      --ink:        #e4eaed;
+      --ink-soft:   #a3b1b9;
+      --ink-faint:  #71818b;
+      --rule:       #26333a;
+      --rule-soft:  #1e292f;
+      --petrol:     #4cbabd;
+      --petrol-bg:  #10353a;
+      --amber:      #d99a45;
+      --amber-bg:   #362713;
+      --moss:       #62ad83;
+      --moss-bg:    #14301f;
+      --term-bg:    #0b1114;
+      --term-ink:   #b6c6cd;
+      --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -18px rgba(0,0,0,.9);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:      #101619;
+    --surface:    #161e22;
+    --surface-2:  #1c262b;
+    --surface-3:  #243139;
+    --ink:        #e4eaed;
+    --ink-soft:   #a3b1b9;
+    --ink-faint:  #71818b;
+    --rule:       #26333a;
+    --rule-soft:  #1e292f;
+    --petrol:     #4cbabd;
+    --petrol-bg:  #10353a;
+    --amber:      #d99a45;
+    --amber-bg:   #362713;
+    --moss:       #62ad83;
+    --moss-bg:    #14301f;
+    --term-bg:    #0b1114;
+    --term-ink:   #b6c6cd;
+    --shadow:     0 1px 2px rgba(0,0,0,.4), 0 8px 24px -18px rgba(0,0,0,.9);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-size: var(--step-0);
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .mono { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+  .num  { font-variant-numeric: tabular-nums; }
+
+  .wrap { max-width: 82rem; margin: 0 auto; padding: 2.25rem 1.25rem 4rem; }
+
+  /* ---------- masthead ---------- */
+  .masthead { border-bottom: 2px solid var(--ink); padding-bottom: 1.15rem; margin-bottom: 1.5rem; }
+  .eyebrow {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: var(--step--1); letter-spacing: .12em; text-transform: uppercase;
+    color: var(--petrol); margin: 0 0 .5rem;
+  }
+  h1 {
+    font-family: "IBM Plex Serif", ui-serif, Georgia, serif;
+    font-weight: 600; font-size: var(--step-3); line-height: 1.1;
+    letter-spacing: -.015em; margin: 0 0 .5rem; text-wrap: balance;
+  }
+  .standfirst { color: var(--ink-soft); margin: 0; max-width: 62ch; text-wrap: pretty; }
+
+  /* ---------- run banner ---------- */
+  .banner {
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+    box-shadow: var(--shadow); padding: .95rem 1.1rem; margin-bottom: .85rem;
+    display: grid; gap: .55rem 1.75rem;
+    grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
+  }
+  .banner .k {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: var(--step--2); letter-spacing: .09em; text-transform: uppercase;
+    color: var(--ink-faint); display: block; margin-bottom: .12rem;
+  }
+  .banner .v { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: var(--step--1); }
+  .banner .why { color: var(--ink-soft); font-size: var(--step--2); display: block; }
+
+  /* ---------- transport ---------- */
+  .transport {
+    display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
+    background: var(--surface); border: 1px solid var(--rule); border-radius: 6px;
+    padding: .6rem .75rem; margin-bottom: 1.15rem; box-shadow: var(--shadow);
+  }
+  button {
+    font: inherit; font-size: var(--step--1); color: var(--ink);
+    background: var(--surface-2); border: 1px solid var(--rule);
+    border-radius: 4px; padding: .34rem .7rem; cursor: pointer;
+  }
+  button:hover { background: var(--surface-3); }
+  button[aria-pressed="true"] { background: var(--petrol-bg); border-color: var(--petrol); color: var(--petrol); }
+  .clock {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums;
+    font-size: var(--step-1); font-weight: 500; letter-spacing: .02em; min-width: 5.5ch;
+  }
+  .clock small { font-size: var(--step--2); color: var(--ink-faint); letter-spacing: .08em; }
+  .scrub { flex: 1 1 12rem; min-width: 8rem; accent-color: var(--petrol); }
+
+  /* ---------- board ---------- */
+  .board {
+    display: grid; gap: .85rem;
+    grid-template-columns: 15rem minmax(0, 1fr) 15.5rem;
+    align-items: start;
+  }
+  @media (max-width: 62rem) { .board { grid-template-columns: 1fr; } }
+
+  .panel {
+    background: var(--surface); border: 1px solid var(--rule);
+    border-radius: 6px; box-shadow: var(--shadow); padding: .9rem 1rem;
+  }
+  .panel h2 {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: var(--step--2); letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-faint); font-weight: 500; margin: 0 0 .7rem;
+  }
+
+  /* ---------- stage rail ---------- */
+  .stage {
+    display: grid; grid-template-columns: 1.4rem 1fr; gap: .55rem;
+    padding: .42rem .3rem; border-radius: 4px; align-items: start;
+    border-left: 2px solid transparent; transition: background .25s;
+  }
+  .stage .dot {
+    width: .72rem; height: .72rem; border-radius: 50%; margin-top: .38rem;
+    border: 1.5px solid var(--rule); background: transparent; transition: all .3s;
+  }
+  .stage[data-state="done"] .dot { background: var(--moss); border-color: var(--moss); }
+  .stage[data-state="live"] .dot { background: var(--petrol); border-color: var(--petrol); }
+  .stage[data-state="live"][data-io="write"] .dot { background: var(--amber); border-color: var(--amber); }
+  .stage[data-state="live"] { background: var(--surface-2); border-left-color: var(--petrol); }
+  .stage[data-state="live"][data-io="write"] { border-left-color: var(--amber); }
+  .stage .code { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: var(--step--2); color: var(--petrol); }
+  .stage[data-io="write"] .code { color: var(--amber); }
+  .stage .nm { font-size: var(--step--1); line-height: 1.35; }
+  .stage .sc { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: var(--step--2); color: var(--ink-faint); }
+  .stage[data-state="idle"] { opacity: .5; }
+
+  /* ---------- centre stage ---------- */
+  .now {
+    display: flex; align-items: baseline; gap: .55rem; flex-wrap: wrap;
+    margin-bottom: .2rem;
+  }
+  .now .t { font-family: "IBM Plex Serif", ui-serif, Georgia, serif; font-size: var(--step-2); font-weight: 600; }
+  .pill {
+    display: inline-block; font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: var(--step--2); letter-spacing: .05em; text-transform: uppercase;
+    padding: .14em .48em; border-radius: 3px; white-space: nowrap; font-weight: 500;
+  }
+  .pill-read  { background: var(--petrol-bg); color: var(--petrol); }
+  .pill-write { background: var(--amber-bg);  color: var(--amber); }
+  .pill-local { background: var(--surface-2); color: var(--ink-soft); }
+  .pill-moss  { background: var(--moss-bg);   color: var(--moss); }
+  .doing { color: var(--ink-soft); font-size: var(--step--1); margin: .1rem 0 .9rem; min-height: 2.6em; }
+
+  .modrow { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: .9rem; }
+  .mod {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: var(--step--2);
+    padding: .2em .5em; border-radius: 3px; border: 1px solid var(--rule);
+    color: var(--ink-faint); background: var(--surface-2); transition: all .3s;
+  }
+  .mod.on { color: var(--petrol); border-color: var(--petrol); background: var(--petrol-bg); }
+
+  /* ---------- subject lanes ---------- */
+  .lanes { display: grid; gap: .5rem; }
+  .lane { display: grid; grid-template-columns: 6.5rem 1fr; gap: .6rem; align-items: center; }
+  .lane .id { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: var(--step--1); }
+  .lane .track {
+    position: relative; height: 2.1rem; border-radius: 4px;
+    background: var(--surface-2); border: 1px solid var(--rule); overflow: hidden;
+  }
+  .lane .fill {
+    position: absolute; inset: 0 auto 0 0; width: 0;
+    background: var(--amber-bg); border-right: 2px solid var(--amber);
+    transition: width .28s linear;
+  }
+  .lane .ahead {
+    position: absolute; top: 0; bottom: 0; width: 0;
+    background: var(--petrol-bg); opacity: .85;
+    transition: left .28s linear, width .28s linear;
+  }
+  .lane .cap {
+    position: absolute; inset: 0; display: flex; align-items: center;
+    justify-content: space-between; padding: 0 .55rem; gap: .5rem;
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: var(--step--2);
+    white-space: nowrap; overflow: hidden;
+  }
+  .lane .cap .visit { overflow: hidden; text-overflow: ellipsis; }
+  .lane .cap .cnt { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+  .legend { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: .7rem; font-size: var(--step--2); color: var(--ink-soft); }
+  .legend i { display: inline-block; width: .72rem; height: .72rem; border-radius: 2px; vertical-align: -1px; margin-right: .3rem; }
+
+  /* ---------- counters ---------- */
+  .counters { display: grid; grid-template-columns: repeat(auto-fit, minmax(6.5rem, 1fr)); gap: .5rem; margin-top: .95rem; }
+  .counter { background: var(--surface-2); border-radius: 4px; padding: .5rem .6rem; }
+  .counter .n {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-variant-numeric: tabular-nums;
+    font-size: var(--step-1); font-weight: 500; display: block; line-height: 1.2;
+  }
+  .counter .l { font-size: var(--step--2); color: var(--ink-faint); letter-spacing: .04em; }
+
+  /* ---------- skills ---------- */
+  .skill {
+    display: flex; align-items: center; gap: .45rem; padding: .3rem .35rem;
+    border-radius: 4px; font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: var(--step--2); color: var(--ink-faint); transition: all .3s;
+  }
+  .skill .bead {
+    width: .5rem; height: .5rem; border-radius: 50%; flex: none;
+    background: var(--rule); transition: background .3s;
+  }
+  .skill.on { color: var(--ink); background: var(--surface-2); }
+  .skill.on .bead { background: var(--petrol); }
+  .skill.rt .bead { border: 1px solid var(--moss); }
+  .skill.rt.on .bead { background: var(--moss); }
+  .skillnote { font-size: var(--step--2); color: var(--ink-faint); margin: .7rem 0 0; line-height: 1.45; }
+  .skillnote b { color: var(--moss); font-weight: 500; }
+
+  /* ---------- terminal ---------- */
+  .term {
+    margin-top: .85rem; background: var(--term-bg); color: var(--term-ink);
+    border: 1px solid var(--rule); border-radius: 6px; padding: .7rem .85rem;
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: var(--step--2);
+    line-height: 1.65; height: 11rem; overflow-y: auto; overflow-x: auto;
+  }
+  .term div { white-space: pre; }
+  .term .ts { color: #6c8b95; }
+  .term .ok { color: #78c39a; }
+  .term .wr { color: #d9a460; }
+  .term .hi { color: #6fc7ca; }
+
+  .foot { margin-top: 1.6rem; color: var(--ink-soft); font-size: var(--step--1); max-width: 68ch; }
+  .foot code {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: .9em;
+    background: var(--surface-2); padding: .1em .35em; border-radius: 3px;
+  }
+
+  :focus-visible { outline: 2px solid var(--petrol); outline-offset: 2px; border-radius: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">rave-testdata-agent &middot; playback</p>
+    <h1>Anatomy of a Run</h1>
+    <p class="standfirst">
+      One study, five subjects, thirty-one minutes &mdash; replayed in ninety seconds. Watch which
+      script is running, which module is doing the work, which skill it is reading, and when the
+      tool is talking to Rave rather than to itself.
+    </p>
+  </header>
+
+  <div class="banner">
+    <div><span class="k">Study</span><span class="v">AES-001(DEV)</span></div>
+    <div><span class="k">CRF version</span><span class="v">17199 (2.0)</span>
+         <span class="why">assigned to site CAN-001, effective 2026-03-27</span></div>
+    <div><span class="k">Site</span><span class="v">CAN-001</span>
+         <span class="why">Toronto General Hospital</span></div>
+    <div><span class="k">Subjects</span><span class="v">5</span>
+         <span class="why">CAN-005 &hellip; CAN-009, 4 at a time</span></div>
+    <div><span class="k">Mode</span><span class="v" style="color:var(--amber)">LIVE</span>
+         <span class="why">writes to Rave</span></div>
+  </div>
+
+  <div class="transport">
+    <button id="play" aria-label="Play or pause">Pause</button>
+    <button id="restart">Restart</button>
+    <span class="clock num" id="clock">00:00<small> / 31:00</small></span>
+    <input class="scrub" id="scrub" type="range" min="0" max="1000" value="0"
+           aria-label="Scrub through the run">
+    <button class="spd" data-s="0.5">0.5&times;</button>
+    <button class="spd" data-s="1" aria-pressed="true">1&times;</button>
+    <button class="spd" data-s="3">3&times;</button>
+  </div>
+
+  <div class="board">
+
+    <section class="panel" aria-label="Stages">
+      <h2>Stages</h2>
+      <div id="rail"></div>
+    </section>
+
+    <section class="panel" aria-label="What is happening now">
+      <h2>Now running</h2>
+      <div class="now">
+        <span class="t" id="stageName">&nbsp;</span>
+        <span class="pill" id="stagePill">&nbsp;</span>
+      </div>
+      <div class="mono" style="font-size:var(--step--1);color:var(--ink-faint)" id="stageScript">&nbsp;</div>
+      <p class="doing" id="doing">&nbsp;</p>
+
+      <h2>Modules at work</h2>
+      <div class="modrow" id="mods"></div>
+
+      <div id="laneWrap" hidden>
+        <h2>Subjects &mdash; each its own process, submissions serialised within it</h2>
+        <div class="lanes" id="lanes"></div>
+        <div class="legend">
+          <span><i style="background:var(--amber-bg);border:1px solid var(--amber)"></i>posting to Rave</span>
+          <span><i style="background:var(--petrol-bg)"></i>generating the next visit while this one posts</span>
+        </div>
+      </div>
+
+      <div class="counters" id="counters"></div>
+    </section>
+
+    <section class="panel" aria-label="Skills">
+      <h2>Skills consulted</h2>
+      <div id="skills"></div>
+      <p class="skillnote">
+        <b>&#9679;</b> Two of these are read by the running tool, not only by a person:
+        <span class="mono">data-rules.md</span> goes into every generation prompt, and
+        <span class="mono">error-codes.md</span> decides what a Rave rejection means.
+        Editing either changes behaviour with no code change.
+      </p>
+    </section>
+  </div>
+
+  <div class="term" id="term" aria-live="off" aria-label="Run log"></div>
+
+  <p class="foot">
+    Timings are from a real run: 4 subjects in 30.6&nbsp;minutes, 15&ndash;17&nbsp;minutes each,
+    running concurrently. Roughly three quarters of that is Rave answering one POST at a time &mdash;
+    Rave charges per message, not per value, so a form with ten fields costs about what a form with
+    a hundred does. That is why the subject lanes, not the stages before them, are where the time
+    goes. Run it yourself with <code>python scripts/run_all.py --study aes-001</code>.
+  </p>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var SUBJECTS = ["CAN-005", "CAN-006", "CAN-007", "CAN-008", "CAN-009"];
+
+  var VISITS = [
+    "Informed Consent", "Screening (Day -30)", "Screening (Day -27)",
+    "Screening (Day -15)", "eCOA Handheld", "TX1 (Day 1)",
+    "Day 3 post Tx1 (Day 4)", "Day 14 post Tx1 (Day 15)", "Tx2 (Day 31)",
+    "Day 3 post Tx2 (Day 34)", "Day 14 post Tx2 (Day 45)", "Tx3 (Day 61)",
+    "Day 3 post Tx3 (Day 64)", "Day 14 post Tx3 (Day 75)", "FU (Day 91)",
+    "FU (Day 151)", "FU (Day 181)", "FU (Day 241)", "FU (Day 331)",
+    "Final Visit (Day 420)", "CM/AE/SAE", "Completion"
+  ];
+
+  var SKILLS = [
+    "rave-connection", "rave-permissions-diagnosis", "rave-metadata-fetch",
+    "als-parsing", "study-model-building", "dynamics-analysis",
+    "odm-authoring", "clinical-data-generation", "llm-structured-generation",
+    "clinical-data-validation", "dynamics-resolution", "rave-submission",
+    "run-reporting"
+  ];
+  var RUNTIME_SKILLS = { "clinical-data-generation": 1, "rave-submission": 1 };
+
+  var STAGES = [
+    { key: "A1", name: "Connection test", script: "test_connection.py", io: "read",
+      from: 0, to: 4,
+      mods: ["connection/checks", "rave/client", "rave/endpoints"],
+      skills: ["rave-connection", "rave-permissions-diagnosis"],
+      doing: "Proves the account can reach the study before anything else is attempted. The check that matters is design-metadata access — without it, edit checks cannot be read and dynamics must come from a hand-exported ALS." },
+
+    { key: "A2", name: "Metadata acquisition", script: "run_metadata.py", io: "read",
+      from: 4, to: 11,
+      mods: ["metadata/downloader", "metadata/manifest", "metadata/observed_structure"],
+      skills: ["rave-metadata-fetch"],
+      doing: "Fetches Sites.odm first and never from cache, because that file decides which CRF version the whole run uses. The site is on 17199, the study's newest is 17481 — the site wins, because that is what data entry there is judged against." },
+
+    { key: "A3", name: "Study model + dynamics graph", script: "run_model.py", io: "local",
+      from: 11, to: 18,
+      mods: ["model/odm_parser", "model/als_parser", "model/matrix_resolver", "model/dynamics_graph"],
+      skills: ["als-parsing", "study-model-building", "dynamics-analysis"],
+      doing: "Entirely offline. Merges ODM metadata with the ALS workbook — RWS publishes structure but not edit checks — into one model: 100 forms, 1,121 fields, 35 folders, and a graph of 218 activating actions saying which answer unlocks which visit." },
+
+    { key: "A4", name: "Site and subjects", script: "run_provision.py", io: "write",
+      from: 18, to: 24,
+      mods: ["provisioning/sites", "provisioning/subjects", "submission/odm_builder"],
+      skills: ["odm-authoring"],
+      doing: "Re-reads the site's CRF version and refuses to continue if the model was built against a different one. Then creates five subjects — an ODM Insert carrying nothing but a SiteRef." },
+
+    { key: "A8", name: "Generate, submit, resolve dynamics", script: "run_dynamics.py × 5", io: "write",
+      from: 24, to: 78,
+      mods: ["dynamics/resolver", "generation/prompt_builder", "generation/llm_client",
+             "generation/validators", "submission/odm_builder", "submission/submitter",
+             "submission/rejections"],
+      skills: ["clinical-data-generation", "llm-structured-generation",
+               "clinical-data-validation", "dynamics-resolution", "odm-authoring",
+               "rave-submission"],
+      doing: "The loop, and three quarters of the clock. Most of a study is invisible to a new subject: folders appear only when an edit check fires. Each pass fills what is reachable, and acceptance is the proof it was reachable." },
+
+    { key: "A7", name: "Verification and reporting", script: "run_verify.py", io: "read",
+      from: 78, to: 86,
+      mods: ["reporting/reconciler", "reporting/report"],
+      skills: ["run-reporting"],
+      doing: "Reads every subject back out of Rave and compares field by field with what was sent — acceptance is not proof a value landed as written. Scoped to this run's five subjects, not to every subject the output folder has accumulated." }
+  ];
+
+  var T_END = 92;          // presentation seconds
+  var RUN_MINUTES = 31;    // what the clock reads at the end
+
+  var LOG = [
+    [0.3,  "A1", "hi", "$ python scripts/run_all.py --study aes-001"],
+    [1.2,  "A1", "",   "connection    checking RaveWebServices 1.16.0"],
+    [2.0,  "A1", "ok", "connection    study access OK | design metadata OK | clinical write OK"],
+    [4.4,  "A2", "",   "metadata      GET datasets/Sites.odm  (never cached)"],
+    [5.4,  "A2", "wr", "metadata      site is not on the study's newest version: 17199 vs 17481"],
+    [6.2,  "A2", "ok", "metadata      crf version selected 17199 (2.0) - assigned to site CAN-001"],
+    [7.4,  "A2", "",   "metadata      GET metadata/studies/AES-001/versions/17199   1.9 MB"],
+    [9.0,  "A2", "",   "metadata      ALS registered  AES-001_2.0.xls  (edit checks are not in RWS)"],
+    [11.4, "A3", "",   "model         ODM parsed      100 forms  1,121 fields  35 folders"],
+    [12.6, "A3", "",   "model         ALS parsed      218 activating actions  28 matrices"],
+    [14.0, "A3", "wr", "model         38 field(s) are derived by Rave and will not be generated"],
+    [15.4, "A3", "ok", "model         dynamics graph  184 edges  seed set 7 folders"],
+    [18.4, "A4", "",   "provision     CRF version 17199 (2.0) - assigned to site CAN-001  [match]"],
+    [19.4, "A4", "ok", "provision     SITE [EXISTS] CAN-001"],
+    [20.6, "A4", "ok", "provision     CAN-005 created   CAN-006 created   CAN-007 created"],
+    [21.8, "A4", "ok", "provision     CAN-008 created   CAN-009 created        counts {created: 5}"],
+    [24.3, "A8", "hi", "dynamics      [4 subjects at a time: CAN-005, CAN-006, CAN-007, CAN-008]"],
+    [25.4, "A8", "",   "CAN-005       pass 0  seed folders, in schedule order - Day 1 before Day 420"],
+    [26.6, "A8", "",   "CAN-005       Informed Consent      DS_IC_F      probe accepted"],
+    [28.0, "A8", "",   "CAN-006       Screening (Day -30)   DOV_F        date pinned 2024-02-27"],
+    [29.6, "A8", "wr", "CAN-007       Screening (Day -27)   LB_PREG2_F   Form does not exist here"],
+    [31.0, "A8", "",   "CAN-005       generating TX1 (Day 1) while Screening posts"],
+    [33.4, "A8", "ok", "CAN-008       pass 0 complete   37 form(s) submitted"],
+    [36.0, "A8", "",   "CAN-005       pass 1  ENR_F._R_ENROLLFAILYN = N unlocked 79 target(s)"],
+    [39.5, "A8", "wr", "CAN-006       AE_F  Record restricted by max limit - retrying with 8"],
+    [42.0, "A8", "ok", "CAN-006       AE_F  accepted   log cap 8 cached for later subjects"],
+    [46.0, "A8", "",   "CAN-007       Tx2 (Day 31)          VS1_F        22 field(s)"],
+    [50.0, "A8", "",   "CAN-005       FU (Day 151)          QS_AQAS_M    validation failed, repairing"],
+    [52.5, "A8", "ok", "CAN-005       FU (Day 151)          QS_AQAS_M    accepted on attempt 2"],
+    [56.0, "A8", "hi", "dynamics      CAN-009 starting - a lane came free"],
+    [61.0, "A8", "",   "CAN-008       Final Visit (Day 420) DOV_F        2025-05-21"],
+    [66.0, "A8", "ok", "CAN-007       pass 2  nothing newly activated - fixed point reached"],
+    [69.0, "A8", "ok", "CAN-005       done    308/328 form(s) accepted   3,383 value(s)"],
+    [76.0, "A8", "ok", "dynamics      all 5 subjects complete"],
+    [78.4, "A7", "",   "verify        reading back CAN-005 CAN-006 CAN-007 CAN-008 CAN-009"],
+    [81.0, "A7", "wr", "verify        2 mismatch(es): a year-only field kept the year"],
+    [83.0, "A7", "ok", "verify        coverage 25/35 folders  316 folder-form pairs"],
+    [85.0, "A7", "ok", "verify        report written to output/AES-001/reports/"],
+    [86.5, "",   "hi", "$ _"]
+  ];
+
+  // ---------- build the static furniture ----------
+  var railEl = document.getElementById("rail");
+  STAGES.forEach(function (s) {
+    var d = document.createElement("div");
+    d.className = "stage";
+    d.dataset.io = s.io;
+    d.dataset.key = s.key;
+    d.innerHTML = '<span class="dot"></span><span><span class="code">' + s.key +
+      '</span> <span class="nm">' + s.name + '</span><br><span class="sc">' + s.script + '</span></span>';
+    railEl.appendChild(d);
+  });
+
+  var skillsEl = document.getElementById("skills");
+  SKILLS.forEach(function (name) {
+    var d = document.createElement("div");
+    d.className = "skill" + (RUNTIME_SKILLS[name] ? " rt" : "");
+    d.dataset.name = name;
+    d.innerHTML = '<span class="bead"></span>' + name;
+    skillsEl.appendChild(d);
+  });
+
+  var lanesEl = document.getElementById("lanes");
+  SUBJECTS.forEach(function (id) {
+    var d = document.createElement("div");
+    d.className = "lane";
+    d.dataset.id = id;
+    d.innerHTML = '<span class="id">' + id + '</span><span class="track">' +
+      '<span class="fill"></span><span class="ahead"></span>' +
+      '<span class="cap"><span class="visit"></span><span class="cnt"></span></span></span>';
+    lanesEl.appendChild(d);
+  });
+
+  var countersEl = document.getElementById("counters");
+  var COUNTERS = [
+    ["forms", "forms posted"], ["values", "values written"],
+    ["llm", "LLM calls"], ["rej", "rejections"]
+  ];
+  COUNTERS.forEach(function (c) {
+    var d = document.createElement("div");
+    d.className = "counter";
+    d.innerHTML = '<span class="n" data-c="' + c[0] + '">0</span><span class="l">' + c[1] + '</span>';
+    countersEl.appendChild(d);
+  });
+
+  // ---------- state ----------
+  var t = 0, playing = true, speed = 1, last = null, lastLogCount = -1;
+  var termEl = document.getElementById("term");
+  var scrubEl = document.getElementById("scrub");
+  var playEl = document.getElementById("play");
+
+  // Each subject gets its own pace, and the fifth waits for a free lane -
+  // max_parallel_subjects is 4.
+  var PLAN = SUBJECTS.map(function (id, i) {
+    return { id: id, start: i < 4 ? 24.5 : 56, span: i < 4 ? 44 + i * 2 : 19 };
+  });
+
+  function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
+
+  function stageAt(time) {
+    for (var i = 0; i < STAGES.length; i++) {
+      if (time >= STAGES[i].from && time < STAGES[i].to) return STAGES[i];
+    }
+    return time >= T_END - 6 ? null : STAGES[STAGES.length - 1];
+  }
+
+  function fmtClock(time) {
+    var total = (clamp(time, 0, T_END) / T_END) * RUN_MINUTES * 60;
+    var m = Math.floor(total / 60), s = Math.floor(total % 60);
+    return (m < 10 ? "0" : "") + m + ":" + (s < 10 ? "0" : "") + s;
+  }
+
+  function render(time) {
+    var cur = stageAt(time);
+
+    // stage rail
+    Array.prototype.forEach.call(railEl.children, function (el) {
+      var s = STAGES.filter(function (x) { return x.key === el.dataset.key; })[0];
+      el.dataset.state = time >= s.to ? "done" : (cur && cur.key === s.key ? "live" : "idle");
+    });
+
+    // centre
+    var nameEl = document.getElementById("stageName");
+    var pillEl = document.getElementById("stagePill");
+    var scriptEl = document.getElementById("stageScript");
+    var doingEl = document.getElementById("doing");
+
+    if (cur) {
+      nameEl.textContent = cur.name;
+      scriptEl.textContent = "scripts/" + cur.script;
+      doingEl.textContent = cur.doing;
+      pillEl.className = "pill " + (cur.io === "write" ? "pill-write" : cur.io === "read" ? "pill-read" : "pill-local");
+      pillEl.textContent = cur.io === "write" ? "writes to Rave" : cur.io === "read" ? "reads Rave" : "offline";
+    } else {
+      nameEl.textContent = "Run complete";
+      scriptEl.textContent = "output/AES-001/reports/";
+      doingEl.textContent = "Five subjects populated and verified. Every request and response is archived; the report says what landed and what did not.";
+      pillEl.className = "pill pill-moss";
+      pillEl.textContent = "done";
+    }
+
+    // modules
+    var modsEl = document.getElementById("mods");
+    var wanted = cur ? cur.mods : [];
+    if (modsEl.dataset.k !== (cur ? cur.key : "end")) {
+      modsEl.dataset.k = cur ? cur.key : "end";
+      modsEl.innerHTML = "";
+      wanted.forEach(function (m) {
+        var el = document.createElement("span");
+        el.className = "mod";
+        el.textContent = m;
+        modsEl.appendChild(el);
+      });
+    }
+    Array.prototype.forEach.call(modsEl.children, function (el, i) {
+      var frac = cur ? (time - cur.from) / (cur.to - cur.from) : 1;
+      el.classList.toggle("on", frac * wanted.length > i);
+    });
+
+    // skills
+    Array.prototype.forEach.call(skillsEl.children, function (el) {
+      el.classList.toggle("on", !!(cur && cur.skills.indexOf(el.dataset.name) >= 0));
+    });
+
+    // lanes
+    var inLoop = cur && cur.key === "A8";
+    document.getElementById("laneWrap").hidden = !inLoop && time < 24;
+    var totals = { forms: 0, values: 0, llm: 0, rej: 0 };
+
+    PLAN.forEach(function (p, i) {
+      var lane = lanesEl.children[i];
+      var prog = clamp((time - p.start) / p.span, 0, 1);
+      var idx = Math.min(VISITS.length - 1, Math.floor(prog * VISITS.length));
+      var fill = lane.querySelector(".fill");
+      var ahead = lane.querySelector(".ahead");
+      var visit = lane.querySelector(".visit");
+      var cnt = lane.querySelector(".cnt");
+
+      fill.style.width = (prog * 100).toFixed(1) + "%";
+      // the lookahead: the next visit is generated while this one is posting
+      var seg = 100 / VISITS.length;
+      ahead.style.left = clamp(prog * 100, 0, 100 - seg) + "%";
+      ahead.style.width = (prog > 0 && prog < 1 ? seg : 0) + "%";
+
+      if (time < p.start) {
+        visit.textContent = "waiting for a free lane";
+        visit.style.color = "var(--ink-faint)";
+        cnt.textContent = "";
+      } else if (prog >= 1) {
+        visit.textContent = "complete";
+        visit.style.color = "var(--moss)";
+        cnt.textContent = "328 forms";
+      } else {
+        visit.textContent = VISITS[idx];
+        visit.style.color = "";
+        cnt.textContent = "pass " + (prog < 0.18 ? 0 : prog < 0.95 ? 1 : 2);
+      }
+
+      totals.forms += Math.round(prog * 328);
+      totals.values += Math.round(prog * 3383);
+      totals.llm += Math.round(prog * 331);
+      totals.rej += Math.round(prog * 41);
+    });
+
+    Array.prototype.forEach.call(countersEl.querySelectorAll("[data-c]"), function (el) {
+      el.textContent = totals[el.dataset.c].toLocaleString();
+    });
+
+    // terminal - rebuilt only when the visible line count changes, so scrubbing
+    // backwards removes lines instead of appending them again
+    var shown = LOG.filter(function (l) { return l[0] <= time; });
+    if (shown.length !== lastLogCount) {
+      lastLogCount = shown.length;
+      termEl.innerHTML = "";
+      shown.forEach(function (l) {
+        var d = document.createElement("div");
+        d.innerHTML = '<span class="ts">' + fmtClock(l[0]) + '</span>  ' +
+          '<span class="' + l[2] + '">' + l[3].replace(/&/g, "&amp;").replace(/</g, "&lt;") + '</span>';
+        termEl.appendChild(d);
+      });
+      termEl.scrollTop = termEl.scrollHeight;
+    }
+
+    document.getElementById("clock").innerHTML =
+      fmtClock(time) + "<small> / " + RUN_MINUTES + ":00</small>";
+    scrubEl.value = String(Math.round((time / T_END) * 1000));
+  }
+
+  function frame(now) {
+    if (last === null) last = now;
+    var dt = (now - last) / 1000;
+    last = now;
+    if (playing) {
+      t += dt * speed;
+      if (t >= T_END) { t = T_END; playing = false; playEl.textContent = "Replay"; }
+      render(t);
+    }
+    requestAnimationFrame(frame);
+  }
+
+  playEl.addEventListener("click", function () {
+    if (t >= T_END) { t = 0; lastLogCount = -1; }
+    playing = !playing;
+    playEl.textContent = playing ? "Pause" : "Play";
+  });
+  document.getElementById("restart").addEventListener("click", function () {
+    t = 0; lastLogCount = -1; playing = true; playEl.textContent = "Pause"; render(t);
+  });
+  scrubEl.addEventListener("input", function () {
+    t = (Number(scrubEl.value) / 1000) * T_END;
+    lastLogCount = -1;
+    render(t);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll(".spd"), function (b) {
+    b.addEventListener("click", function () {
+      speed = Number(b.dataset.s);
+      Array.prototype.forEach.call(document.querySelectorAll(".spd"), function (o) {
+        o.setAttribute("aria-pressed", String(o === b));
+      });
+    });
+  });
+  railEl.addEventListener("click", function (e) {
+    var row = e.target.closest ? e.target.closest(".stage") : null;
+    if (!row) return;
+    var s = STAGES.filter(function (x) { return x.key === row.dataset.key; })[0];
+    t = s.from + 0.05; lastLogCount = -1; render(t);
+  });
+
+  if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    playing = false;
+    playEl.textContent = "Play";
+  }
+
+  render(0);
+  requestAnimationFrame(frame);
+})();
+</script>

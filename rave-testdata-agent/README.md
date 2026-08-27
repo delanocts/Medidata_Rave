@@ -138,6 +138,7 @@ new about Rave, add it to the skill rather than to a comment.
 
 | Where | What |
 |---|---|
+| `docs/run-playback.html` | Animated replay of one run — 1 study, 5 subjects, 31 minutes in 90 seconds — showing which script, module and skill is at work at each moment, and where the time actually goes. Open it in a browser. |
 | `docs/pipeline-guide.html` | Illustrated walkthrough: how the stages fit together, how the dynamics loop detects activation, and the step-by-step for pointing the tool at a new study. Open it in a browser. |
 | `CLAUDE.md` | Project rules — the constraints that must hold in any change. |
 | `.claude/skills/` | What this project learned about Rave, rwslib and the Claude API, one skill per activity. |

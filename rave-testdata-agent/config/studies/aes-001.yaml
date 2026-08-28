@@ -1,33 +1,19 @@
-# Study: AES-001 (DEV) - Aesthetics
-# The only file that changes when targeting a different study (NFR-1).
+# Study: AES-001
+# Written by the local console on 2026-08-27 16:21Z.
+# The only file that changes when targeting a different study.
 
 rave:
-  base_url: "https://cognizant.mdsol.com"
-  environment: "DEV"
-
+  base_url: https://cognizant.mdsol.com
+  environment: DEV
 study:
-  name: "AES-001"
-
+  name: AES-001
 site:
-  # Rave's site *number* is the ODM Location OID; the name is the label.
-  # Confirmed from Sites.odm: OID=001234, Name=DEV-AES-001.
-  number: "CAN-001"
-  name: "Toronto General Hospital"
-  country: "CA"              # ISO 3166 alpha-2
-  create_if_missing: false   # created manually; the account cannot write AdminData
-
+  number: CAN-001
+  name: Toronto General Hospital
+  country: CA
 subjects:
-  count: 4
-  id_prefix: "CAN-"
-  id_start_number: 5
-  id_pad_width: 3            # -> CAN-001, CAN-002
-
+  count: 2
+  id_prefix: CAN-
+  id_start_number: 9
 generation:
-  # Rave's own derivation on ADMIN/EX_MNMX_F reports the indication as
-  # "Acne Scars, Scar Mitigation" - more specific than the "Aesthetics" label.
-  therapeutic_area: "Aesthetic dermatology - acne scars, scar mitigation"
-  therapeutic_realism: true
-
-dynamics:
-  enabled: true
-  trigger_strategy: "maximize"
+  therapeutic_area: Aesthetic dermatology - acne scars, scar mitigation

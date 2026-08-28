@@ -1072,6 +1072,132 @@ python scripts/run_all.py <span class="flag">--study</span> aes-002 <span class=
 python scripts/run_dynamics.py  <span class="flag">--study</span> aes-002 <span class="flag">--subject</span> TST-003
 python scripts/run_verify.py    <span class="flag">--study</span> aes-002</code></pre>
 
+  <h2>Running it from a browser</h2>
+  <p class="deck">
+    A local console: every configurable field as a form, and a run you can watch. It needs
+    nothing beyond <span class="mono">requirements.txt</span> &mdash; it is built on the standard
+    library. It is a viewer rather than a second way to run things: it shells out to
+    <span class="mono">run_all.py</span> and reads the same artifacts, so the command line stays
+    the single execution path and <span class="mono">--resume</span> still works if you close the
+    tab.
+  </p>
+
+<pre><code>python web/server.py            <span class="cmt"># then open http://127.0.0.1:8765</span></code></pre>
+
+  <p>
+    It binds to <span class="mono">127.0.0.1</span> because the process holds a session that can
+    write to Rave, and it never sends credentials to the browser &mdash; the page is told whether
+    <span class="mono">.env</span> loads and nothing more.
+  </p>
+
+  <h3>Where the study list comes from</h3>
+  <p>
+    The dropdown is simply the <span class="mono">.yaml</span> files in
+    <span class="mono">config/studies/</span>. There is no registry and no database: drop a file
+    in that folder and it appears. What it lists is the <b>file name</b>, not the study name
+    inside the file &mdash; the same token <span class="mono">run_all.py --study</span> takes.
+  </p>
+
+  <div class="tablewrap">
+    <table>
+      <thead>
+        <tr><th>File</th><th>The dropdown shows</th><th><span class="mono">study.name</span> inside</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="mono">config/studies/aes-001.yaml</span></td><td><span class="mono">aes-001</span></td><td><span class="mono">AES-001</span></td></tr>
+        <tr><td><span class="mono">config/studies/aes-002.yaml</span></td><td><span class="mono">aes-002</span></td><td><span class="mono">AES-002</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    Selecting one runs the real loader &mdash; <span class="mono">defaults.yaml</span> merged
+    under the study file, plus any <span class="mono">RAVE_AGENT_*</span> overrides &mdash; and
+    fills the form with the <em>effective</em> values. A field your study file never mentions
+    shows the default rather than sitting blank, so what you read is what a run would use.
+  </p>
+
+  <h3>Step by step</h3>
+  <ol class="steps">
+    <li>
+      <h4>Pick a study, or create one</h4>
+      <p class="lede-in">
+        Choose from the dropdown, or type a name and press <b>Create</b>. Create only adds the
+        option in the browser &mdash; nothing is written until you save. A new study starts from
+        the defaults, so the Rave URL, environment, study name and site are all yours to fill in
+        before it will validate.
+      </p>
+    </li>
+    <li>
+      <h4>Edit the fields</h4>
+      <p class="lede-in">
+        Seven groups: Rave, Study, Site, Subjects, Generation, Dynamics, and metadata and
+        execution. Each carries help text where the reason is not obvious. The edits you will make
+        most often are the subject count, prefix and start number, and
+        <span class="mono">execution.max_parallel_subjects</span>.
+      </p>
+    </li>
+    <li>
+      <h4>Save</h4>
+      <p class="lede-in">
+        <b>Save configuration</b> writes <span class="mono">config/studies/&lt;name&gt;.yaml</span>
+        &mdash; but only after the real loader accepts it. A rejected configuration lists its
+        actual problems and leaves the existing file untouched, so a bad edit cannot overwrite a
+        working study. Only values that differ from the defaults are written, which keeps the file
+        the short statement of what makes this study different.
+      </p>
+    </li>
+    <li>
+      <h4>Decide how the run should behave</h4>
+      <p class="lede-in">
+        <b>Dry run</b> is on by default: every payload is built and nothing is posted. Note that it
+        also short-circuits the connection and metadata stages, so it proves the configuration
+        rather than the connection &mdash; use <b>Stop after</b> &rarr; connection, live, for that.
+        <b>Resume</b> skips stages already marked <span class="mono">ok</span>. <b>Stop after</b>
+        ends the run at a chosen stage; stopping after the study model is the quick way to check a
+        configuration without touching Rave.
+      </p>
+    </li>
+    <li>
+      <h4>Start, and watch</h4>
+      <p class="lede-in">
+        Unchecking Dry run reveals a warning first, because that writes subjects and clinical data
+        into Rave. Once running, the Stages panel fills in as each one completes, with its duration
+        and any failure detail, and the Output panel streams the same text the terminal would show.
+        Both come from a snapshot pushed once a second, so a refresh mid-run picks up correctly
+        rather than losing its place. <b>Open last report</b> appears as soon as a report exists.
+      </p>
+    </li>
+  </ol>
+
+  <div class="note warn">
+    <span class="note-label">Saving rewrites the file</span>
+    <p>
+      Going through the form discards comments and any key left at its default. The result is
+      valid and means the same thing, but the notes are gone. If a study file carries reasoning
+      worth keeping &mdash; why that site number, where a value was confirmed &mdash; edit it by
+      hand instead.
+    </p>
+  </div>
+
+  <div class="note">
+    <span class="note-label">Three things that will surprise you</span>
+    <p>
+      <b>One run at a time.</b> Two runs against one study would race
+      <span class="mono">run_manifest.json</span> and the activation state, which assume a study
+      has a single owner.
+    </p>
+    <p>
+      <b>The console only sees runs it started.</b> Launch
+      <span class="mono">run_all.py</span> in a terminal and the page will not show it.
+    </p>
+    <p>
+      <b>The dropdown does not refresh itself.</b> A file added to
+      <span class="mono">config/studies/</span> while the page is open needs a browser reload;
+      only saving re-fetches the list.
+    </p>
+  </div>
+
   <h2>Using it for a different study</h2>
   <p class="deck">
     One new file. The engine, the skills and the shared defaults are the same for every

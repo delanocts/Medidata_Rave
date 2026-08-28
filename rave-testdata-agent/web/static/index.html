@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>rave-testdata-agent console</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@600&display=swap">
+<style>
+  :root {
+    --paper:#f6f7f8; --surface:#fff; --surface-2:#eef1f2; --surface-3:#e4e9eb;
+    --ink:#141d24; --ink-soft:#4a5a66; --ink-faint:#7a8994;
+    --rule:#dce1e4; --petrol:#0d6d70; --petrol-bg:#e2eff0;
+    --amber:#9a5b12; --amber-bg:#f6ecdd; --moss:#2f6a4c; --moss-bg:#e4efe9;
+    --red:#9b2c2c; --red-bg:#f7e4e4;
+    --term-bg:#131c21; --term-ink:#c3d2d8;
+    --shadow:0 1px 2px rgba(20,29,36,.06), 0 8px 24px -18px rgba(20,29,36,.5);
+    --s--2:.7rem; --s--1:.8125rem; --s0:.9375rem; --s1:1.125rem; --s2:1.5rem; --s3:2rem;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:#101619; --surface:#161e22; --surface-2:#1c262b; --surface-3:#243139;
+      --ink:#e4eaed; --ink-soft:#a3b1b9; --ink-faint:#71818b;
+      --rule:#26333a; --petrol:#4cbabd; --petrol-bg:#10353a;
+      --amber:#d99a45; --amber-bg:#362713; --moss:#62ad83; --moss-bg:#14301f;
+      --red:#e08585; --red-bg:#3a1e1e;
+      --term-bg:#0b1114; --term-ink:#b6c6cd;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -18px rgba(0,0,0,.9);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:#101619; --surface:#161e22; --surface-2:#1c262b; --surface-3:#243139;
+    --ink:#e4eaed; --ink-soft:#a3b1b9; --ink-faint:#71818b;
+    --rule:#26333a; --petrol:#4cbabd; --petrol-bg:#10353a;
+    --amber:#d99a45; --amber-bg:#362713; --moss:#62ad83; --moss-bg:#14301f;
+    --red:#e08585; --red-bg:#3a1e1e;
+    --term-bg:#0b1114; --term-ink:#b6c6cd;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -18px rgba(0,0,0,.9);
+  }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"IBM Plex Sans",ui-sans-serif,system-ui,sans-serif;
+    font-size:var(--s0); line-height:1.5; -webkit-font-smoothing:antialiased;
+  }
+  .mono { font-family:"IBM Plex Mono",ui-monospace,Menlo,monospace; }
+  .wrap { max-width:84rem; margin:0 auto; padding:1.75rem 1.25rem 3rem; }
+
+  header.top { border-bottom:2px solid var(--ink); padding-bottom:.9rem; margin-bottom:1.25rem;
+    display:flex; align-items:flex-end; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
+  .eyebrow { font-family:"IBM Plex Mono",monospace; font-size:var(--s--1); letter-spacing:.12em;
+    text-transform:uppercase; color:var(--petrol); margin:0 0 .35rem; }
+  h1 { font-family:"IBM Plex Serif",Georgia,serif; font-size:var(--s3); font-weight:600;
+    margin:0; line-height:1.1; letter-spacing:-.015em; }
+  .sub { color:var(--ink-soft); font-size:var(--s--1); margin:.3rem 0 0; }
+
+  .pill { display:inline-block; font-family:"IBM Plex Mono",monospace; font-size:var(--s--2);
+    letter-spacing:.05em; text-transform:uppercase; padding:.2em .55em; border-radius:3px; font-weight:500; }
+  .pill-ok { background:var(--moss-bg); color:var(--moss); }
+  .pill-bad { background:var(--red-bg); color:var(--red); }
+  .pill-run { background:var(--amber-bg); color:var(--amber); }
+  .pill-idle { background:var(--surface-2); color:var(--ink-soft); }
+
+  .cols { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1fr); gap:1rem; align-items:start; }
+  @media (max-width:64rem){ .cols { grid-template-columns:1fr; } }
+
+  .panel { background:var(--surface); border:1px solid var(--rule); border-radius:6px;
+    box-shadow:var(--shadow); padding:1rem 1.1rem; margin-bottom:1rem; }
+  .panel > h2 { font-family:"IBM Plex Mono",monospace; font-size:var(--s--2); letter-spacing:.1em;
+    text-transform:uppercase; color:var(--ink-faint); font-weight:500; margin:0 0 .8rem; }
+
+  .row { display:flex; gap:.55rem; align-items:center; flex-wrap:wrap; }
+  label.fl { display:block; font-size:var(--s--1); margin-bottom:.18rem; }
+  .help { font-size:var(--s--2); color:var(--ink-faint); line-height:1.4; margin:.2rem 0 0; }
+  input[type=text], input[type=number], input[type=date], select {
+    width:100%; font:inherit; font-size:var(--s--1); color:var(--ink);
+    background:var(--surface-2); border:1px solid var(--rule); border-radius:4px; padding:.36rem .5rem;
+  }
+  input[type=text], input[type=number] { font-family:"IBM Plex Mono",monospace; }
+  input:focus, select:focus { outline:2px solid var(--petrol); outline-offset:1px; }
+  .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(14rem,1fr)); gap:.75rem 1rem; }
+  .fieldset { border:none; margin:0 0 1.3rem; padding:0; }
+  .fieldset > legend { font-family:"IBM Plex Serif",Georgia,serif; font-size:var(--s1);
+    font-weight:600; padding:0; margin-bottom:.15rem; }
+  .fieldset .note { color:var(--ink-soft); font-size:var(--s--1); margin:0 0 .7rem; max-width:60ch; }
+  .chk { display:flex; align-items:flex-start; gap:.45rem; font-size:var(--s--1); }
+  .chk input { margin-top:.25rem; }
+
+  button { font:inherit; font-size:var(--s--1); color:var(--ink); background:var(--surface-2);
+    border:1px solid var(--rule); border-radius:4px; padding:.4rem .85rem; cursor:pointer; }
+  button:hover:not(:disabled) { background:var(--surface-3); }
+  button:disabled { opacity:.45; cursor:not-allowed; }
+  button.primary { background:var(--petrol); border-color:var(--petrol); color:#fff; font-weight:500; }
+  :root[data-theme="dark"] button.primary, :root:not([data-theme="light"]) button.primary { color:#08201f; }
+  button.danger { background:var(--amber); border-color:var(--amber); color:#fff; font-weight:500; }
+  :root[data-theme="dark"] button.danger, :root:not([data-theme="light"]) button.danger { color:#2a1c06; }
+
+  .problems { background:var(--red-bg); border-left:3px solid var(--red); border-radius:4px;
+    padding:.6rem .8rem; margin:.6rem 0 0; font-size:var(--s--1); }
+  .problems ul { margin:.3rem 0 0; padding-left:1.1rem; }
+  .flash { font-size:var(--s--1); color:var(--moss); }
+
+  .stage { display:grid; grid-template-columns:.8rem 1fr auto; gap:.5rem; align-items:baseline;
+    padding:.35rem .25rem; border-radius:4px; }
+  .stage .dot { width:.65rem; height:.65rem; border-radius:50%; background:var(--rule);
+    border:1.5px solid var(--rule); align-self:center; }
+  .stage[data-s="ok"] .dot { background:var(--moss); border-color:var(--moss); }
+  .stage[data-s="failed"] .dot { background:var(--red); border-color:var(--red); }
+  .stage[data-s="skipped"] .dot { background:transparent; border-color:var(--ink-faint); }
+  .stage[data-s="running"] .dot { background:var(--amber); border-color:var(--amber); }
+  .stage .nm { font-size:var(--s--1); }
+  .stage .sec { font-family:"IBM Plex Mono",monospace; font-size:var(--s--2); color:var(--ink-faint);
+    font-variant-numeric:tabular-nums; }
+  .stage .det { grid-column:2/4; font-size:var(--s--2); color:var(--red); }
+
+  .term { background:var(--term-bg); color:var(--term-ink); border:1px solid var(--rule);
+    border-radius:6px; padding:.7rem .85rem; font-family:"IBM Plex Mono",monospace;
+    font-size:var(--s--2); line-height:1.6; height:24rem; overflow:auto; white-space:pre; }
+  .warnbox { border:1px solid var(--amber); background:var(--amber-bg); border-radius:4px;
+    padding:.6rem .8rem; font-size:var(--s--1); margin-bottom:.8rem; }
+  a { color:var(--petrol); }
+  :focus-visible { outline:2px solid var(--petrol); outline-offset:2px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <p class="eyebrow">local console &middot; 127.0.0.1</p>
+      <h1>rave-testdata-agent</h1>
+      <p class="sub" id="repo">&nbsp;</p>
+    </div>
+    <div class="row">
+      <span class="pill" id="envPill">checking .env</span>
+      <span class="pill pill-idle" id="runPill">idle</span>
+    </div>
+  </header>
+
+  <div class="cols">
+
+    <div>
+      <section class="panel">
+        <h2>Study</h2>
+        <div class="row" style="margin-bottom:.6rem">
+          <select id="studySel" style="max-width:16rem"></select>
+          <button id="reload">Reload</button>
+          <span style="flex:1"></span>
+          <input type="text" id="newName" placeholder="new-study-name" style="max-width:12rem">
+          <button id="newBtn">Create</button>
+        </div>
+        <div id="cfgProblems"></div>
+      </section>
+
+      <section class="panel">
+        <h2>Configuration</h2>
+        <form id="form"></form>
+        <div class="row" style="margin-top:.4rem">
+          <button class="primary" id="save">Save configuration</button>
+          <span class="flash" id="saveFlash"></span>
+        </div>
+      </section>
+    </div>
+
+    <div>
+      <section class="panel">
+        <h2>Run</h2>
+        <div class="warnbox" id="modeWarn" hidden>
+          <b>Live run.</b> This writes subjects and clinical data into Rave. Production
+          environments are refused in code, but everything else is real.
+        </div>
+        <div class="chk" style="margin-bottom:.4rem">
+          <input type="checkbox" id="dryRun" checked>
+          <label for="dryRun">Dry run &mdash; build every payload, post nothing</label>
+        </div>
+        <div class="chk" style="margin-bottom:.8rem">
+          <input type="checkbox" id="resume">
+          <label for="resume">Resume &mdash; skip stages that already completed</label>
+        </div>
+        <label class="fl" for="stopAfter">Stop after</label>
+        <select id="stopAfter" style="margin-bottom:.8rem">
+          <option value="">run every stage</option>
+        </select>
+        <div class="row">
+          <button class="primary" id="start">Start run</button>
+          <button class="danger" id="stop" disabled>Stop</button>
+          <a id="reportLink" href="#" target="_blank" rel="noopener" hidden>Open last report</a>
+        </div>
+        <p class="help" id="argvLine"></p>
+      </section>
+
+      <section class="panel">
+        <h2>Stages</h2>
+        <div id="stages"><p class="help">No run yet.</p></div>
+      </section>
+    </div>
+  </div>
+
+  <section class="panel">
+    <h2>Output</h2>
+    <div class="term" id="term">Waiting for a run.</div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var GROUPS = [], FIELDS = [], current = "", saved = {};
+  var $ = function (id) { return document.getElementById(id); };
+
+  function api(path, opts) {
+    return fetch(path, opts).then(function (r) {
+      return r.json().then(function (j) { return { ok: r.ok, body: j }; });
+    });
+  }
+
+  // ---------- form ----------
+  function fieldControl(f) {
+    var id = "f_" + f.key.replace(/\./g, "_");
+    if (f.type === "checkbox") {
+      return '<div class="chk"><input type="checkbox" id="' + id + '" data-key="' + f.key + '">' +
+             '<label for="' + id + '">' + f.label + '</label></div>' +
+             (f.help ? '<p class="help">' + f.help + '</p>' : '');
+    }
+    var input;
+    if (f.type === "select") {
+      input = '<select id="' + id + '" data-key="' + f.key + '">' +
+        f.options.map(function (o) { return '<option value="' + o + '">' + o + '</option>'; }).join("") +
+        '</select>';
+    } else {
+      var attrs = 'id="' + id + '" data-key="' + f.key + '" type="' +
+        (f.type === "number" ? "number" : f.type === "date" ? "date" : "text") + '"';
+      if (f.min !== undefined) attrs += ' min="' + f.min + '"';
+      if (f.max !== undefined) attrs += ' max="' + f.max + '"';
+      if (f.placeholder) attrs += ' placeholder="' + f.placeholder + '"';
+      input = '<input ' + attrs + '>';
+    }
+    return '<label class="fl" for="' + id + '">' + f.label + '</label>' + input +
+           (f.help ? '<p class="help">' + f.help + '</p>' : '');
+  }
+
+  function buildForm() {
+    $("form").innerHTML = GROUPS.map(function (g) {
+      return '<fieldset class="fieldset"><legend>' + g.title + '</legend>' +
+        (g.note ? '<p class="note">' + g.note + '</p>' : '') +
+        '<div class="grid">' +
+        g.fields.map(function (f) { return "<div>" + fieldControl(f) + "</div>"; }).join("") +
+        '</div></fieldset>';
+    }).join("");
+  }
+
+  function fill(values) {
+    FIELDS.forEach(function (f) {
+      var el = document.querySelector('[data-key="' + f.key + '"]');
+      if (!el) return;
+      var v = values[f.key];
+      if (f.type === "checkbox") el.checked = !!v;
+      else el.value = (v === null || v === undefined) ? "" : String(v);
+    });
+  }
+
+  function collect() {
+    var out = {};
+    FIELDS.forEach(function (f) {
+      var el = document.querySelector('[data-key="' + f.key + '"]');
+      if (!el) return;
+      if (f.type === "checkbox") out[f.key] = el.checked;
+      else if (f.type === "number") out[f.key] = el.value === "" ? null : Number(el.value);
+      else out[f.key] = el.value === "" ? null : el.value;
+    });
+    return out;
+  }
+
+  function showProblems(list) {
+    var box = $("cfgProblems");
+    if (!list || !list.length) { box.innerHTML = ""; return; }
+    box.innerHTML = '<div class="problems"><b>This configuration is not usable yet</b><ul>' +
+      list.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("") + "</ul></div>";
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // ---------- studies ----------
+  function loadStudy(name) {
+    if (!name) return;
+    current = name;
+    api("/api/study?study=" + encodeURIComponent(name)).then(function (r) {
+      saved = r.body.values || {};
+      fill(saved);
+      showProblems(r.body.problems);
+      var link = $("reportLink");
+      if (r.body.report && r.body.report.name) {
+        link.hidden = false;
+        link.href = "/api/report?study=" + encodeURIComponent(name);
+        link.textContent = "Open last report (" + r.body.report.name + ")";
+      } else { link.hidden = true; }
+    });
+  }
+
+  function setStudies(names, pick) {
+    $("studySel").innerHTML = names.map(function (n) {
+      return '<option value="' + n + '"' + (n === pick ? " selected" : "") + ">" + n + "</option>";
+    }).join("");
+  }
+
+  // ---------- live ----------
+  function renderStages(snap) {
+    var m = snap.manifest || {}, stages = m.stages || [];
+    var box = $("stages");
+    if (!stages.length) {
+      box.innerHTML = '<p class="help">' + (snap.active ? "Starting&hellip;" : "No run yet.") + "</p>";
+      return;
+    }
+    var done = {};
+    stages.forEach(function (s) { done[s.key] = s; });
+    box.innerHTML = stages.map(function (s) {
+      return '<div class="stage" data-s="' + esc(s.status) + '">' +
+        '<span class="dot"></span><span class="nm">' + esc(s.name) + "</span>" +
+        '<span class="sec">' + (s.seconds ? s.seconds + "s" : "") + "</span>" +
+        (s.detail ? '<span class="det">' + esc(s.detail) + "</span>" : "") +
+        "</div>";
+    }).join("");
+  }
+
+  function renderTerm(lines) {
+    var t = $("term");
+    var stick = t.scrollTop + t.clientHeight >= t.scrollHeight - 40;
+    t.textContent = (lines && lines.length) ? lines.join("\n") : "Waiting for a run.";
+    if (stick) t.scrollTop = t.scrollHeight;
+  }
+
+  function renderRun(snap) {
+    var pill = $("runPill");
+    if (snap.active) {
+      pill.className = "pill pill-run";
+      pill.textContent = (snap.dry_run ? "dry run" : "live") + " · " + snap.study;
+    } else if (snap.exit_code === 0) {
+      pill.className = "pill pill-ok"; pill.textContent = "finished";
+    } else if (snap.exit_code === null || snap.exit_code === undefined) {
+      pill.className = "pill pill-idle"; pill.textContent = "idle";
+    } else {
+      pill.className = "pill pill-bad"; pill.textContent = "exit " + snap.exit_code;
+    }
+    $("start").disabled = snap.active;
+    $("stop").disabled = !snap.active;
+    renderStages(snap);
+    renderTerm(snap.lines);
+  }
+
+  var es = null;
+  function listen() {
+    if (es) es.close();
+    es = new EventSource("/api/events");
+    es.onmessage = function (e) {
+      try { renderRun(JSON.parse(e.data)); } catch (_) {}
+    };
+    es.onerror = function () { /* EventSource retries on its own */ };
+  }
+
+  // ---------- wiring ----------
+  $("studySel").addEventListener("change", function () { loadStudy(this.value); });
+  $("reload").addEventListener("click", function () { loadStudy(current); });
+
+  $("newBtn").addEventListener("click", function () {
+    var name = $("newName").value.trim();
+    if (!/^[A-Za-z0-9._-]{1,64}$/.test(name)) {
+      showProblems(["A study name may use letters, digits, dot, dash and underscore only."]);
+      return;
+    }
+    var opt = document.createElement("option");
+    opt.value = name; opt.textContent = name;
+    $("studySel").appendChild(opt);
+    $("studySel").value = name;
+    current = name;
+    fill({});                       // a blank sheet; defaults apply until saved
+    showProblems(["New study - fill in Rave, study and site, then save."]);
+    $("newName").value = "";
+  });
+
+  $("save").addEventListener("click", function () {
+    $("saveFlash").textContent = "";
+    api("/api/study", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ study: current, values: collect() })
+    }).then(function (r) {
+      if (r.body.ok) {
+        showProblems([]);
+        $("saveFlash").textContent = "saved to config/studies/" + current + ".yaml";
+        api("/api/bootstrap").then(function (b) { setStudies(b.body.studies, current); });
+      } else {
+        showProblems(r.body.problems || [r.body.error || "could not save"]);
+      }
+    });
+  });
+
+  $("dryRun").addEventListener("change", function () {
+    $("modeWarn").hidden = this.checked;
+  });
+
+  $("start").addEventListener("click", function () {
+    $("saveFlash").textContent = "";
+    api("/api/run", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        study: current, dry_run: $("dryRun").checked,
+        resume: $("resume").checked, stop_after: $("stopAfter").value
+      })
+    }).then(function (r) {
+      if (!r.body.ok) {
+        showProblems(r.body.problems || [r.body.error || "could not start"]);
+      } else {
+        showProblems([]);
+        // Show the equivalent command, so the console is never the only way in.
+        var args = r.body.argv.slice();
+        args[0] = "scripts/run_all.py";
+        $("argvLine").textContent = "python " + args.join(" ");
+      }
+    });
+  });
+
+  $("stop").addEventListener("click", function () {
+    api("/api/stop", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+  });
+
+  api("/api/bootstrap").then(function (r) {
+    GROUPS = r.body.groups;
+    FIELDS = GROUPS.reduce(function (a, g) { return a.concat(g.fields); }, []);
+    $("repo").textContent = r.body.repo;
+    (r.body.stages || []).forEach(function (st) {
+      var o = document.createElement("option");
+      o.value = st.key; o.textContent = "after " + st.name;
+      $("stopAfter").appendChild(o);
+    });
+    var env = r.body.env || {};
+    $("envPill").className = "pill " + (env.ok ? "pill-ok" : "pill-bad");
+    $("envPill").textContent = env.ok ? ".env loaded" : ".env incomplete";
+    $("envPill").title = env.detail || "";
+    buildForm();
+    setStudies(r.body.studies, r.body.studies[0]);
+    if (r.body.studies.length) loadStudy(r.body.studies[0]);
+    listen();
+  });
+})();
+</script>
+</body>
+</html>
